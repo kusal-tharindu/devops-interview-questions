@@ -1,3 +1,8 @@
+---
+title: Python Basics - Interview Q&A
+permalink: /python/basics/
+---
+
 # Python Basics - Interview Q&A
 
 ## Q: What is the difference between a list and a tuple in Python?

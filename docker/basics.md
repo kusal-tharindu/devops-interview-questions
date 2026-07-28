@@ -1,3 +1,8 @@
+---
+title: Docker Basics - Interview Q&A
+permalink: /docker/basics/
+---
+
 # Docker Basics - Interview Q&A
 
 ## Q: What is the difference between a Docker image and a container?

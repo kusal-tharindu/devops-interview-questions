@@ -1,3 +1,8 @@
+---
+title: Linux File System - Interview Q&A
+permalink: /linux/file-system/
+---
+
 # Linux File System - Interview Q&A
 
 ## Q: What is the Linux Filesystem Hierarchy Standard (FHS)?

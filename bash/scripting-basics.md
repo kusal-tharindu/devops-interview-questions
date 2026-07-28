@@ -1,3 +1,8 @@
+---
+title: Bash Scripting Basics - Interview Q&A
+permalink: /bash/scripting-basics/
+---
+
 # Bash Scripting Basics - Interview Q&A
 
 ## Q: What is the difference between #!/bin/bash and #!/bin/sh?

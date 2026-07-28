@@ -4,7 +4,7 @@ A community-driven collection of DevOps interview questions and answers covering
 
 Each question includes a **short summary answer** for quick recall and **links to official documentation** for deeper learning.
 
-## 📚 Topics
+## Topics
 
 | Topic | Description |
 |-------|-------------|
@@ -14,13 +14,13 @@ Each question includes a **short summary answer** for quick recall and **links t
 | [Bash](./bash/) | Shell scripting, text processing, automation |
 | [Python](./python/) | Scripting, data types, DevOps automation |
 
-## 🎯 How to Use
+## How to Use
 
 1. **Interview prep** — Read the question, try to recall the answer, then check the summary
 2. **Deep learning** — Follow the official doc links for full understanding
 3. **Quick reference** — Use key points as a cheat sheet
 
-## 📝 Q&A Format
+## Q&A Format
 
 Each file follows this structure:
 
@@ -39,14 +39,14 @@ Short, clear explanation that covers the core concept.
 - [Official Doc Title](link)
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read the [Contributing Guide](./CONTRIBUTING.md) before submitting a PR.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ---
 
-⭐ If this helped you, consider giving it a star!
+If this helped you, consider giving it a star!

@@ -1,3 +1,8 @@
+---
+title: Terraform Basics - Interview Q&A
+permalink: /terraform/basics/
+---
+
 # Terraform Basics - Interview Q&A
 
 ## Q: What is Terraform and how does it work?
