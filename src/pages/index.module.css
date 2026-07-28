@@ -1,5 +1,5 @@
 .heroBanner {
-  padding: 4rem 0;
+  padding: 4rem 0 3rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -18,24 +18,77 @@
   margin-top: 1.5rem;
 }
 
+/*
+ * Stats strip and topic cards section both sit on the same dark surface
+ * color as the hero (--site-surface, set in custom.css), so the whole
+ * homepage reads as one continuous surface rather than three separate
+ * blocks. A faint top border is used instead of a background change to
+ * separate sections.
+ */
+.statsStrip {
+  background: var(--site-surface);
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  padding: 0.85rem 0;
+}
+
+.statsInner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.statsInner strong {
+  color: var(--ifm-color-primary);
+}
+
+.statsDivider {
+  margin: 0 0.6rem;
+  opacity: 0.5;
+}
+
 .topics {
-  padding: 3rem 0;
+  background: var(--site-surface);
+  padding: 3rem 0 4rem;
 }
 
 .card {
   display: block;
   height: 100%;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--site-surface-raised);
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  position: relative;
 }
 
 .card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transform: translateY(-3px);
+  border-color: var(--ifm-color-primary);
   text-decoration: none;
   color: var(--ifm-font-color-base);
+}
+
+.cardIcon {
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.cardDescription {
+  margin-bottom: 0.5rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.cardCount {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-700);
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
 }

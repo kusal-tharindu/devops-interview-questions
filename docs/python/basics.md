@@ -1,12 +1,16 @@
 ---
 title: Basics
 sidebar_position: 1
+displayed_sidebar: pythonSidebar
 description: Python interview questions - lists vs tuples, args/kwargs, virtual environments
 ---
 
 # Python Basics - Interview Q&A
 
 ## Q: What is the difference between a list and a tuple in Python?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 Lists are mutable (can be changed after creation) while tuples are immutable (cannot be modified). Tuples are faster and can be used as dictionary keys; lists are for collections that need to change.
@@ -23,9 +27,14 @@ Lists are mutable (can be changed after creation) while tuples are immutable (ca
 - [Python Docs — Lists](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists)
 - [Python Docs — Tuples](https://docs.python.org/3/tutorial/datastructures.html#tuples-and-sequences)
 
+</details>
+
 ---
 
 ## Q: What are *args and **kwargs in Python?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `*args` allows a function to accept any number of positional arguments (as a tuple). `**kwargs` allows any number of keyword arguments (as a dictionary). They make functions flexible.
@@ -40,9 +49,14 @@ Lists are mutable (can be changed after creation) while tuples are immutable (ca
 **Learn more:**
 - [Python Docs — More on Functions](https://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions)
 
+</details>
+
 ---
 
 ## Q: What is a virtual environment and why use one?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 A virtual environment is an isolated Python environment that has its own packages independent of the system Python. It prevents dependency conflicts between different projects.
@@ -57,3 +71,5 @@ A virtual environment is an isolated Python environment that has its own package
 
 **Learn more:**
 - [Python Docs — Virtual Environments](https://docs.python.org/3/tutorial/venv.html)
+
+</details>

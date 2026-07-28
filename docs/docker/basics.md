@@ -1,12 +1,16 @@
 ---
 title: Basics
 sidebar_position: 1
+displayed_sidebar: dockerSidebar
 description: Docker interview questions - images vs containers, Dockerfile, CMD vs ENTRYPOINT
 ---
 
 # Docker Basics - Interview Q&A
 
 ## Q: What is the difference between a Docker image and a container?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 A Docker image is a read-only template containing the application code, runtime, libraries, and dependencies. A container is a running instance of an image — it adds a writable layer on top of the image.
@@ -21,9 +25,14 @@ A Docker image is a read-only template containing the application code, runtime,
 **Learn more:**
 - [Docker Docs — Images and Containers](https://docs.docker.com/get-started/overview/#images)
 
+</details>
+
 ---
 
 ## Q: What is a Dockerfile and what are the key instructions?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 A Dockerfile is a text file with instructions to build a Docker image. Each instruction creates a layer in the image. Docker reads the Dockerfile top-to-bottom and executes each instruction sequentially.
@@ -40,9 +49,14 @@ A Dockerfile is a text file with instructions to build a Docker image. Each inst
 **Learn more:**
 - [Docker Docs — Dockerfile Reference](https://docs.docker.com/reference/dockerfile/)
 
+</details>
+
 ---
 
 ## Q: What is the difference between CMD and ENTRYPOINT?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `CMD` provides default arguments that can be easily overridden when running the container. `ENTRYPOINT` sets the main command that always runs — `CMD` becomes the default arguments to `ENTRYPOINT`.
@@ -55,3 +69,5 @@ A Dockerfile is a text file with instructions to build a Docker image. Each inst
 
 **Learn more:**
 - [Docker Docs — CMD vs ENTRYPOINT](https://docs.docker.com/reference/dockerfile/#cmd)
+
+</details>

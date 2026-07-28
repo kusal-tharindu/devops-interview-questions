@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "generate:stats": "node scripts/generate-topic-stats.js",
+    "prestart": "npm run generate:stats",
+    "prebuild": "npm run generate:stats",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",

@@ -1,12 +1,16 @@
 ---
 title: File System
 sidebar_position: 1
+displayed_sidebar: linuxSidebar
 description: Linux file system interview questions - FHS, inodes, /bin vs /usr/bin
 ---
 
 # Linux File System - Interview Q&A
 
 ## Q: What is the Linux Filesystem Hierarchy Standard (FHS)?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 FHS defines the directory structure and directory contents in Linux. It provides a standard layout so that programs and users can predict the location of files and directories.
@@ -25,9 +29,14 @@ FHS defines the directory structure and directory contents in Linux. It provides
 - [Filesystem Hierarchy Standard (Official)](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html)
 - [Red Hat — Linux File System Structure](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/index)
 
+</details>
+
 ---
 
 ## Q: What is the difference between /bin and /usr/bin?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `/bin` contains essential binaries needed for the system to boot and run in single-user mode. `/usr/bin` contains general-purpose user commands that are not critical for basic system operation.
@@ -41,9 +50,14 @@ FHS defines the directory structure and directory contents in Linux. It provides
 **Learn more:**
 - [Filesystem Hierarchy Standard — /bin](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html#binEssentialUserCommandBinaries)
 
+</details>
+
 ---
 
 ## Q: What is an inode in Linux?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 An inode is a data structure that stores metadata about a file (permissions, owner, size, timestamps, disk block locations) — everything except the filename and actual data. Each file has a unique inode number within its filesystem.
@@ -58,3 +72,5 @@ An inode is a data structure that stores metadata about a file (permissions, own
 **Learn more:**
 - [Linux man page — inode(7)](https://man7.org/linux/man-pages/man7/inode.7.html)
 - [Red Hat — Understanding inodes](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/index)
+
+</details>

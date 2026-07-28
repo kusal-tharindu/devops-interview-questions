@@ -1,6 +1,16 @@
 // @ts-check
 // Docusaurus configuration. See https://docusaurus.io/docs/api/docusaurus-config
 
+const { getTopicsForNavbar } = require('./scripts/topics');
+
+// Built from the docs/ folder structure at build/dev time, so adding a new
+// topic folder automatically adds it to the navbar dropdown - no manual
+// edit needed here.
+const topicNavItems = getTopicsForNavbar().map((topic) => ({
+  label: topic.label,
+  to: `/${topic.firstDocId}`,
+}));
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'DevOps Interview Questions & Answers',
@@ -50,8 +60,9 @@ const config = {
     ({
       image: 'img/social-card.png',
       colorMode: {
-        defaultMode: 'light',
-        respectPrefersColorScheme: true,
+        defaultMode: 'dark',
+        disableSwitch: true,
+        respectPrefersColorScheme: false,
       },
       navbar: {
         title: 'DevOps Interview Q&A',
@@ -61,10 +72,15 @@ const config = {
         },
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'topicsSidebar',
+            to: '/intro',
             position: 'left',
-            label: 'Topics',
+            label: 'Introduction',
+          },
+          {
+            type: 'dropdown',
+            label: 'Tech Stack',
+            position: 'left',
+            items: topicNavItems,
           },
           {
             href: 'https://github.com/kusal-tharindu/devops-interview-questions',
@@ -77,14 +93,8 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Topics',
-            items: [
-              { label: 'Linux', to: '/linux/file-system' },
-              { label: 'Docker', to: '/docker/basics' },
-              { label: 'Terraform', to: '/terraform/basics' },
-              { label: 'Bash', to: '/bash/scripting-basics' },
-              { label: 'Python', to: '/python/basics' },
-            ],
+            title: 'Tech Stack',
+            items: topicNavItems,
           },
           {
             title: 'More',

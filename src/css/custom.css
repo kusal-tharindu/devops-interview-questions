@@ -4,19 +4,12 @@
  * See https://docusaurus.io/docs/styling-layout for reference.
  */
 
-:root {
-  --ifm-color-primary: #1a7a5e;
-  --ifm-color-primary-dark: #176e54;
-  --ifm-color-primary-darker: #16684f;
-  --ifm-color-primary-darkest: #125541;
-  --ifm-color-primary-light: #1d8668;
-  --ifm-color-primary-lighter: #1e8c6d;
-  --ifm-color-primary-lightest: #22a17d;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode palette */
+/*
+ * Dark mode is the only supported mode (see docusaurus.config.js
+ * colorMode.disableSwitch). Variables are defined directly under
+ * [data-theme='dark'] since that's the only theme ever applied - this
+ * also avoids any flash of an unstyled/light theme on initial load.
+ */
 [data-theme='dark'] {
   --ifm-color-primary: #4fd1a5;
   --ifm-color-primary-dark: #2fc794;
@@ -25,14 +18,48 @@
   --ifm-color-primary-light: #6fdab3;
   --ifm-color-primary-lighter: #7ddebb;
   --ifm-color-primary-lightest: #a6ebd3;
+  --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  /* Single dark surface color used across the whole homepage (hero, stats
+     strip, topic cards section) so the page reads as one continuous
+     "terminal" surface instead of three visibly different dark shades. */
+  --site-surface: #0b0f19;
+  --site-surface-raised: #11162350;
+  --site-grid-line: rgba(255, 255, 255, 0.05);
+
+  --ifm-background-color: var(--site-surface);
+  --ifm-background-surface-color: var(--site-surface);
 }
 
+/*
+ * Homepage hero: dark, subtle-grid background instead of a bright gradient,
+ * so it reads as a "dev tool" rather than a generic marketing banner and
+ * pairs naturally with the terminal component rendered inside it.
+ */
 .hero {
-  background: linear-gradient(90deg, #155799 0%, #159957 100%);
+  background-color: var(--site-surface);
+  background-image:
+    linear-gradient(var(--site-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--site-grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 0%,
+    rgba(79, 209, 165, 0.18),
+    transparent 70%
+  );
+  pointer-events: none;
 }
 
 .hero__title,
 .hero__subtitle {
   color: #ffffff;
+  position: relative;
 }

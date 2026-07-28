@@ -1,12 +1,16 @@
 ---
 title: Basics
 sidebar_position: 1
+displayed_sidebar: terraformSidebar
 description: Terraform interview questions - state management, plan vs apply
 ---
 
 # Terraform Basics - Interview Q&A
 
 ## Q: What is Terraform and how does it work?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 Terraform is an Infrastructure as Code (IaC) tool by HashiCorp that lets you define cloud resources in declarative configuration files (HCL). It compares your desired state with the current state and makes only the necessary changes.
@@ -22,9 +26,14 @@ Terraform is an Infrastructure as Code (IaC) tool by HashiCorp that lets you def
 - [Terraform Docs — Introduction](https://developer.hashicorp.com/terraform/intro)
 - [Terraform Docs — CLI Workflow](https://developer.hashicorp.com/terraform/cli)
 
+</details>
+
 ---
 
 ## Q: What is Terraform state and why is it important?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 Terraform state is a JSON file that maps your configuration to real-world resources. It's how Terraform knows what it's managing and what changes need to be made on the next apply.
@@ -41,9 +50,14 @@ Terraform state is a JSON file that maps your configuration to real-world resour
 - [Terraform Docs — State](https://developer.hashicorp.com/terraform/language/state)
 - [Terraform Docs — Remote State](https://developer.hashicorp.com/terraform/language/state/remote)
 
+</details>
+
 ---
 
 ## Q: What is the difference between `terraform plan` and `terraform apply`?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `terraform plan` is a dry run — it shows what changes Terraform WOULD make without actually making them. `terraform apply` executes those changes for real.
@@ -58,3 +72,5 @@ Terraform state is a JSON file that maps your configuration to real-world resour
 **Learn more:**
 - [Terraform Docs — Plan Command](https://developer.hashicorp.com/terraform/cli/commands/plan)
 - [Terraform Docs — Apply Command](https://developer.hashicorp.com/terraform/cli/commands/apply)
+
+</details>

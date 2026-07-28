@@ -1,12 +1,16 @@
 ---
 title: Scripting Basics
 sidebar_position: 1
+displayed_sidebar: bashSidebar
 description: Bash interview questions - shebangs, command substitution, error handling
 ---
 
 # Bash Scripting Basics - Interview Q&A
 
 ## Q: What is the difference between #!/bin/bash and #!/bin/sh?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `#!/bin/bash` tells the system to use Bash (Bourne Again Shell) which has more features. `#!/bin/sh` uses the system's default POSIX shell, which is more portable but has fewer features.
@@ -22,9 +26,14 @@ description: Bash interview questions - shebangs, command substitution, error ha
 - [GNU Bash Manual](https://www.gnu.org/software/bash/manual/bash.html)
 - [POSIX Shell Specification](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
 
+</details>
+
 ---
 
-## Q: What is the difference between $(), ``, and ${} in Bash?
+## Q: What is the difference between $(), \`\`, and ${} in Bash?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 `$()` and backticks (\`\`) both do command substitution (run a command and capture output). `${}` is for variable expansion (referencing and manipulating variables).
@@ -40,9 +49,14 @@ description: Bash interview questions - shebangs, command substitution, error ha
 **Learn more:**
 - [GNU Bash — Shell Expansions](https://www.gnu.org/software/bash/manual/bash.html#Shell-Expansions)
 
+</details>
+
 ---
 
 ## Q: How do you handle errors in a Bash script?
+
+<details>
+<summary>Show answer</summary>
 
 **Summary:**
 Use `set -e` to exit on any error, `set -u` to treat unset variables as errors, and `set -o pipefail` to catch errors in piped commands. Together they make scripts fail fast and predictably.
@@ -57,3 +71,5 @@ Use `set -e` to exit on any error, `set -u` to treat unset variables as errors, 
 
 **Learn more:**
 - [GNU Bash — The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
+
+</details>
