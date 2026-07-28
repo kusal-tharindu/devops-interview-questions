@@ -93,20 +93,37 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Tech Stack',
+            title: 'Topics',
             items: topicNavItems,
           },
           {
-            title: 'More',
+            title: 'Resources',
+            items: [
+              {
+                label: 'Getting Started',
+                to: '/intro',
+              },
+              {
+                label: 'Contributing Guide',
+                href: 'https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md',
+              },
+            ],
+          },
+          {
+            title: 'Community',
             items: [
               {
                 label: 'GitHub',
                 href: 'https://github.com/kusal-tharindu/devops-interview-questions',
               },
+              {
+                label: 'Report an Issue',
+                href: 'https://github.com/kusal-tharindu/devops-interview-questions/issues',
+              },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} devops-interview-questions is maintained by kusal-tharindu.`,
+        copyright: `© ${new Date().getFullYear()} DevOps Interview Q&A — Built with Docusaurus · Maintained by <a href="https://github.com/kusal-tharindu" target="_blank" rel="noopener noreferrer">kusal-tharindu</a>`,
       },
       prism: {
         additionalLanguages: ['bash', 'python', 'hcl', 'docker', 'yaml'],

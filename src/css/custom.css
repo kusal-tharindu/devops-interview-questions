@@ -63,3 +63,71 @@
   color: #ffffff;
   position: relative;
 }
+
+/*
+ * Footer: seamless dark surface matching the rest of the page with
+ * a subtle top border and refined spacing for a professional look.
+ */
+.footer {
+  background: var(--site-surface) !important;
+  border-top: 1px solid rgba(79, 209, 165, 0.15);
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(79, 209, 165, 0.4),
+    transparent
+  );
+}
+
+.footer__title {
+  color: var(--ifm-color-primary) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.footer__link-item {
+  color: rgba(255, 255, 255, 0.65) !important;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer__link-item:hover {
+  color: var(--ifm-color-primary) !important;
+  text-decoration: none;
+}
+
+.footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+}
+
+.footer__copyright {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.85rem;
+}
+
+.footer__copyright a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer__copyright a:hover {
+  color: var(--ifm-color-primary-light);
+}
