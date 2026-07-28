@@ -1,6 +1,7 @@
 ---
-title: Terraform Basics - Interview Q&A
-permalink: /terraform/basics/
+title: Basics
+sidebar_position: 1
+description: Terraform interview questions - state management, plan vs apply
 ---
 
 # Terraform Basics - Interview Q&A

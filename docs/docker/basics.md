@@ -1,6 +1,7 @@
 ---
-title: Docker Basics - Interview Q&A
-permalink: /docker/basics/
+title: Basics
+sidebar_position: 1
+description: Docker interview questions - images vs containers, Dockerfile, CMD vs ENTRYPOINT
 ---
 
 # Docker Basics - Interview Q&A

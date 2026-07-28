@@ -1,6 +1,7 @@
 ---
-title: Linux File System - Interview Q&A
-permalink: /linux/file-system/
+title: File System
+sidebar_position: 1
+description: Linux file system interview questions - FHS, inodes, /bin vs /usr/bin
 ---
 
 # Linux File System - Interview Q&A

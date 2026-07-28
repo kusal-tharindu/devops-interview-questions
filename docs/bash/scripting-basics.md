@@ -1,6 +1,7 @@
 ---
-title: Bash Scripting Basics - Interview Q&A
-permalink: /bash/scripting-basics/
+title: Scripting Basics
+sidebar_position: 1
+description: Bash interview questions - shebangs, command substitution, error handling
 ---
 
 # Bash Scripting Basics - Interview Q&A

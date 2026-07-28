@@ -1,6 +1,7 @@
 ---
-title: Python Basics - Interview Q&A
-permalink: /python/basics/
+title: Basics
+sidebar_position: 1
+description: Python interview questions - lists vs tuples, args/kwargs, virtual environments
 ---
 
 # Python Basics - Interview Q&A

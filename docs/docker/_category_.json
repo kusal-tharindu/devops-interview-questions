@@ -1,0 +1,8 @@
+{
+  "label": "Docker",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Interview questions and answers covering Docker fundamentals: images, containers, Dockerfile, networking."
+  }
+}
