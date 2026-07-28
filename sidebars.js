@@ -2,17 +2,19 @@ const { getTopicDirs } = require('./scripts/topics');
 
 /**
  * Builds one sidebar per topic folder under docs/, each scoped to only
- * that topic's files (plus the Introduction page). This means visiting
- * a Linux page only shows Linux items in the sidebar, not every topic.
+ * that topic's files. The Introduction page has its own dedicated sidebar
+ * so it doesn't pull in unrelated topics.
  *
  * Adding a new topic later is just "add a folder under docs/ with a
  * _category_.json" - no manual edits needed here.
  */
-const sidebars = {};
+const sidebars = {
+  // Dedicated sidebar for the Introduction page
+  introSidebar: ['intro'],
+};
 
 for (const topic of getTopicDirs()) {
   sidebars[`${topic}Sidebar`] = [
-    'intro',
     {
       type: 'category',
       label: topic.charAt(0).toUpperCase() + topic.slice(1),

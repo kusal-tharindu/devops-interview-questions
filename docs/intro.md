@@ -1,6 +1,7 @@
 ---
 title: Introduction
 sidebar_position: 0
+displayed_sidebar: introSidebar
 ---
 
 # DevOps Interview Questions & Answers
