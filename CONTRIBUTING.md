@@ -1,98 +1,166 @@
 # Contributing Guide
 
-Thanks for wanting to contribute! Here's how you can help.
+Thanks for wanting to contribute! Here's how to add questions and topics.
 
-## How to Add Questions
+## Architecture
+
+Content lives in two file types per topic:
+
+```
+docs/<topic>/basics.md              ← Concept page (mental model + learn more links)
+docs/<topic>/basics.cards.yaml      ← Flashcards (parsed at build time → cards.json)
+```
+
+The Markdown file is for human reading. The `.cards.yaml` file feeds the spaced repetition engine.
+
+## How to Add Cards
 
 1. Fork this repository
-2. Find the right topic folder under `docs/` (or create one, see below)
-3. Copy the block from `docs/_templates/question-template.md` into the topic file
-4. Fill in your question and answer
+2. Find the right `.cards.yaml` file under `docs/<topic>/`
+3. Add a card block following the schema below
+4. Run `npm run validate:cards` to verify
 5. Submit a Pull Request
 
-## Q&A Format
+### Card Schema
 
-Each question uses a collapsible `<details>` block so readers can try to
-recall the answer before revealing it (better for studying than a plain
-question-and-answer list):
-
-```markdown
-## Q: Your question here?
-
-<details>
-<summary>Show answer</summary>
-
-**Summary:**
-Clear, concise explanation (2-4 sentences).
-
-**Key points:**
-- Point 1
-- Point 2
-- Point 3
-
-**Learn more:**
-- [Doc Title](https://link-to-official-docs)
-
-</details>
-
----
+```yaml
+- id: topic-subtopic-short-slug
+  tier: core
+  type: recall
+  q: Your question here?
+  a: Short, precise answer.
+  why: Optional elaboration shown after reveal.
+  tags: [topic, subtopic]
+  verified: 2026-07-29
+  version: "1.9"
+  sources:
+    - title: Official Doc Title
+      url: https://link-to-official-docs
 ```
+
+### Required Fields
+
+| Field | Format | Description |
+|-------|--------|-------------|
+| `id` | `{topic}-{subtopic}-{slug}` | Unique ID. Lowercase, hyphens, 3+ segments. **Never reuse.** |
+| `tier` | `core` \| `deep` \| `trivia` | Difficulty/importance level |
+| `type` | `recall` \| `concept` \| `elaborative` \| `scenario` \| `cloze` \| `command` | Card type |
+| `q` | string | The question. One question = one fact. |
+| `a` | string | Shortest correct answer. |
+| `tags` | array | For filtering and interleaving. Include the topic name. |
+| `verified` | `YYYY-MM-DD` | Last date someone confirmed this is correct. |
+
+### Optional Fields
+
+| Field | Description |
+|-------|-------------|
+| `why` | Elaboration shown after reveal (explains why the answer matters) |
+| `version` | Tool version the card is true for (e.g., `k8s: 1.31`) |
+| `sources` | Array of `{title, url}` — official docs only |
+| `deprecated` | Set to `true` to retire a card without breaking user progress |
+
+### ID Convention
+
+Format: `{topic}-{subtopic}-{2-4 word slug}`
+
+```
+linux-fs-etc-purpose
+docker-basics-image-vs-container
+k8s-pods-crashloop-diagnose
+terraform-state-purpose
+```
+
+The build script checks for duplicate IDs across all files. If two cards share an ID, the build fails.
+
+### Card Types
+
+- **`recall`** — atomic fact. Q/A pair.
+- **`concept`** — tests the mental model, not a detail.
+- **`elaborative`** — a "why" or "how" question.
+- **`scenario`** — symptom → diagnosis (troubleshooting).
+- **`cloze`** — fill the gap in a statement.
+- **`command`** — "write the command that does X."
+
+### Tiers
+
+- **`core`** (~60%) — every DevOps engineer should know this cold
+- **`deep`** (~30%) — senior / specialist depth
+- **`trivia`** (~10%) — real but rarely critical
+
+## Card Quality Checklist
+
+Before submitting, verify:
+
+- [ ] One question = one fact (atomic)
+- [ ] Answer is the shortest correct formulation
+- [ ] ID follows the naming convention and is globally unique
+- [ ] `verified` date is today (you checked the fact is still true)
+- [ ] Tags include the topic name
+- [ ] `npm run validate:cards` passes
+- [ ] Sources link to official docs (not blogs)
 
 ## Adding a New Topic
 
-1. Create a new folder under `docs/` (lowercase, hyphens), e.g. `docs/kubernetes/`
-2. Add a `_category_.json` file inside it:
+1. Create `docs/<topic-name>/` folder (lowercase, hyphens)
+2. Add `_category_.json`:
    ```json
    {
-     "label": "Kubernetes",
-     "position": 6,
+     "label": "Topic Name",
+     "position": 10,
      "link": {
        "type": "generated-index",
-       "description": "Interview questions and answers covering Kubernetes fundamentals."
+       "description": "One-line description."
      }
    }
    ```
-3. Add your first `.md` file with front matter like:
+3. Add `basics.md` with mental model and learn more links:
    ```markdown
    ---
    title: Basics
    sidebar_position: 1
-   displayed_sidebar: kubernetesSidebar
-   description: One-line description for SEO / category cards
+   displayed_sidebar: topicNameSidebar
+   description: One-line SEO description
    ---
+
+   # Topic Name Basics
+
+   ## Mental model
+
+   2-3 paragraphs building the picture before drilling.
+
+   ## Learn more
+
+   - [Link 1](url)
    ```
-   The `displayed_sidebar` value must be `<topic-folder-name>Sidebar` (camelCase
-   the folder name + `Sidebar`). This scopes the sidebar so visitors browsing
-   this topic only see this topic's pages, not every topic at once.
-4. That's it — both the sidebar contents and the navbar dropdown are
-   generated automatically from the `docs/` folder structure at build time.
-   No separate config file to hand-edit.
+4. Add `basics.cards.yaml` with at least 15-20 cards
+5. The navbar, sidebar, and stats update automatically on build
 
-## Adding a Subtopic to an Existing Topic
+**Minimum viable topic: 20 core cards + one concept page.** Below that, cards become orphans in memory.
 
-Just add a new `.md` file in the topic folder, e.g. `docs/linux/permissions.md`,
-with its own front matter (`title`, `sidebar_position`, `displayed_sidebar`
-matching that topic, `description`). It shows up automatically in that
-topic's sidebar.
+## CRUD Operations
 
-## Guidelines
+| Action | How | Notes |
+|--------|-----|-------|
+| Add card | Add block to `.cards.yaml` | Build validates uniqueness |
+| Edit card | Change q/a/fields, keep same `id`, bump `verified` | User progress preserved |
+| Delete card | Remove the block | Engine ignores orphan localStorage state |
+| Retire card | Add `deprecated: true` | Optional — engine skips it |
 
-- Keep summaries short and focused on interview recall
-- Always link to official documentation, not blog posts
-- One subtopic per file (e.g., `file-system.md`, `permissions.md`)
-- Use diagrams/images when they help explain concepts (put them in `static/img/`)
-- Check for duplicates before adding a new question
-- Keep language simple and beginner-friendly
+**Rule: never reuse a deleted ID for a different question.**
 
-## Local Preview
+## Local Development
 
 ```bash
 npm install
-npm run start
+npm run start          # Dev server at localhost:3000
+npm run validate:cards # Check card schema without full build
+npm run build          # Full production build
 ```
-
-Then open `http://localhost:3000/devops-interview-questions/`.
 
 ## Reporting Issues
 
-If you find incorrect information or broken links, please open an issue.
+- Wrong answer? Open an issue with the card ID
+- Stale info? Same — include the correct version/date
+- Bad formulation? Suggest a rewrite in the issue
+
+Thank you for helping engineers remember what matters.

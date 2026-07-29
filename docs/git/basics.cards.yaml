@@ -1,0 +1,120 @@
+- id: git-basics-what-is
+  tier: core
+  type: concept
+  q: What is Git?
+  a: A distributed version control system that tracks changes to files as snapshots (not diffs), with full history stored locally on each developer's machine.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+
+- id: git-basics-commit-what
+  tier: core
+  type: recall
+  q: What does a Git commit contain?
+  a: A pointer to a tree (snapshot of all files), metadata (author, date, message), and pointer(s) to parent commit(s).
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+
+- id: git-basics-branch-definition
+  tier: core
+  type: recall
+  q: What is a Git branch?
+  a: A lightweight movable pointer to a commit. Creating a branch just creates a new pointer — it does not copy files.
+  tags: [git, branching]
+  verified: 2026-07-29
+
+- id: git-basics-head-meaning
+  tier: core
+  type: recall
+  q: What is HEAD in Git?
+  a: A pointer to the currently checked-out branch (or commit in detached HEAD state). It tells Git where the next commit will go.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+
+- id: git-basics-staging-area
+  tier: core
+  type: concept
+  q: What is the staging area (index) in Git?
+  a: An intermediate layer between working directory and commit history. You selectively stage changes before committing, allowing precise control over what goes into each commit.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+
+- id: git-basics-merge-vs-rebase
+  tier: core
+  type: elaborative
+  q: What is the difference between merge and rebase?
+  a: Merge creates a new merge commit joining two histories. Rebase replays commits on top of another branch, creating a linear history. Merge preserves context; rebase keeps history clean.
+  why: Never rebase commits that have been pushed and shared — it rewrites history others depend on.
+  tags: [git, branching, workflows]
+  verified: 2026-07-29
+
+- id: git-basics-fast-forward
+  tier: deep
+  type: recall
+  q: What is a fast-forward merge?
+  a: When the target branch has not diverged, Git just moves the pointer forward — no merge commit is created. Use --no-ff to force a merge commit.
+  tags: [git, branching]
+  verified: 2026-07-29
+
+- id: git-basics-conflict-resolution
+  tier: core
+  type: scenario
+  q: You get a merge conflict. What do you do?
+  a: Open the conflicted file, look for <<<<<<< / ======= / >>>>>>> markers, manually choose the correct code, then git add the file and git commit.
+  tags: [git, troubleshooting]
+  verified: 2026-07-29
+
+- id: git-basics-reset-vs-revert
+  tier: core
+  type: recall
+  q: What is the difference between git reset and git revert?
+  a: Reset moves the branch pointer backward (rewrites history). Revert creates a new commit that undoes a previous one (safe for shared branches).
+  tags: [git, commands]
+  verified: 2026-07-29
+
+- id: git-basics-stash-purpose
+  tier: core
+  type: recall
+  q: What does git stash do?
+  a: Temporarily saves uncommitted changes and reverts working directory to clean state. Retrieve later with git stash pop.
+  tags: [git, commands]
+  verified: 2026-07-29
+
+- id: git-basics-cherry-pick
+  tier: deep
+  type: recall
+  q: What does git cherry-pick do?
+  a: Applies a specific commit from one branch onto the current branch. Useful for pulling individual fixes without merging the whole branch.
+  tags: [git, commands]
+  verified: 2026-07-29
+
+- id: git-basics-detached-head
+  tier: deep
+  type: scenario
+  q: You accidentally committed in detached HEAD state. How do you save the work?
+  a: Create a branch at the current position with git branch my-branch, then checkout that branch. The commits are now on a named branch and safe from garbage collection.
+  tags: [git, troubleshooting]
+  verified: 2026-07-29
+
+- id: git-basics-remote-origin
+  tier: core
+  type: recall
+  q: What is origin in Git?
+  a: The default name for the remote repository you cloned from. It is just a shortname alias for the remote URL.
+  tags: [git, remotes]
+  verified: 2026-07-29
+
+- id: git-basics-fetch-vs-pull
+  tier: core
+  type: recall
+  q: What is the difference between git fetch and git pull?
+  a: Fetch downloads new data from remote without modifying your working files. Pull does fetch + merge (or rebase) in one step.
+  tags: [git, remotes, commands]
+  verified: 2026-07-29
+
+- id: git-basics-gitignore-purpose
+  tier: core
+  type: recall
+  q: What does .gitignore do?
+  a: Specifies files/patterns that Git should not track. Common entries include node_modules/, build/, .env, and OS files like .DS_Store.
+  tags: [git, configuration]
+  verified: 2026-07-29
