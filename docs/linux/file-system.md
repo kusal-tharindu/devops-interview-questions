@@ -5,72 +5,147 @@ displayed_sidebar: linuxSidebar
 description: Linux file system interview questions - FHS, inodes, /bin vs /usr/bin
 ---
 
-# Linux File System - Interview Q&A
+# Linux File System
 
-## Q: What is the Linux Filesystem Hierarchy Standard (FHS)?
+## Mental model
 
-<details>
-<summary>Show answer</summary>
+Every Linux system organises files into a single tree rooted at `/`. The Filesystem Hierarchy Standard (FHS) assigns meaning to each top-level directory so that programs and administrators can predict where things live regardless of distribution. An **inode** is the actual on-disk data structure that represents a file — filenames are just pointers to inodes stored in directory entries.
 
-**Summary:**
-FHS defines the directory structure and directory contents in Linux. It provides a standard layout so that programs and users can predict the location of files and directories.
+Understanding these three layers — the standard, the namespace (paths), and the storage (inodes/blocks) — covers the majority of filesystem interview questions.
 
-**Key points:**
-- `/` is the root of the entire filesystem
-- `/etc` — system configuration files
-- `/home` — user home directories
-- `/var` — variable data (logs, caches, spool)
-- `/tmp` — temporary files (cleared on reboot)
-- `/usr` — user programs and data
-- `/bin` — essential command binaries
-- `/sbin` — system administration binaries
+<!-- cards:start -->
+- id: linux-fs-fhs-purpose
+  tier: core
+  type: concept
+  q: What problem does the Filesystem Hierarchy Standard solve?
+  a: It standardises where files live so software and admins can predict paths across distributions.
+  why: Without it, every distro would place config and binaries differently and nothing would be portable.
+  tags: [linux, filesystem, fundamentals]
+  verified: 2026-07-29
+  sources:
+    - title: Filesystem Hierarchy Standard 3.0
+      url: https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html
 
-**Learn more:**
-- [Filesystem Hierarchy Standard (Official)](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html)
-- [Red Hat — Linux File System Structure](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/index)
+- id: linux-fs-root-meaning
+  tier: core
+  type: recall
+  q: What is / in a Linux filesystem?
+  a: The root of the entire filesystem tree — every path descends from it.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
-</details>
+- id: linux-fs-etc-purpose
+  tier: core
+  type: recall
+  q: What does /etc hold?
+  a: System-wide configuration files.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
----
+- id: linux-fs-var-purpose
+  tier: core
+  type: recall
+  q: What does /var hold?
+  a: Variable data — logs, caches, spool files.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
-## Q: What is the difference between /bin and /usr/bin?
+- id: linux-fs-tmp-purpose
+  tier: core
+  type: recall
+  q: What does /tmp hold and what happens to it on reboot?
+  a: Temporary files — typically cleared on reboot.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
-<details>
-<summary>Show answer</summary>
+- id: linux-fs-home-purpose
+  tier: core
+  type: recall
+  q: What does /home hold?
+  a: User home directories.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
-**Summary:**
-`/bin` contains essential binaries needed for the system to boot and run in single-user mode. `/usr/bin` contains general-purpose user commands that are not critical for basic system operation.
+- id: linux-fs-usr-purpose
+  tier: core
+  type: recall
+  q: What does /usr hold?
+  a: User programs, libraries, and read-only data.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
 
-**Key points:**
-- `/bin` — essential commands like `ls`, `cp`, `cat`, `mount`
-- `/usr/bin` — non-essential commands like `vim`, `git`, `python`
-- Modern distros (like Ubuntu) often merge them (symlink `/bin` → `/usr/bin`)
-- The split is historical from when `/usr` could be on a separate partition
+- id: linux-fs-bin-vs-usrbin
+  tier: deep
+  type: elaborative
+  q: Why did /bin and /usr/bin historically exist as separate directories?
+  a: /bin held binaries needed to boot in single-user mode; /usr could live on a separate partition not available that early.
+  why: Modern distros symlink /bin → /usr/bin because the original constraint (separate partitions) no longer applies.
+  tags: [linux, filesystem, history]
+  verified: 2026-07-29
 
-**Learn more:**
-- [Filesystem Hierarchy Standard — /bin](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html#binEssentialUserCommandBinaries)
+- id: linux-fs-inode-definition
+  tier: core
+  type: concept
+  q: What is an inode?
+  a: A data structure storing a file's metadata (permissions, owner, size, timestamps, block pointers) — everything except the filename and actual content.
+  tags: [linux, filesystem, inodes]
+  verified: 2026-07-29
+  sources:
+    - title: inode(7) man page
+      url: https://man7.org/linux/man-pages/man7/inode.7.html
 
-</details>
+- id: linux-fs-inode-not-stored
+  tier: core
+  type: recall
+  q: What two things does an inode NOT store?
+  a: The filename and the file contents.
+  why: Filenames live in directory entries that map name → inode number. This is why hard links work — multiple names point to the same inode.
+  tags: [linux, filesystem, inodes]
+  verified: 2026-07-29
 
----
+- id: linux-fs-inode-view-command
+  tier: core
+  type: command
+  q: How do you view the inode number of a file?
+  a: ls -i filename
+  tags: [linux, filesystem, inodes, commands]
+  verified: 2026-07-29
 
-## Q: What is an inode in Linux?
+- id: linux-fs-hardlink-inode
+  tier: deep
+  type: elaborative
+  q: How do hard links relate to inodes?
+  a: Hard links share the same inode — they are different directory entries pointing to the same data. The file is only deleted when the last hard link is removed (link count reaches 0).
+  tags: [linux, filesystem, inodes]
+  verified: 2026-07-29
 
-<details>
-<summary>Show answer</summary>
+- id: linux-fs-symlink-vs-hardlink
+  tier: core
+  type: recall
+  q: What is the key difference between a symbolic link and a hard link?
+  a: A symbolic link has its own inode and stores a path to the target. A hard link shares the target's inode directly.
+  tags: [linux, filesystem, inodes]
+  verified: 2026-07-29
 
-**Summary:**
-An inode is a data structure that stores metadata about a file (permissions, owner, size, timestamps, disk block locations) — everything except the filename and actual data. Each file has a unique inode number within its filesystem.
+- id: linux-fs-inode-exhaustion
+  tier: deep
+  type: scenario
+  q: df shows free disk space but writes fail with "No space left on device". What do you check?
+  a: Inode exhaustion — run df -i. Many tiny files can consume all inodes while byte capacity remains.
+  tags: [linux, filesystem, troubleshooting]
+  verified: 2026-07-29
 
-**Key points:**
-- Stores: permissions, owner, group, size, timestamps, block pointers
-- Does NOT store: filename or file content
-- Filenames are stored in directory entries that map names → inode numbers
-- `ls -i` shows inode numbers
-- Hard links share the same inode; symbolic links have their own inode
+- id: linux-fs-proc-purpose
+  tier: deep
+  type: recall
+  q: What is /proc and is it stored on disk?
+  a: A virtual filesystem exposing kernel and process information as files. Not stored on disk — generated on the fly by the kernel.
+  tags: [linux, filesystem]
+  verified: 2026-07-29
+<!-- cards:end -->
 
-**Learn more:**
+## Learn more
+
+- [Filesystem Hierarchy Standard 3.0 (Official)](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.html)
+- [Red Hat — Managing File Systems](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/index)
 - [Linux man page — inode(7)](https://man7.org/linux/man-pages/man7/inode.7.html)
-- [Red Hat — Understanding inodes](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/managing_file_systems/index)
-
-</details>
