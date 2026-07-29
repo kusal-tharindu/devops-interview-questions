@@ -1,15 +1,9 @@
 /**
- * Custom theme colors for DevOps Interview Questions & Answers.
- * Overrides Docusaurus Infima CSS variables.
- * See https://docusaurus.io/docs/styling-layout for reference.
+ * DevOps Recall — Custom Theme
+ * Dark-only, modern terminal aesthetic with teal accent.
  */
 
-/*
- * Dark mode is the only supported mode (see docusaurus.config.js
- * colorMode.disableSwitch). Variables are defined directly under
- * [data-theme='dark'] since that's the only theme ever applied - this
- * also avoids any flash of an unstyled/light theme on initial load.
- */
+/* --- Root Variables --- */
 [data-theme='dark'] {
   --ifm-color-primary: #4fd1a5;
   --ifm-color-primary-dark: #2fc794;
@@ -19,31 +13,76 @@
   --ifm-color-primary-lighter: #7ddebb;
   --ifm-color-primary-lightest: #a6ebd3;
   --ifm-code-font-size: 95%;
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-line-height-base: 1.65;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 
-  /* Single dark surface color used across the whole homepage (hero, stats
-     strip, topic cards section) so the page reads as one continuous
-     "terminal" surface instead of three visibly different dark shades. */
-  --site-surface: #0b0f19;
-  --site-surface-raised: #11162350;
-  --site-grid-line: rgba(255, 255, 255, 0.05);
+  --site-surface: #0a0e17;
+  --site-surface-raised: rgba(17, 22, 35, 0.6);
+  --site-surface-card: rgba(20, 27, 45, 0.7);
+  --site-grid-line: rgba(255, 255, 255, 0.035);
+  --site-border: rgba(255, 255, 255, 0.08);
+  --site-glow: rgba(79, 209, 165, 0.12);
 
   --ifm-background-color: var(--site-surface);
   --ifm-background-surface-color: var(--site-surface);
+  --ifm-navbar-background-color: rgba(10, 14, 23, 0.85);
+  --ifm-navbar-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/*
- * Homepage hero: dark, subtle-grid background instead of a bright gradient,
- * so it reads as a "dev tool" rather than a generic marketing banner and
- * pairs naturally with the terminal component rendered inside it.
- */
+/* --- Global Typography --- */
+html {
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* --- Navbar --- */
+.navbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--site-border);
+  padding: 0.5rem 0;
+}
+
+.navbar__title {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.navbar__link {
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+}
+
+.navbar__link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.navbar__link--active {
+  color: var(--ifm-color-primary);
+}
+
+/* Mobile nav */
+@media screen and (max-width: 996px) {
+  .navbar {
+    padding: 0.35rem 0;
+  }
+}
+
+/* --- Hero Section --- */
 .hero {
   background-color: var(--site-surface);
   background-image:
     linear-gradient(var(--site-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--site-grid-line) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-size: 48px 48px;
   position: relative;
+  overflow: hidden;
 }
 
 .hero::before {
@@ -51,27 +90,90 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 60% 50% at 50% 0%,
-    rgba(79, 209, 165, 0.18),
+    ellipse 70% 60% at 50% -10%,
+    var(--site-glow),
     transparent 70%
   );
   pointer-events: none;
 }
 
-.hero__title,
-.hero__subtitle {
-  color: #ffffff;
-  position: relative;
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, var(--site-surface));
+  pointer-events: none;
 }
 
-/*
- * Footer: seamless dark surface matching the rest of the page with
- * a subtle top border and refined spacing for a professional look.
- */
+.hero__title {
+  color: #ffffff;
+  position: relative;
+  font-size: 2.5rem;
+  line-height: 1.2;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero__subtitle {
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+  font-size: 1.15rem;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0.75rem auto 0;
+}
+
+@media screen and (max-width: 768px) {
+  .hero__title {
+    font-size: 1.75rem;
+  }
+
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* --- Docs pages --- */
+.markdown h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.markdown h2 {
+  margin-top: 2.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--site-border);
+}
+
+article {
+  max-width: 800px;
+}
+
+/* --- Sidebar --- */
+.menu__link {
+  font-size: 0.88rem;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menu__link:hover {
+  background: rgba(79, 209, 165, 0.08);
+}
+
+.menu__link--active {
+  color: var(--ifm-color-primary) !important;
+  background: rgba(79, 209, 165, 0.1) !important;
+  font-weight: 600;
+}
+
+/* --- Footer --- */
 .footer {
   background: var(--site-surface) !important;
-  border-top: 1px solid rgba(79, 209, 165, 0.15);
-  padding-top: 3rem;
+  border-top: none;
+  padding-top: 3.5rem;
   padding-bottom: 2rem;
   position: relative;
 }
@@ -80,54 +182,97 @@
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  left: 10%;
+  right: 10%;
   height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(79, 209, 165, 0.4),
+    rgba(79, 209, 165, 0.35),
     transparent
   );
 }
 
 .footer__title {
   color: var(--ifm-color-primary) !important;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.75rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
 }
 
 .footer__link-item {
-  color: rgba(255, 255, 255, 0.65) !important;
-  font-size: 0.9rem;
-  transition: color 0.2s ease;
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-size: 0.88rem;
+  transition: color 0.2s ease, transform 0.15s ease;
 }
 
 .footer__link-item:hover {
-  color: var(--ifm-color-primary) !important;
+  color: #ffffff !important;
   text-decoration: none;
+  transform: translateX(2px);
 }
 
 .footer__bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
   margin-top: 2.5rem;
   padding-top: 1.5rem;
 }
 
 .footer__copyright {
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.82rem;
 }
 
 .footer__copyright a {
   color: var(--ifm-color-primary);
   text-decoration: none;
-  transition: color 0.2s ease;
 }
 
 .footer__copyright a:hover {
   color: var(--ifm-color-primary-light);
+}
+
+/* --- Buttons (global) --- */
+.button--secondary {
+  background: transparent;
+  border: 1.5px solid var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.button--secondary:hover {
+  background: rgba(79, 209, 165, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79, 209, 165, 0.15);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--site-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Selection --- */
+::selection {
+  background: rgba(79, 209, 165, 0.3);
+  color: #ffffff;
 }

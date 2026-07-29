@@ -1,94 +1,278 @@
+/* --- Hero --- */
 .heroBanner {
-  padding: 4rem 0 3rem;
+  padding: 5rem 0 4rem;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-@media screen and (max-width: 996px) {
+@media screen and (max-width: 768px) {
   .heroBanner {
-    padding: 2rem;
+    padding: 3rem 1rem 2.5rem;
   }
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+  border: 1px solid rgba(79, 209, 165, 0.3);
+  border-radius: 999px;
+  padding: 0.3rem 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  background: rgba(79, 209, 165, 0.05);
 }
 
 .buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1.5rem;
+  gap: 1rem;
+  margin-top: 2rem;
+  position: relative;
+  flex-wrap: wrap;
 }
 
-/*
- * Stats strip and topic cards section both sit on the same dark surface
- * color as the hero (--site-surface, set in custom.css), so the whole
- * homepage reads as one continuous surface rather than three separate
- * blocks. A faint top border is used instead of a background change to
- * separate sections.
- */
+.btnPrimary {
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  background: var(--ifm-color-primary);
+  color: #0a0e17;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79, 209, 165, 0.25);
+  color: #0a0e17;
+  text-decoration: none;
+}
+
+.btnSecondary {
+  padding: 0.85rem 2rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.btnSecondary:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* --- Stats Strip --- */
 .statsStrip {
   background: var(--site-surface);
-  border-top: 1px solid var(--ifm-color-emphasis-200);
-  padding: 0.85rem 0;
+  border-top: 1px solid var(--site-border);
+  border-bottom: 1px solid var(--site-border);
+  padding: 1.5rem 0;
 }
 
 .statsInner {
-  max-width: 900px;
+  max-width: 700px;
   margin: 0 auto;
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--ifm-color-emphasis-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.statsInner strong {
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.statNum {
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--ifm-color-primary);
+  font-variant-numeric: tabular-nums;
 }
 
-.statsDivider {
-  margin: 0 0.6rem;
-  opacity: 0.5;
+.statLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
 }
 
+.statDivider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media screen and (max-width: 600px) {
+  .statsInner {
+    gap: 1rem;
+  }
+
+  .statDivider {
+    display: none;
+  }
+
+  .statsInner {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Section Headers --- */
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.sectionSub {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* --- Topics Grid --- */
 .topics {
   background: var(--site-surface);
-  padding: 3rem 0 4rem;
+  padding: 4rem 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
 }
 
 .card {
-  display: block;
-  height: 100%;
-  padding: 1.5rem;
-  border-radius: 10px;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  background: var(--site-surface-raised);
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface-card);
   text-decoration: none;
   color: var(--ifm-font-color-base);
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-  position: relative;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transform: translateY(-3px);
-  border-color: var(--ifm-color-primary);
+  border-color: rgba(79, 209, 165, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(79, 209, 165, 0.1);
   text-decoration: none;
   color: var(--ifm-font-color-base);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
 .cardIcon {
   color: var(--ifm-color-primary);
-  margin-bottom: 0.5rem;
-}
-
-.cardDescription {
-  margin-bottom: 0.5rem;
-  color: var(--ifm-color-emphasis-700);
+  opacity: 0.85;
 }
 
 .cardCount {
-  display: inline-block;
-  font-size: 0.8rem;
-  color: var(--ifm-color-emphasis-700);
-  background: var(--ifm-color-emphasis-200);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  background: rgba(79, 209, 165, 0.1);
   border-radius: 999px;
-  padding: 0.15rem 0.65rem;
+  padding: 0.2rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.cardDescription {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+/* --- How It Works --- */
+.howSection {
+  background: var(--site-surface);
+  padding: 4rem 0 5rem;
+  border-top: 1px solid var(--site-border);
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.step {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.stepNum {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+  border: 1px solid rgba(79, 209, 165, 0.3);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+.stepTitle {
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.stepDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .stepsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .stepsGrid {
+    grid-template-columns: 1fr;
+  }
 }

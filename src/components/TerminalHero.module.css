@@ -1,41 +1,41 @@
 .terminal {
-  max-width: 640px;
-  margin: 2rem auto 0;
-  border-radius: 10px;
+  max-width: 580px;
+  margin: 2.5rem auto 0;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   text-align: left;
-  background: #1e1e2e;
+  background: #1a1a2e;
 }
 
 .terminalHeader {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background: #2a2a3d;
+  gap: 7px;
+  padding: 12px 16px;
+  background: #24243a;
 }
 
 .dot {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   display: inline-block;
 }
 
 .terminalTitle {
   margin-left: 10px;
-  color: #a0a0b8;
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
   font-family: var(--ifm-font-family-monospace);
 }
 
 .terminalBody {
-  padding: 20px 18px;
+  padding: 20px 20px;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #e6e6f0;
-  min-height: 3.5rem;
+  min-height: 3.2rem;
   line-height: 1.5;
 }
 

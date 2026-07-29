@@ -1,10 +1,8 @@
 import React from 'react';
 
 /**
- * Small inline SVG icon set for topic cards. Kept as plain inline SVG
- * (no icon library dependency) to avoid adding new third-party packages.
- * Falls back to a generic "terminal" icon for unknown topic slugs, so
- * adding a new topic later never breaks the homepage.
+ * Inline SVG icon set for topic cards. No icon library dependency.
+ * Falls back to a generic terminal icon for unknown topic slugs.
  */
 const icons = {
   linux: (props) => (
@@ -42,6 +40,21 @@ const icons = {
     <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
       <path d="M12 3c-3 0-5 1-5 3.5V9h5v1H5.5C3.5 10 3 11.8 3 13.5s.5 3.5 2.5 3.5H8v-2.3c0-2 1.7-3.2 3.7-3.2H16c1.8 0 3-1.2 3-3V6.5C19 4 17 3 14 3h-2Z" />
       <path d="M12 21c3 0 5-1 5-3.5V15h-5v-1h6.5c2 0 2.5-1.8 2.5-3.5S20.5 7 18.5 7H16v2.3c0 2-1.7 3.2-3.7 3.2H8c-1.8 0-3 1.2-3 3v2.5c0 2.5 2 3.5 5 3.5h2Z" />
+    </svg>
+  ),
+  kubernetes: (props) => (
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2Z" />
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 9v-3M12 15v3M9.4 10.5L7 8.5M14.6 13.5L17 15.5M9.4 13.5L7 15.5M14.6 10.5L17 8.5" />
+    </svg>
+  ),
+  networking: (props) => (
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.6" {...props}>
+      <circle cx="12" cy="5" r="2.5" />
+      <circle cx="5" cy="19" r="2.5" />
+      <circle cx="19" cy="19" r="2.5" />
+      <path d="M12 7.5v4.5M10 12l-4 5M14 12l4 5" />
     </svg>
   ),
   default: (props) => (
