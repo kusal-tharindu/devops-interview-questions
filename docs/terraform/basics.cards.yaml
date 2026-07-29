@@ -1,0 +1,103 @@
+- id: terraform-basics-what-is
+  tier: core
+  type: concept
+  q: What is Terraform?
+  a: An Infrastructure as Code tool by HashiCorp that lets you define cloud resources in declarative config files (HCL) and manages their lifecycle.
+  tags: [terraform, iac, fundamentals]
+  verified: 2026-07-29
+  sources:
+    - title: Terraform Docs — Introduction
+      url: https://developer.hashicorp.com/terraform/intro
+
+- id: terraform-basics-declarative-meaning
+  tier: core
+  type: recall
+  q: What does it mean that Terraform is declarative?
+  a: You describe WHAT you want (desired state), not HOW to create it. Terraform determines the steps.
+  tags: [terraform, iac, fundamentals]
+  verified: 2026-07-29
+
+- id: terraform-basics-provider-purpose
+  tier: core
+  type: recall
+  q: What is a Terraform provider?
+  a: A plugin that lets Terraform interact with a specific platform (AWS, Azure, GCP, etc.). It translates HCL into API calls.
+  tags: [terraform, providers]
+  verified: 2026-07-29
+
+- id: terraform-basics-state-purpose
+  tier: core
+  type: concept
+  q: What is Terraform state and why does it exist?
+  a: A JSON file (terraform.tfstate) mapping your config to real-world resources. It is how Terraform knows what it manages and what changes to make next.
+  why: Without state, Terraform would have no way to know which real resources correspond to which config blocks — it would try to create duplicates on every apply.
+  tags: [terraform, state, fundamentals]
+  verified: 2026-07-29
+  sources:
+    - title: Terraform Docs — State
+      url: https://developer.hashicorp.com/terraform/language/state
+
+- id: terraform-basics-state-sensitive
+  tier: core
+  type: recall
+  q: Why should you never commit terraform.tfstate to git?
+  a: It contains sensitive data (passwords, keys, IPs) in plain text.
+  tags: [terraform, state, security]
+  verified: 2026-07-29
+
+- id: terraform-basics-remote-state
+  tier: core
+  type: recall
+  q: Where should Terraform state be stored in production?
+  a: Remote backend — e.g., S3 + DynamoDB (for locking), Terraform Cloud, or Azure Blob Storage.
+  tags: [terraform, state]
+  verified: 2026-07-29
+
+- id: terraform-basics-state-locking
+  tier: deep
+  type: elaborative
+  q: What is state locking and why is it needed?
+  a: It prevents two people or CI jobs from running apply at the same time, which would corrupt state. DynamoDB is commonly used for locking with S3 backends.
+  tags: [terraform, state]
+  verified: 2026-07-29
+
+- id: terraform-basics-workflow
+  tier: core
+  type: recall
+  q: What is the standard Terraform workflow (4 commands in order)?
+  a: init, plan, apply, destroy
+  tags: [terraform, workflow]
+  verified: 2026-07-29
+
+- id: terraform-basics-plan-purpose
+  tier: core
+  type: recall
+  q: What does terraform plan do?
+  a: A dry run — shows what changes Terraform WOULD make (additions, modifications, deletions) without actually making them.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+
+- id: terraform-basics-apply-purpose
+  tier: core
+  type: recall
+  q: What does terraform apply do?
+  a: Executes the planned changes for real — creates, updates, or deletes infrastructure to match your config.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+
+- id: terraform-basics-plan-symbols
+  tier: deep
+  type: recall
+  q: What do +, ~, and - mean in terraform plan output?
+  a: + means create, ~ means update in-place, - means destroy.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+
+- id: terraform-basics-idempotent
+  tier: deep
+  type: elaborative
+  q: What does it mean that Terraform is idempotent?
+  a: Running apply multiple times with the same config produces the same result — if nothing changed, nothing happens.
+  why: This is safe because Terraform compares desired state (config) with current state (state file) and only acts on differences.
+  tags: [terraform, fundamentals]
+  verified: 2026-07-29
