@@ -5,6 +5,8 @@ displayed_sidebar: kubernetesSidebar
 description: Kubernetes interview questions - pods, deployments, services, namespaces
 ---
 
+import TopicQA from '@site/src/components/TopicQA';
+
 # Kubernetes Basics
 
 ## Mental model
@@ -12,6 +14,10 @@ description: Kubernetes interview questions - pods, deployments, services, names
 Kubernetes (K8s) is a container orchestrator: it decides which nodes run which containers, restarts them when they fail, scales them up/down, and routes traffic to them. The **control plane** (API server, scheduler, etcd, controller manager) makes decisions. **Worker nodes** (kubelet, container runtime) execute them. Everything is expressed as **declarative YAML** — you describe desired state, K8s converges to it.
 
 The key abstraction layers: **Pod** (smallest deployable unit) → **Deployment** (manages replica sets) → **Service** (stable network identity) → **Ingress** (external traffic routing).
+
+## Questions
+
+<TopicQA topic="kubernetes" />
 
 ## Learn more
 

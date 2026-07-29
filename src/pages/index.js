@@ -24,8 +24,8 @@ function HomepageHeader() {
           Recall-based learning with spaced repetition. Stop re-reading — start remembering.
         </p>
         <div className={styles.buttons}>
-          <Link className={styles.btnPrimary} to="/review">
-            Start Review
+          <Link className={styles.btnPrimary} to="/revise">
+            Start Revising
           </Link>
           <Link className={styles.btnSecondary} to="/intro">
             Browse Topics
@@ -98,28 +98,48 @@ function TopicCards() {
 }
 
 function HowItWorks() {
-  const steps = [
-    { num: '01', title: 'See the question', desc: 'Try to recall the answer from memory before revealing it.' },
-    { num: '02', title: 'Grade yourself', desc: 'Rate how well you remembered — Again, Hard, Good, or Easy.' },
-    { num: '03', title: 'Spaced scheduling', desc: 'SM-2 algorithm schedules your next review at the optimal interval.' },
-    { num: '04', title: 'Long-term retention', desc: 'Repeated recall at expanding intervals moves knowledge to permanent memory.' },
+  const modes = [
+    {
+      num: '01',
+      title: 'Learn',
+      desc: 'Pick a topic. Read the mental model, then work through its questions at your own pace.',
+      to: '/intro',
+      cta: 'Browse topics',
+    },
+    {
+      num: '02',
+      title: 'Revise',
+      desc: 'Test yourself on one tech stack. Your grades quietly build a spaced schedule underneath.',
+      to: '/revise',
+      cta: 'Start revising',
+    },
+    {
+      num: '03',
+      title: 'Drill',
+      desc: 'Timed, all topics mixed, randomised. Cram the night before an interview.',
+      to: '/drill',
+      cta: 'Run a drill',
+    },
   ];
 
   return (
     <section className={styles.howSection}>
       <div className="container">
         <div className={styles.sectionHeader}>
-          <Heading as="h2" className={styles.sectionTitle}>How It Works</Heading>
+          <Heading as="h2" className={styles.sectionTitle}>Three Ways to Use It</Heading>
           <p className={styles.sectionSub}>
-            Based on decades of memory research. No gimmicks.
+            Learn it, check it, cram it. Spacing happens without you managing it.
           </p>
         </div>
         <div className={styles.stepsGrid}>
-          {steps.map((step) => (
-            <div key={step.num} className={styles.step}>
-              <span className={styles.stepNum}>{step.num}</span>
-              <h3 className={styles.stepTitle}>{step.title}</h3>
-              <p className={styles.stepDesc}>{step.desc}</p>
+          {modes.map((mode) => (
+            <div key={mode.num} className={styles.step}>
+              <span className={styles.stepNum}>{mode.num}</span>
+              <h3 className={styles.stepTitle}>{mode.title}</h3>
+              <p className={styles.stepDesc}>{mode.desc}</p>
+              <Link to={mode.to} className={styles.stepLink}>
+                {mode.cta} →
+              </Link>
             </div>
           ))}
         </div>

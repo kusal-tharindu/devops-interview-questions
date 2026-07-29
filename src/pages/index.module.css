@@ -261,7 +261,19 @@
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
-  margin: 0;
+  margin: 0 0 0.75rem;
+}
+
+.stepLink {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.stepLink:hover {
+  text-decoration: underline;
+  color: var(--ifm-color-primary-light);
 }
 
 @media screen and (max-width: 768px) {

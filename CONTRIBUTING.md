@@ -7,11 +7,21 @@ Thanks for wanting to contribute! Here's how to add questions and topics.
 Content lives in two file types per topic:
 
 ```
-docs/<topic>/basics.md              ← Concept page (mental model + learn more links)
+docs/<topic>/basics.md              ← Concept page (mental model + <TopicQA /> + learn more)
 docs/<topic>/basics.cards.yaml      ← Flashcards (parsed at build time → cards.json)
 ```
 
-The Markdown file is for human reading. The `.cards.yaml` file feeds the spaced repetition engine.
+The Markdown file holds the mental model prose and renders the cards as a
+collapsible Q&A list. The `.cards.yaml` file is the single source of truth for
+card content.
+
+One card you write powers all three study modes:
+
+| Mode | Route | What it does |
+|------|-------|--------------|
+| **Learn** | `/<topic>/<page>` | Mental model, then all cards as collapsible Q&A |
+| **Revise** | `/revise` | Pick one topic, self-test, grades build a spaced schedule |
+| **Drill** | `/drill` | All topics mixed and timed, does not touch the schedule |
 
 ## How to Add Cards
 
@@ -58,6 +68,27 @@ The Markdown file is for human reading. The `.cards.yaml` file feeds the spaced 
 | `version` | Tool version the card is true for (e.g., `k8s: 1.31`) |
 | `sources` | Array of `{title, url}` — official docs only |
 | `deprecated` | Set to `true` to retire a card without breaking user progress |
+
+### Do not set `topic` by hand
+
+The build injects a `topic` field on every card, derived from the folder the
+`.cards.yaml` file lives in. A card in `docs/kubernetes/` gets `topic: kubernetes`.
+
+This is what decides which topic page a card appears on and which group it falls
+under in Revise. **Tags do not control topic membership.** Tags are free-form and
+cross-cutting — a Kubernetes card can be tagged `networking` for discoverability
+without leaking onto the Networking page.
+
+### Tags vs topic
+
+| | `topic` | `tags` |
+|---|---|---|
+| Set by | The build, from the folder name | You |
+| Controls | Topic page + Revise grouping | Search, cross-referencing |
+| Cardinality | Exactly one | Any number |
+
+Always include the topic name as the first tag anyway — it keeps cards readable
+on their own.
 
 ### ID Convention
 
@@ -113,7 +144,7 @@ Before submitting, verify:
      }
    }
    ```
-3. Add `basics.md` with mental model and learn more links:
+3. Add `basics.md` with the mental model, the Q&A list, and further reading:
    ```markdown
    ---
    title: Basics
@@ -122,18 +153,25 @@ Before submitting, verify:
    description: One-line SEO description
    ---
 
+   import TopicQA from '@site/src/components/TopicQA';
+
    # Topic Name Basics
 
    ## Mental model
 
    2-3 paragraphs building the picture before drilling.
 
+   ## Questions
+
+   <TopicQA topic="topic-name" />
+
    ## Learn more
 
    - [Link 1](url)
    ```
+   The `topic` prop must match the folder name exactly.
 4. Add `basics.cards.yaml` with at least 15-20 cards
-5. The navbar, sidebar, and stats update automatically on build
+5. The navbar, sidebar, Revise topic list, and stats all update automatically on build
 
 **Minimum viable topic: 20 core cards + one concept page.** Below that, cards become orphans in memory.
 

@@ -5,6 +5,8 @@ displayed_sidebar: linuxSidebar
 description: Linux file system interview questions - FHS, inodes, /bin vs /usr/bin
 ---
 
+import TopicQA from '@site/src/components/TopicQA';
+
 # Linux File System
 
 ## Mental model
@@ -12,6 +14,10 @@ description: Linux file system interview questions - FHS, inodes, /bin vs /usr/b
 Every Linux system organises files into a single tree rooted at `/`. The Filesystem Hierarchy Standard (FHS) assigns meaning to each top-level directory so that programs and administrators can predict where things live regardless of distribution. An **inode** is the actual on-disk data structure that represents a file — filenames are just pointers to inodes stored in directory entries.
 
 Understanding these three layers — the standard, the namespace (paths), and the storage (inodes/blocks) — covers the majority of filesystem interview questions.
+
+## Questions
+
+<TopicQA topic="linux" />
 
 ## Learn more
 
