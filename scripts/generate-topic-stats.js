@@ -34,18 +34,15 @@ function readCategoryMeta(topicPath) {
   }
 }
 
-function countQuestionsInFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  const matches = content.match(/^##\s+Q:/gm);
-  return matches ? matches.length : 0;
-}
-
 function countQuestionsInTopic(topicPath) {
   let count = 0;
   const entries = fs.readdirSync(topicPath, { withFileTypes: true });
   for (const entry of entries) {
-    if (entry.isFile() && entry.name.endsWith('.md')) {
-      count += countQuestionsInFile(path.join(topicPath, entry.name));
+    if (entry.isFile() && entry.name.endsWith('.cards.yaml')) {
+      const content = fs.readFileSync(path.join(topicPath, entry.name), 'utf8');
+      // Count top-level list items (lines starting with "- id:")
+      const matches = content.match(/^- id:/gm);
+      count += matches ? matches.length : 0;
     }
   }
   return count;
