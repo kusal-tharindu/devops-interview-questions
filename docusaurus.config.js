@@ -77,6 +77,11 @@ const config = {
             label: 'Introduction',
           },
           {
+            to: '/review',
+            position: 'left',
+            label: 'Review',
+          },
+          {
             type: 'dropdown',
             label: 'Tech Stack',
             position: 'left',
