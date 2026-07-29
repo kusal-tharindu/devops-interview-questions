@@ -1,0 +1,250 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.progress {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.9rem;
+}
+
+.dot {
+  margin: 0 0.5rem;
+  opacity: 0.5;
+}
+
+/* Card */
+.card {
+  background: var(--site-surface-raised, #111623);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.tier,
+.type,
+.tag {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-700);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tier {
+  background: rgba(79, 209, 165, 0.15);
+  color: var(--ifm-color-primary);
+}
+
+.type {
+  background: rgba(111, 168, 220, 0.15);
+  color: #6fa8dc;
+}
+
+.question {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.qLabel {
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+  margin-right: 0.3rem;
+}
+
+/* Reveal button */
+.revealBtn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  border: 1px dashed var(--ifm-color-emphasis-400);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ifm-color-emphasis-600);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.revealBtn:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+/* Answer section */
+.answerSection {
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  padding-top: 1.25rem;
+}
+
+.answer {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.aLabel {
+  color: #27c93f;
+  font-weight: 700;
+  margin-right: 0.3rem;
+}
+
+.why {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid var(--ifm-color-emphasis-300);
+}
+
+/* Grade buttons */
+.gradePrompt {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.75rem;
+}
+
+.grades {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.gradeBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.gradeBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.gradeKey {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* Shortcut hint */
+.shortcutHint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-500);
+  margin-top: 0.5rem;
+}
+
+/* Session complete */
+.complete {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.complete h2 {
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statNum {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.completeActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.actionBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--ifm-color-primary);
+  color: #0b0f19;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.actionBtn:hover {
+  opacity: 0.9;
+}
+
+.actionBtnSecondary {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ifm-color-emphasis-700);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.actionBtnSecondary:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+  .grades {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
