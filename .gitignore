@@ -29,4 +29,6 @@ yarn-error.log*
 
 # Generated at build/dev time from docs/ - see scripts/generate-topic-stats.js
 src/data/topics.json
-.kiro-guide
+
+# Generated at build/dev time from docs/ - see scripts/parse-cards.js
+static/cards.json

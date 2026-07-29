@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "generate:stats": "node scripts/generate-topic-stats.js",
-    "prestart": "npm run generate:stats",
-    "prebuild": "npm run generate:stats",
+    "generate:cards": "node scripts/parse-cards.js",
+    "prestart": "npm run generate:stats && npm run generate:cards",
+    "prebuild": "npm run generate:stats && npm run generate:cards",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
-    "clear": "docusaurus clear"
+    "clear": "docusaurus clear",
+    "validate:cards": "node scripts/parse-cards.js"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
