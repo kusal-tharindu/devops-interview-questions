@@ -1,0 +1,202 @@
+- id: k8s-basics-what-is
+  tier: core
+  type: concept
+  q: What is Kubernetes?
+  a: An open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.
+  tags: [kubernetes, fundamentals]
+  verified: 2026-07-29
+  sources:
+    - title: Kubernetes Docs — Overview
+      url: https://kubernetes.io/docs/concepts/overview/
+
+- id: k8s-basics-control-plane
+  tier: core
+  type: concept
+  q: What is the Kubernetes control plane?
+  a: The set of components that make global decisions about the cluster — includes the API server, etcd, scheduler, and controller manager.
+  tags: [kubernetes, architecture, fundamentals]
+  verified: 2026-07-29
+
+- id: k8s-basics-api-server
+  tier: core
+  type: recall
+  q: What is the role of kube-apiserver?
+  a: The front door of the control plane — all communication (kubectl, kubelet, other components) goes through it. It validates and persists state to etcd.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+
+- id: k8s-basics-etcd-purpose
+  tier: core
+  type: recall
+  q: What is etcd in Kubernetes?
+  a: A distributed key-value store that holds all cluster state and configuration. It is the single source of truth.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+
+- id: k8s-basics-scheduler-purpose
+  tier: core
+  type: recall
+  q: What does kube-scheduler do?
+  a: Watches for newly created pods with no assigned node, then selects a node for them to run on based on resource requirements and constraints.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+
+- id: k8s-basics-kubelet-purpose
+  tier: core
+  type: recall
+  q: What is the kubelet?
+  a: An agent running on each worker node that ensures containers in a pod are running. It talks to the API server and manages the container runtime.
+  tags: [kubernetes, architecture, nodes]
+  verified: 2026-07-29
+
+- id: k8s-basics-pod-definition
+  tier: core
+  type: concept
+  q: What is a Pod?
+  a: The smallest deployable unit in K8s — one or more containers that share network namespace (same IP) and storage volumes. Usually one container per pod.
+  tags: [kubernetes, pods, fundamentals]
+  verified: 2026-07-29
+
+- id: k8s-basics-pod-ephemeral
+  tier: core
+  type: recall
+  q: Are pods permanent or ephemeral?
+  a: Ephemeral — they can be killed and recreated at any time. Never rely on a specific pod instance persisting.
+  tags: [kubernetes, pods]
+  verified: 2026-07-29
+
+- id: k8s-basics-deployment-purpose
+  tier: core
+  type: concept
+  q: What is a Deployment?
+  a: A controller that manages ReplicaSets and ensures the desired number of pod replicas are running. Handles rolling updates and rollbacks.
+  tags: [kubernetes, deployments, workloads]
+  verified: 2026-07-29
+
+- id: k8s-basics-replicaset-purpose
+  tier: deep
+  type: recall
+  q: What is a ReplicaSet?
+  a: Ensures a specified number of identical pods are running at all times. Managed by Deployments — rarely created directly.
+  tags: [kubernetes, deployments, workloads]
+  verified: 2026-07-29
+
+- id: k8s-basics-service-purpose
+  tier: core
+  type: concept
+  q: What is a Service in Kubernetes?
+  a: A stable network abstraction that provides a fixed IP and DNS name to access a set of pods. Pods change, the Service stays.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+
+- id: k8s-basics-service-clusterip
+  tier: core
+  type: recall
+  q: What is a ClusterIP service?
+  a: The default Service type — exposes the service on an internal cluster IP. Only reachable from inside the cluster.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+
+- id: k8s-basics-service-nodeport
+  tier: core
+  type: recall
+  q: What is a NodePort service?
+  a: Exposes the service on a static port on each node's IP. Accessible from outside the cluster via NodeIP:NodePort.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+
+- id: k8s-basics-service-loadbalancer
+  tier: core
+  type: recall
+  q: What is a LoadBalancer service?
+  a: Provisions an external load balancer (in cloud environments) that routes traffic to the service. Built on top of NodePort.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+
+- id: k8s-basics-namespace-purpose
+  tier: core
+  type: recall
+  q: What is a Namespace in Kubernetes?
+  a: A virtual partition of the cluster for organizing resources and applying access control. Default namespaces: default, kube-system, kube-public.
+  tags: [kubernetes, namespaces]
+  verified: 2026-07-29
+
+- id: k8s-basics-configmap-purpose
+  tier: core
+  type: recall
+  q: What is a ConfigMap?
+  a: A K8s object that stores non-sensitive configuration data as key-value pairs. Consumed by pods as environment variables or mounted files.
+  tags: [kubernetes, configuration]
+  verified: 2026-07-29
+
+- id: k8s-basics-secret-purpose
+  tier: core
+  type: recall
+  q: What is a Secret and how does it differ from a ConfigMap?
+  a: Stores sensitive data (passwords, tokens, keys). Base64-encoded by default (not encrypted at rest unless you configure it). Same usage pattern as ConfigMap but intended for sensitive data.
+  tags: [kubernetes, configuration, security]
+  verified: 2026-07-29
+
+- id: k8s-basics-crashloop-diagnose
+  tier: core
+  type: scenario
+  q: A pod is in CrashLoopBackOff. What do you check first?
+  a: kubectl logs <pod> to see the crash reason, then kubectl describe pod <pod> for events (image pull errors, OOM kills, probe failures).
+  tags: [kubernetes, troubleshooting, pods]
+  verified: 2026-07-29
+
+- id: k8s-basics-rolling-update
+  tier: deep
+  type: elaborative
+  q: How does a Deployment perform a rolling update?
+  a: Creates a new ReplicaSet with updated pods, gradually scales it up while scaling the old one down. At no point are zero pods available (controlled by maxUnavailable/maxSurge).
+  tags: [kubernetes, deployments, updates]
+  verified: 2026-07-29
+
+- id: k8s-basics-liveness-vs-readiness
+  tier: core
+  type: recall
+  q: What is the difference between a liveness probe and a readiness probe?
+  a: Liveness determines if a container is alive (fail = restart). Readiness determines if a container can accept traffic (fail = remove from service endpoints).
+  tags: [kubernetes, pods, health-checks]
+  verified: 2026-07-29
+
+- id: k8s-basics-kubectl-apply
+  tier: core
+  type: command
+  q: How do you apply a YAML manifest to the cluster?
+  a: kubectl apply -f filename.yaml
+  tags: [kubernetes, commands]
+  verified: 2026-07-29
+
+- id: k8s-basics-kubectl-get-pods
+  tier: core
+  type: command
+  q: How do you list all pods in the current namespace?
+  a: kubectl get pods
+  tags: [kubernetes, commands]
+  verified: 2026-07-29
+
+- id: k8s-basics-kubectl-logs
+  tier: core
+  type: command
+  q: How do you view logs of a running pod?
+  a: kubectl logs <pod-name> (add -f to follow, --previous for crashed container logs)
+  tags: [kubernetes, commands, troubleshooting]
+  verified: 2026-07-29
+
+- id: k8s-basics-ingress-purpose
+  tier: deep
+  type: concept
+  q: What is an Ingress?
+  a: An API object that manages external HTTP/HTTPS access to services. Provides URL routing, TLS termination, and virtual hosting. Requires an Ingress controller to function.
+  tags: [kubernetes, networking, ingress]
+  verified: 2026-07-29
+
+- id: k8s-basics-statefulset-purpose
+  tier: deep
+  type: recall
+  q: When would you use a StatefulSet instead of a Deployment?
+  a: When pods need stable network identities, persistent storage, and ordered startup/shutdown — typically for databases, message queues, or clustered apps.
+  tags: [kubernetes, workloads]
+  verified: 2026-07-29
