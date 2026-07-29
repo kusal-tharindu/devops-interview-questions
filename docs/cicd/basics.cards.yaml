@@ -1,0 +1,119 @@
+- id: cicd-basics-ci-definition
+  tier: core
+  type: concept
+  q: What is Continuous Integration (CI)?
+  a: The practice of automatically building and testing code every time a developer pushes changes, catching integration bugs early.
+  tags: [cicd, fundamentals]
+  verified: 2026-07-29
+
+- id: cicd-basics-cd-delivery
+  tier: core
+  type: recall
+  q: What is Continuous Delivery?
+  a: Code is always in a deployable state after passing all pipeline stages. Deployment to production requires a manual approval step.
+  tags: [cicd, fundamentals]
+  verified: 2026-07-29
+
+- id: cicd-basics-cd-deployment
+  tier: core
+  type: recall
+  q: What is Continuous Deployment (vs Delivery)?
+  a: Every change that passes all pipeline stages is automatically deployed to production — no manual approval gate.
+  tags: [cicd, fundamentals]
+  verified: 2026-07-29
+
+- id: cicd-basics-pipeline-stages
+  tier: core
+  type: recall
+  q: What are the typical stages of a CI/CD pipeline?
+  a: Source (trigger) → Build → Test (unit, integration) → Staging → Deploy to production.
+  tags: [cicd, pipelines]
+  verified: 2026-07-29
+
+- id: cicd-basics-pipeline-trigger
+  tier: core
+  type: recall
+  q: What triggers a CI/CD pipeline?
+  a: Usually a git push or pull request event. Can also be scheduled (cron), manual dispatch, or triggered by another pipeline.
+  tags: [cicd, pipelines]
+  verified: 2026-07-29
+
+- id: cicd-basics-artifact-meaning
+  tier: core
+  type: recall
+  q: What is a build artifact in CI/CD?
+  a: The output of the build stage — a compiled binary, container image, or bundle that gets deployed. Stored in artifact repositories.
+  tags: [cicd, pipelines]
+  verified: 2026-07-29
+
+- id: cicd-basics-blue-green
+  tier: core
+  type: concept
+  q: What is a blue-green deployment?
+  a: Two identical environments (blue=current, green=new). Deploy to green, test it, then switch traffic. Instant rollback by switching back to blue.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+
+- id: cicd-basics-canary
+  tier: core
+  type: concept
+  q: What is a canary deployment?
+  a: Route a small percentage of traffic to the new version first. Monitor for errors. If healthy, gradually increase to 100%. If not, roll back.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+
+- id: cicd-basics-rolling-update
+  tier: core
+  type: recall
+  q: What is a rolling deployment?
+  a: Replace instances one at a time (or in batches). At any point some run old version, some new. No extra infrastructure needed but slower rollback.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+
+- id: cicd-basics-gha-workflow
+  tier: core
+  type: recall
+  q: What is a workflow in GitHub Actions?
+  a: A YAML file in .github/workflows/ that defines automated steps triggered by events (push, PR, schedule). Contains one or more jobs.
+  tags: [cicd, github-actions]
+  verified: 2026-07-29
+
+- id: cicd-basics-gha-job-vs-step
+  tier: core
+  type: recall
+  q: What is the difference between a job and a step in GitHub Actions?
+  a: A job is a set of steps that runs on one runner. Jobs run in parallel by default. Steps are sequential commands within a job.
+  tags: [cicd, github-actions]
+  verified: 2026-07-29
+
+- id: cicd-basics-gha-secret
+  tier: core
+  type: recall
+  q: How do you store sensitive values (API keys, passwords) in GitHub Actions?
+  a: As encrypted secrets in repo/org settings. Access in workflows via secrets.SECRET_NAME. Never hardcode in YAML.
+  tags: [cicd, github-actions, security]
+  verified: 2026-07-29
+
+- id: cicd-basics-pipeline-fails
+  tier: core
+  type: scenario
+  q: A CI pipeline passes locally but fails in CI. What do you check?
+  a: Environment differences — Node/Python version, missing env vars, different OS, cached dependencies. Check CI logs for the exact failure line.
+  tags: [cicd, troubleshooting]
+  verified: 2026-07-29
+
+- id: cicd-basics-idempotent-deploys
+  tier: deep
+  type: elaborative
+  q: Why should deployments be idempotent?
+  a: Running the same deployment twice should produce the same result. This makes retries safe after partial failures and prevents drift.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+
+- id: cicd-basics-rollback-strategy
+  tier: deep
+  type: scenario
+  q: A production deployment introduces a critical bug. What is the fastest rollback approach?
+  a: Redeploy the previous known-good artifact (not the code — the built image/binary). Blue-green makes this instant (switch traffic back).
+  tags: [cicd, deployment-strategies, troubleshooting]
+  verified: 2026-07-29

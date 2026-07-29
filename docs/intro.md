@@ -4,37 +4,39 @@ sidebar_position: 0
 displayed_sidebar: introSidebar
 ---
 
-# DevOps Interview Questions & Answers
+# DevOps Recall
 
-A community-driven collection of DevOps interview questions and answers covering Linux, Docker, Terraform, Kubernetes, Bash, Python, and more.
+A free, open-source spaced repetition system for DevOps engineers preparing for interviews or wanting to solidify their fundamentals.
 
-Each question includes a **short summary answer** for quick recall and **links to official documentation** for deeper learning.
+## The problem
 
-## How to Use
+DevOps spans dozens of tools — Linux, Docker, Kubernetes, Terraform, Ansible, AWS, networking, CI/CD, monitoring — and no one can memorise everything from a single read. Studies show that **re-reading and highlighting are the least effective study techniques**, yet they are what most people default to.
 
-1. **Interview prep** — Read the question, try to recall the answer, then check the summary
-2. **Deep learning** — Follow the official doc links for full understanding
-3. **Quick reference** — Use key points as a cheat sheet
+## The solution
 
-## Q&A Format
+This site applies two high-utility learning techniques backed by decades of cognitive science research:
 
-Each page follows this structure:
+1. **Retrieval practice** — you see the question and try to recall the answer *before* revealing it
+2. **Spaced repetition** — the SM-2 algorithm schedules your next review at the optimal interval to combat the forgetting curve
 
-```markdown
-## Q: [Question here]
+## How to use
 
-**Summary:**
-Short, clear explanation that covers the core concept.
+### Daily Review (`/review`)
+Your main loop. Cards that are due today appear automatically. Grade yourself (Again / Hard / Good / Easy) and the algorithm adjusts the next interval. 15-20 minutes per day is enough.
 
-**Key points:**
-- Important fact 1
-- Important fact 2
-- Important fact 3
+### Interview Drill (`/drill`)
+Timed, mixed-topic practice with no scheduling side effects. Simulates a real interview where questions jump between topics. Use it to test yourself before the real thing.
 
-**Learn more:**
-- [Official Doc Title](link)
-```
+### Browse Topics
+Each topic has a **mental model** page (the "understand first" layer) and an atomic card deck. Read the mental model once to build the big picture, then let spaced repetition handle retention.
+
+## Principles
+
+- **One card, one fact** — atomic questions are easier to remember than complex ones
+- **Recall before reveal** — never see an answer you haven't first tried to produce
+- **Version-stamped** — every card carries a verification date because DevOps facts expire
+- **Your data stays yours** — progress is in localStorage, no accounts, no tracking
 
 ## Contributing
 
-Contributions are welcome. See the [Contributing Guide](https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md) before submitting a pull request.
+This is community-maintained. See the [Contributing Guide](https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md) for how to add cards, fix errors, or propose new topics.

@@ -82,6 +82,11 @@ const config = {
             label: 'Review',
           },
           {
+            to: '/drill',
+            position: 'left',
+            label: 'Drill',
+          },
+          {
             type: 'dropdown',
             label: 'Tech Stack',
             position: 'left',
