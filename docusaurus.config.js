@@ -77,9 +77,9 @@ const config = {
             label: 'Introduction',
           },
           {
-            to: '/review',
+            to: '/revise',
             position: 'left',
-            label: 'Review',
+            label: 'Revise',
           },
           {
             to: '/drill',
@@ -88,7 +88,7 @@ const config = {
           },
           {
             type: 'dropdown',
-            label: 'Tech Stack',
+            label: 'Learn',
             position: 'left',
             items: topicNavItems,
           },
@@ -107,11 +107,19 @@ const config = {
             items: topicNavItems,
           },
           {
-            title: 'Resources',
+            title: 'Study',
             items: [
               {
                 label: 'Getting Started',
                 to: '/intro',
+              },
+              {
+                label: 'Revise a Topic',
+                to: '/revise',
+              },
+              {
+                label: 'Interview Drill',
+                to: '/drill',
               },
               {
                 label: 'Contributing Guide',

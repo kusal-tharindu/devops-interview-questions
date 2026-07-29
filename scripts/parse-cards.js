@@ -28,7 +28,9 @@ const OUTPUT_FILE = path.join(__dirname, '..', 'static', 'cards.json');
 // --- Schema ---
 
 const REQUIRED_FIELDS = ['id', 'tier', 'type', 'q', 'a', 'tags', 'verified'];
-const OPTIONAL_FIELDS = ['why', 'version', 'sources', 'deprecated'];
+// `topic` is injected by the parser from the folder name, so it is allowed in
+// output but authors should not set it by hand.
+const OPTIONAL_FIELDS = ['why', 'version', 'sources', 'deprecated', 'topic'];
 const ALL_FIELDS = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
 
 const VALID_TIERS = ['core', 'deep', 'trivia'];
@@ -55,7 +57,7 @@ function findCardFiles(dir) {
 
 // --- Validation ---
 
-function parseAndValidate(yamlContent, filePath) {
+function parseAndValidate(yamlContent, filePath, topic) {
   const cards = [];
   const errors = [];
 
@@ -111,7 +113,15 @@ function parseAndValidate(yamlContent, filePath) {
       errors.push({ file: filePath, message: `Card "${item.id}" verified must be YYYY-MM-DD format` });
     }
 
-    cards.push({ ...item, _source: path.relative(path.join(__dirname, '..'), filePath) });
+    // `topic` is derived from the containing folder, never from tags.
+    // Tags are free-form and cross-cutting (a Kubernetes card may be tagged
+    // `networking`), so using them for topic membership double-counts cards
+    // and leaks them onto the wrong topic page.
+    cards.push({
+      ...item,
+      topic,
+      _source: path.relative(path.join(__dirname, '..'), filePath),
+    });
   }
 
   return { cards, errors };
@@ -132,7 +142,8 @@ function main() {
   for (const filePath of cardFiles) {
     const content = fs.readFileSync(filePath, 'utf8').trim();
     if (!content) continue;
-    const { cards, errors } = parseAndValidate(content, filePath);
+    const topic = path.basename(path.dirname(filePath));
+    const { cards, errors } = parseAndValidate(content, filePath, topic);
     allCards.push(...cards);
     allErrors.push(...errors);
   }
@@ -163,10 +174,18 @@ function main() {
 
   const outputCards = allCards.map(({ _source, ...card }) => card);
 
+  // Per-topic counts, keyed by the folder-derived topic. Sums to totalCards.
+  const byTopic = {};
+  for (const card of outputCards) {
+    byTopic[card.topic] = (byTopic[card.topic] || 0) + 1;
+  }
+
   const output = {
     cards: outputCards,
     totalCards: outputCards.length,
-    topics: [...new Set(outputCards.flatMap((c) => c.tags))].sort(),
+    topics: Object.keys(byTopic).sort(),
+    cardsPerTopic: byTopic,
+    tags: [...new Set(outputCards.flatMap((c) => c.tags))].sort(),
     generatedAt: new Date().toISOString(),
   };
 

@@ -19,16 +19,22 @@ This site applies two high-utility learning techniques backed by decades of cogn
 1. **Retrieval practice** — you see the question and try to recall the answer *before* revealing it
 2. **Spaced repetition** — the SM-2 algorithm schedules your next review at the optimal interval to combat the forgetting curve
 
-## How to use
+## Three ways to use this
 
-### Daily Review (`/review`)
-Your main loop. Cards that are due today appear automatically. Grade yourself (Again / Hard / Good / Easy) and the algorithm adjusts the next interval. 15-20 minutes per day is enough.
+### 1. Learn — pick a topic from the nav
+Each topic page opens with a **mental model**: a few paragraphs building the big picture, because memorising facts you do not understand is wasted effort. Below that is every question for that topic as a collapsible list.
 
-### Interview Drill (`/drill`)
-Timed, mixed-topic practice with no scheduling side effects. Simulates a real interview where questions jump between topics. Use it to test yourself before the real thing.
+Read the question, answer it in your head, then expand to check yourself. Self-paced, nothing tracked.
 
-### Browse Topics
-Each topic has a **mental model** page (the "understand first" layer) and an atomic card deck. Read the mental model once to build the big picture, then let spaced repetition handle retention.
+### 2. Revise (`/revise`) — test one topic
+Pick a tech stack and work through its questions, grading how well you recalled each one.
+
+To you it is a self-test. Underneath, your grades build a spaced review schedule, so questions you fumbled come back sooner and ones you know cold drop away. No daily habit required — the scheduling just happens.
+
+### 3. Drill (`/drill`) — cram before an interview
+Timed, all topics mixed, randomised order. A Terraform question, then Linux, then a troubleshooting scenario. Like the real thing.
+
+Drill deliberately does not touch your review schedule — cramming should not distort your long-term data.
 
 ## Principles
 
