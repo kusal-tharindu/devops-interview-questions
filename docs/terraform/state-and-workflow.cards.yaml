@@ -1,0 +1,154 @@
+- id: terraform-basics-what-is
+  tier: core
+  type: concept
+  q: What is Terraform?
+  a: An Infrastructure as Code tool that provisions resources from declarative HCL configuration.
+  tags: [terraform, iac, fundamentals]
+  verified: 2026-07-29
+  ref: '#state'
+  sources:
+    - title: Terraform — State
+      url: https://developer.hashicorp.com/terraform/language/state
+
+- id: terraform-basics-declarative-meaning
+  tier: core
+  type: recall
+  q: What does it mean that Terraform is declarative?
+  a: You describe the desired end state, not the steps — Terraform computes how to get there.
+  tags: [terraform, iac, fundamentals]
+  verified: 2026-07-29
+  ref: '#state'
+
+- id: terraform-state-purpose
+  tier: core
+  type: concept
+  q: Why does Terraform need a state file?
+  a: It maps config blocks to real resource IDs, so Terraform knows what it already created.
+  why: Without it, every apply would create duplicates instead of updating.
+  tags: [terraform, state, fundamentals]
+  verified: 2026-07-29
+  ref: '#state'
+
+- id: terraform-state-sensitive
+  tier: core
+  type: recall
+  q: Why must terraform.tfstate never be committed to Git?
+  a: It stores resource attributes in plain text, including generated passwords and connection strings.
+  tags: [terraform, state, security]
+  verified: 2026-07-29
+  ref: '#state'
+
+- id: terraform-state-loss-impact
+  tier: deep
+  type: scenario
+  q: You lose your Terraform state file. What actually happens to your infrastructure?
+  a: Nothing — it keeps running. Terraform just no longer knows it owns it, so resources must be imported back.
+  tags: [terraform, state, troubleshooting]
+  verified: 2026-07-29
+  ref: '#state'
+
+- id: terraform-state-remote-backend
+  tier: core
+  type: recall
+  q: Where should state live for a team?
+  a: A remote backend such as S3, Terraform Cloud, Azure Blob Storage or GCS.
+  tags: [terraform, state, backends]
+  verified: 2026-07-29
+  ref: '#backends'
+  sources:
+    - title: Terraform — Backends
+      url: https://developer.hashicorp.com/terraform/language/backend
+
+- id: terraform-state-locking
+  tier: core
+  type: elaborative
+  q: What does state locking prevent?
+  a: Two concurrent applies interleaving writes and corrupting the state file.
+  tags: [terraform, state, backends]
+  verified: 2026-07-29
+  ref: '#backends'
+
+- id: terraform-basics-provider-purpose
+  tier: core
+  type: recall
+  q: What is a Terraform provider?
+  a: A plugin that translates HCL into a specific platform's API calls.
+  tags: [terraform, providers]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-basics-workflow
+  tier: core
+  type: recall
+  q: What is the standard Terraform workflow?
+  a: init, plan, apply, destroy.
+  tags: [terraform, workflow]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-init-purpose
+  tier: core
+  type: recall
+  q: What does terraform init do?
+  a: Downloads providers and configures the backend.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-basics-plan-purpose
+  tier: core
+  type: recall
+  q: What does terraform plan do?
+  a: Refreshes state, diffs it against config, and prints the changes it would make — changing nothing.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+  ref: '#workflow'
+  sources:
+    - title: Terraform — Command plan
+      url: https://developer.hashicorp.com/terraform/cli/commands/plan
+
+- id: terraform-basics-apply-purpose
+  tier: core
+  type: recall
+  q: What does terraform apply do?
+  a: Executes the planned changes against the real infrastructure.
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-basics-plan-symbols
+  tier: deep
+  type: recall
+  q: What do +, ~, - and -/+ mean in plan output?
+  a: Create, update in place, destroy, and replace (destroy then create).
+  tags: [terraform, workflow, commands]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-plan-replace-danger
+  tier: core
+  type: scenario
+  q: A plan shows -/+ on your database. Why is that alarming?
+  a: Replace means destroy then create — on a stateful resource that is data loss.
+  tags: [terraform, workflow, troubleshooting]
+  verified: 2026-07-29
+  ref: '#workflow'
+
+- id: terraform-basics-idempotent
+  tier: deep
+  type: elaborative
+  q: Why is a second terraform apply with no config change a no-op?
+  a: Terraform diffs desired against actual state and only acts on differences.
+  tags: [terraform, fundamentals]
+  verified: 2026-07-29
+  ref: '#drift'
+
+- id: terraform-drift-definition
+  tier: core
+  type: concept
+  q: What is drift in Terraform?
+  a: When a resource is changed outside Terraform, so reality diverges from state.
+  why: The next plan tries to pull reality back to your config, undoing manual edits.
+  tags: [terraform, state, drift]
+  verified: 2026-07-29
+  ref: '#drift'

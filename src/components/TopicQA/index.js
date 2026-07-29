@@ -1,140 +1,177 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDoc } from '@docusaurus/plugin-content-docs/client';
+import config from '@site/site.config';
+import { loadPageCards } from '@site/src/lib/cardStore';
+import CardBadges from '@site/src/components/CardBadges';
+import CardAnswer from '@site/src/components/CardAnswer';
 import styles from './styles.module.css';
 
-const TIER_ORDER = { core: 0, deep: 1, trivia: 2 };
-const TIERS = ['core', 'deep', 'trivia'];
+/**
+ * Learn mode: the questions for the current documentation page, as a
+ * collapsible self-test list.
+ *
+ * Usage in any topic page, with no props:
+ *
+ *   import TopicQA from '@site/src/components/TopicQA';
+ *   <TopicQA />
+ *
+ * The component resolves its own content from the Docusaurus doc id, which is
+ * identical to the card deck's `topic/page` identity by construction
+ * (docs/docker/images.md <-> docs/docker/images.cards.yaml). That means a page
+ * can never drift out of sync with its cards, and renaming a file needs no
+ * corresponding edit here.
+ *
+ * Props exist only as an escape hatch for pages that need to show another
+ * page's cards.
+ */
+
+const TIER_ORDER = new Map(config.cards.tiers.map((tier, i) => [tier.id, i]));
+const TIER_LABELS = new Map(config.cards.tiers.map((tier) => [tier.id, tier.label]));
+
+const Status = Object.freeze({
+  LOADING: 'loading',
+  READY: 'ready',
+  EMPTY: 'empty',
+  ERROR: 'error',
+});
 
 /**
- * Learn mode: renders every card for a topic as a collapsible Q&A list.
+ * Split a Docusaurus doc id into topic and page.
+ * "docker/networking/bridge" -> { topic: "docker", page: "networking/bridge" }
  *
- * Used at the bottom of each topic's concept page. Reads the generated
- * cards.json and filters by the `topic` tag, so adding a card to the
- * topic's .cards.yaml makes it appear here with no further work.
- *
- * Nothing here is graded or persisted — this is the first-exposure
- * surface. Grading lives in /revise.
+ * @param {string} docId
+ * @returns {{topic: string, page: string}}
  */
-export default function TopicQA({ topic }) {
-  const cardsUrl = useBaseUrl('/cards.json');
+function splitDocId(docId) {
+  const slash = docId.indexOf('/');
+  if (slash === -1) return { topic: docId, page: '' };
+  return { topic: docId.slice(0, slash), page: docId.slice(slash + 1) };
+}
+
+/**
+ * @param {object} props
+ * @param {string} [props.topic] Override the resolved topic.
+ * @param {string} [props.page] Override the resolved page.
+ */
+export default function TopicQA({ topic: topicProp, page: pageProp }) {
+  const doc = useDoc();
+  const resolved = splitDocId(doc?.metadata?.id || '');
+  const topic = topicProp ?? resolved.topic;
+  const page = pageProp ?? resolved.page;
+
   const [cards, setCards] = useState([]);
-  const [status, setStatus] = useState('loading');
+  const [status, setStatus] = useState(Status.LOADING);
   const [openIds, setOpenIds] = useState(() => new Set());
   const [tierFilter, setTierFilter] = useState('all');
 
   useEffect(() => {
     let cancelled = false;
+    setStatus(Status.LOADING);
 
-    async function load() {
-      try {
-        const resp = await fetch(cardsUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
+    loadPageCards(topic, page)
+      .then((loaded) => {
         if (cancelled) return;
-        const forTopic = (data.cards || []).filter(
-          (c) => !c.deprecated && c.topic === topic
-        );
-        setCards(forTopic);
-        setStatus(forTopic.length > 0 ? 'ready' : 'empty');
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    }
+        setCards(loaded);
+        setStatus(loaded.length > 0 ? Status.READY : Status.EMPTY);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.warn('TopicQA could not load cards:', error?.message);
+        setStatus(Status.ERROR);
+      });
 
-    load();
     return () => {
       cancelled = true;
     };
-  }, [cardsUrl, topic]);
-
-  const sorted = useMemo(() => {
-    const filtered =
-      tierFilter === 'all' ? cards : cards.filter((c) => c.tier === tierFilter);
-    return [...filtered].sort(
-      (a, b) => (TIER_ORDER[a.tier] ?? 9) - (TIER_ORDER[b.tier] ?? 9)
-    );
-  }, [cards, tierFilter]);
+  }, [topic, page]);
 
   const tierCounts = useMemo(() => {
-    return cards.reduce((acc, c) => {
-      acc[c.tier] = (acc[c.tier] || 0) + 1;
-      return acc;
-    }, {});
+    const counts = new Map();
+    for (const card of cards) {
+      counts.set(card.tier, (counts.get(card.tier) || 0) + 1);
+    }
+    return counts;
   }, [cards]);
 
-  function toggle(id) {
-    setOpenIds((prev) => {
-      const next = new Set(prev);
+  const visibleCards = useMemo(() => {
+    const filtered =
+      tierFilter === 'all' ? cards : cards.filter((c) => c.tier === tierFilter);
+
+    return [...filtered].sort((a, b) => {
+      const tierDiff =
+        (TIER_ORDER.get(a.tier) ?? 99) - (TIER_ORDER.get(b.tier) ?? 99);
+      return tierDiff !== 0 ? tierDiff : 0;
+    });
+  }, [cards, tierFilter]);
+
+  const allExpanded =
+    visibleCards.length > 0 &&
+    visibleCards.every((card) => openIds.has(card.id));
+
+  const toggleCard = (id) => {
+    setOpenIds((previous) => {
+      const next = new Set(previous);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }
+  };
 
-  function setAll(open) {
-    setOpenIds(open ? new Set(sorted.map((c) => c.id)) : new Set());
-  }
+  const toggleAll = () => {
+    setOpenIds(allExpanded ? new Set() : new Set(visibleCards.map((c) => c.id)));
+  };
 
-  if (status === 'loading') {
+  if (status === Status.LOADING) {
     return <p className={styles.muted}>Loading questions…</p>;
   }
 
-  if (status === 'error') {
+  if (status === Status.ERROR) {
     return (
       <p className={styles.muted}>
-        Could not load questions. Try a refresh, or run <code>npm run build</code> if
-        you are developing locally.
+        Could not load questions for this page. Refresh to retry, or run{' '}
+        <code>npm run build</code> if you are developing locally.
       </p>
     );
   }
 
-  if (status === 'empty') {
+  if (status === Status.EMPTY) {
     return (
       <p className={styles.muted}>
-        No questions for this topic yet.{' '}
-        <a href="https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md">
-          Contribute some
+        No questions for this page yet.{' '}
+        <a href={config.links.contributing} target="_blank" rel="noopener noreferrer">
+          Add some
         </a>
         .
       </p>
     );
   }
 
-  const allOpen = sorted.length > 0 && openIds.size >= sorted.length;
-
   return (
     <div className={styles.wrapper}>
       <div className={styles.toolbar}>
-        <div className={styles.tierTabs} role="group" aria-label="Filter by tier">
-          <button
-            type="button"
-            className={tabClass(tierFilter === 'all')}
+        <div className={styles.tierTabs} role="group" aria-label="Filter questions by tier">
+          <TierTab
+            active={tierFilter === 'all'}
+            count={cards.length}
+            label="All"
             onClick={() => setTierFilter('all')}
-            aria-pressed={tierFilter === 'all'}
-          >
-            All <span className={styles.tabCount}>{cards.length}</span>
-          </button>
-          {TIERS.map((tier) =>
-            tierCounts[tier] ? (
-              <button
-                key={tier}
-                type="button"
-                className={tabClass(tierFilter === tier)}
-                onClick={() => setTierFilter(tier)}
-                aria-pressed={tierFilter === tier}
-              >
-                {tier} <span className={styles.tabCount}>{tierCounts[tier]}</span>
-              </button>
+          />
+          {config.cards.tiers.map((tier) =>
+            tierCounts.has(tier.id) ? (
+              <TierTab
+                key={tier.id}
+                active={tierFilter === tier.id}
+                count={tierCounts.get(tier.id)}
+                label={TIER_LABELS.get(tier.id)}
+                title={tier.description}
+                onClick={() => setTierFilter(tier.id)}
+              />
             ) : null
           )}
         </div>
 
-        <button
-          type="button"
-          className={styles.expandAll}
-          onClick={() => setAll(!allOpen)}
-        >
-          {allOpen ? 'Collapse all' : 'Expand all'}
+        <button type="button" className={styles.toggleAll} onClick={toggleAll}>
+          {allExpanded ? 'Collapse all' : 'Expand all'}
         </button>
       </div>
 
@@ -142,66 +179,57 @@ export default function TopicQA({ topic }) {
         Read the question, answer it in your head, then expand to check yourself.
       </p>
 
-      <ol className={styles.list}>
-        {sorted.map((card) => {
+      <ul className={styles.list}>
+        {visibleCards.map((card) => {
           const isOpen = openIds.has(card.id);
           return (
             <li key={card.id} className={styles.item}>
               <button
                 type="button"
                 className={styles.question}
-                onClick={() => toggle(card.id)}
+                onClick={() => toggleCard(card.id)}
                 aria-expanded={isOpen}
-                aria-controls={`answer-${card.id}`}
+                aria-controls={`qa-${card.id}`}
               >
-                <span className={styles.chevron} aria-hidden="true">
+                <span className={styles.marker} aria-hidden="true">
                   {isOpen ? '−' : '+'}
                 </span>
                 <span className={styles.questionText}>{card.q}</span>
-                <span className={styles.badges}>
-                  <span className={styles[`tier_${card.tier}`]}>{card.tier}</span>
-                </span>
+                <CardBadges tier={card.tier} />
               </button>
 
               {isOpen && (
-                <div className={styles.answer} id={`answer-${card.id}`}>
-                  <p className={styles.answerText}>{card.a}</p>
-
-                  {card.why && <p className={styles.why}>{card.why}</p>}
-
-                  <div className={styles.meta}>
-                    <span className={styles.type}>{card.type}</span>
-                    {card.version && (
-                      <span className={styles.version}>v{card.version}</span>
-                    )}
-                    {card.verified && (
-                      <span className={styles.verified}>
-                        verified {card.verified}
-                      </span>
-                    )}
-                  </div>
-
-                  {Array.isArray(card.sources) && card.sources.length > 0 && (
-                    <ul className={styles.sources}>
-                      {card.sources.map((s) => (
-                        <li key={s.url}>
-                          <a href={s.url} target="_blank" rel="noopener noreferrer">
-                            {s.title}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                <div className={styles.answerPanel} id={`qa-${card.id}`}>
+                  {/* Already on the card's own page, so the backlink is noise. */}
+                  <CardAnswer card={card} showTheoryLink={false} />
                 </div>
               )}
             </li>
           );
         })}
-      </ol>
+      </ul>
     </div>
   );
 }
 
-function tabClass(active) {
-  return active ? `${styles.tab} ${styles.tabActive}` : styles.tab;
+/**
+ * @param {object} props
+ * @param {boolean} props.active
+ * @param {number} props.count
+ * @param {string} props.label
+ * @param {string} [props.title]
+ * @param {() => void} props.onClick
+ */
+function TierTab({ active, count, label, title, onClick }) {
+  return (
+    <button
+      type="button"
+      className={active ? `${styles.tab} ${styles.tabActive}` : styles.tab}
+      onClick={onClick}
+      aria-pressed={active}
+      title={title}
+    >
+      {label} <span className={styles.tabCount}>{count}</span>
+    </button>
+  );
 }

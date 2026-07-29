@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "generate:stats": "node scripts/generate-topic-stats.js",
-    "generate:cards": "node scripts/parse-cards.js",
-    "prestart": "npm run generate:stats && npm run generate:cards",
-    "prebuild": "npm run generate:stats && npm run generate:cards",
+    "content:build": "node scripts/build-content.js",
+    "content:check": "node scripts/build-content.js --quiet",
+    "prestart": "npm run content:build",
+    "prebuild": "npm run content:build",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",
-    "validate:cards": "node scripts/parse-cards.js"
+    "typecheck": "docusaurus build --dry-run || true"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
+    "@docusaurus/theme-mermaid": "3.10.2",
     "@mdx-js/react": "3.1.1",
     "clsx": "2.1.1",
     "prism-react-renderer": "2.4.1",

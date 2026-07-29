@@ -1,11 +1,21 @@
 // @ts-check
-// Docusaurus configuration. See https://docusaurus.io/docs/api/docusaurus-config
+/**
+ * Docusaurus configuration.
+ *
+ * Site identity, links and topic labels come from site.config.js so they are
+ * defined once and shared with the build scripts and the React app. Prefer
+ * editing site.config.js over hardcoding anything here.
+ *
+ * @see https://docusaurus.io/docs/api/docusaurus-config
+ */
 
+const siteConfig = require('./site.config');
 const { getTopicsForNavbar } = require('./scripts/topics');
 
-// Built from the docs/ folder structure at build/dev time, so adding a new
-// topic folder automatically adds it to the navbar dropdown - no manual
-// edit needed here.
+const { site, links } = siteConfig;
+
+// Built from the docs/ tree at build time, so a new topic folder appears in the
+// navbar and footer with no edit here.
 const topicNavItems = getTopicsForNavbar().map((topic) => ({
   label: topic.label,
   to: `/${topic.firstDocId}`,
@@ -13,23 +23,27 @@ const topicNavItems = getTopicsForNavbar().map((topic) => ({
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'DevOps Interview Questions & Answers',
-  tagline: 'Community-driven DevOps interview questions covering Linux, Docker, Terraform, Bash, Python',
+  title: site.title,
+  tagline: site.tagline,
   favicon: 'img/favicon.ico',
 
-  url: 'https://kusal-tharindu.github.io',
-  baseUrl: '/devops-interview-questions/',
-
-  organizationName: 'kusal-tharindu',
-  projectName: 'devops-interview-questions',
+  url: site.url,
+  baseUrl: site.baseUrl,
+  organizationName: site.organizationName,
+  projectName: site.projectName,
 
   onBrokenLinks: 'throw',
 
   markdown: {
+    // Diagrams live in markdown as Mermaid code blocks: diffable in review,
+    // no binary assets to maintain.
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
   },
+
+  themes: ['@docusaurus/theme-mermaid'],
 
   i18n: {
     defaultLocale: 'en',
@@ -44,8 +58,8 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
-          editUrl:
-            'https://github.com/kusal-tharindu/devops-interview-questions/edit/main/',
+          editUrl: links.editUrlBase,
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {
@@ -59,46 +73,40 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       image: 'img/social-card.png',
+
       colorMode: {
         defaultMode: 'dark',
         disableSwitch: true,
         respectPrefersColorScheme: false,
       },
+
+      mermaid: {
+        theme: { light: 'dark', dark: 'dark' },
+        options: {
+          fontFamily: 'inherit',
+        },
+      },
+
       navbar: {
-        title: 'DevOps Interview Q&A',
+        title: site.shortTitle,
         logo: {
-          alt: 'DevOps Interview Questions Logo',
+          alt: `${site.shortTitle} logo`,
           src: 'img/logo.svg',
         },
         items: [
-          {
-            to: '/intro',
-            position: 'left',
-            label: 'Introduction',
-          },
-          {
-            to: '/revise',
-            position: 'left',
-            label: 'Revise',
-          },
-          {
-            to: '/drill',
-            position: 'left',
-            label: 'Drill',
-          },
+          { to: '/intro', position: 'left', label: 'Introduction' },
           {
             type: 'dropdown',
             label: 'Learn',
             position: 'left',
             items: topicNavItems,
           },
-          {
-            href: 'https://github.com/kusal-tharindu/devops-interview-questions',
-            label: 'GitHub',
-            position: 'right',
-          },
+          { to: '/revise', position: 'left', label: 'Revise' },
+          { to: '/drill', position: 'left', label: 'Drill' },
+          { href: links.github, label: 'GitHub', position: 'right' },
         ],
       },
+
       footer: {
         style: 'dark',
         links: [
@@ -109,42 +117,27 @@ const config = {
           {
             title: 'Study',
             items: [
-              {
-                label: 'Getting Started',
-                to: '/intro',
-              },
-              {
-                label: 'Revise a Topic',
-                to: '/revise',
-              },
-              {
-                label: 'Interview Drill',
-                to: '/drill',
-              },
-              {
-                label: 'Contributing Guide',
-                href: 'https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md',
-              },
+              { label: 'Getting Started', to: '/intro' },
+              { label: 'Revise a Topic', to: '/revise' },
+              { label: 'Interview Drill', to: '/drill' },
             ],
           },
           {
             title: 'Community',
             items: [
-              {
-                label: 'GitHub',
-                href: 'https://github.com/kusal-tharindu/devops-interview-questions',
-              },
-              {
-                label: 'Report an Issue',
-                href: 'https://github.com/kusal-tharindu/devops-interview-questions/issues',
-              },
+              { label: 'GitHub', href: links.github },
+              { label: 'Contributing Guide', href: links.contributing },
+              { label: 'Report an Issue', href: links.issues },
             ],
           },
         ],
-        copyright: `© ${new Date().getFullYear()} DevOps Interview Q&A — Built with Docusaurus · Maintained by <a href="https://github.com/kusal-tharindu" target="_blank" rel="noopener noreferrer">kusal-tharindu</a>`,
+        copyright:
+          `© ${new Date().getFullYear()} ${site.shortTitle} — Built with Docusaurus · ` +
+          `Maintained by <a href="${links.ownerProfile}" target="_blank" rel="noopener noreferrer">${site.organizationName}</a>`,
       },
+
       prism: {
-        additionalLanguages: ['bash', 'python', 'hcl', 'docker', 'yaml'],
+        additionalLanguages: ['bash', 'python', 'hcl', 'docker', 'yaml', 'json', 'ini'],
       },
     }),
 };

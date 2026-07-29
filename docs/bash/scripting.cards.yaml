@@ -1,0 +1,117 @@
+- id: bash-scripting-shebang-purpose
+  tier: core
+  type: concept
+  q: What does the shebang line do?
+  a: Tells the kernel which interpreter to use to execute the script file.
+  tags: [bash, scripting, fundamentals]
+  verified: 2026-07-29
+  ref: '#shebang'
+  sources:
+    - title: GNU Bash Manual
+      url: https://www.gnu.org/software/bash/manual/bash.html
+
+- id: bash-scripting-bash-vs-sh
+  tier: core
+  type: recall
+  q: Why is a script with #!/bin/sh not guaranteed to run under Bash?
+  a: /bin/sh is the system POSIX shell — on Debian and Ubuntu it is dash, not Bash.
+  why: Bash-only syntax like arrays or [[ ]] will fail there, usually with a confusing error.
+  tags: [bash, scripting, fundamentals]
+  verified: 2026-07-29
+  ref: '#shebang'
+
+- id: bash-scripting-env-shebang
+  tier: deep
+  type: elaborative
+  q: Why prefer "#!/usr/bin/env bash" over "#!/bin/bash"?
+  a: env resolves the first bash on PATH, so it works on systems where bash is not at /bin/bash.
+  tags: [bash, scripting, fundamentals]
+  verified: 2026-07-29
+  ref: '#shebang'
+
+- id: bash-scripting-set-e
+  tier: core
+  type: recall
+  q: What does set -e do?
+  a: Exits immediately when any command returns a non-zero status.
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#strict-mode'
+
+- id: bash-scripting-set-u
+  tier: core
+  type: recall
+  q: What does set -u do?
+  a: Treats a reference to an unset variable as an error instead of expanding to empty string.
+  why: Without it, "rm -rf $BUILD_DIR/" becomes "rm -rf /" when the variable is unset.
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#strict-mode'
+
+- id: bash-scripting-pipefail
+  tier: core
+  type: recall
+  q: What does set -o pipefail change?
+  a: A pipeline fails if ANY command in it fails, not just the last one.
+  why: Without it, "failing-cmd | grep ok" exits 0 whenever grep succeeds, hiding the real failure.
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#strict-mode'
+
+- id: bash-scripting-safe-combo
+  tier: core
+  type: command
+  q: What is the standard safety preamble for a production Bash script?
+  a: set -euo pipefail
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#strict-mode'
+
+- id: bash-scripting-allow-failure
+  tier: deep
+  type: command
+  q: How do you let one command fail without tripping set -e?
+  a: Append || true to that command.
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#strict-mode'
+
+- id: bash-scripting-command-sub-modern
+  tier: core
+  type: recall
+  q: What is the preferred syntax for command substitution?
+  a: $(command) — it nests and is easier to read than backticks.
+  tags: [bash, scripting, expansion]
+  verified: 2026-07-29
+  ref: '#expansion'
+
+- id: bash-scripting-default-value
+  tier: deep
+  type: command
+  q: How do you supply a fallback when a variable is unset or empty?
+  a: Use the :- form, as in ${var:-default}
+  tags: [bash, scripting, expansion]
+  verified: 2026-07-29
+  ref: '#expansion'
+
+- id: bash-scripting-quote-expansions
+  tier: core
+  type: elaborative
+  q: Why must you quote variable expansions?
+  a: Unquoted expansions are word-split on whitespace, so a filename with a space becomes two arguments.
+  tags: [bash, scripting, expansion]
+  verified: 2026-07-29
+  ref: '#expansion'
+
+- id: bash-scripting-trap-cleanup
+  tier: deep
+  type: command
+  q: How do you guarantee cleanup runs however a script exits?
+  a: trap cleanup_function EXIT
+  why: EXIT fires on success, on a set -e abort, and on SIGTERM.
+  tags: [bash, scripting, error-handling]
+  verified: 2026-07-29
+  ref: '#traps'
+  sources:
+    - title: Bash — The Set Builtin
+      url: https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin

@@ -1,0 +1,124 @@
+- id: docker-dockerfile-purpose
+  tier: core
+  type: concept
+  q: What is a Dockerfile?
+  a: A build recipe read top to bottom, where each instruction adds a layer or sets image metadata.
+  tags: [docker, dockerfile, fundamentals]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+  sources:
+    - title: Docker Docs — Dockerfile reference
+      url: https://docs.docker.com/reference/dockerfile/
+
+- id: docker-dockerfile-from
+  tier: core
+  type: recall
+  q: What does FROM do and where must it appear?
+  a: Sets the base image to build on. It must be the first instruction.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+
+- id: docker-dockerfile-run
+  tier: core
+  type: recall
+  q: What does RUN do?
+  a: Executes a command during the build and commits the result as a new layer.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+
+- id: docker-dockerfile-copy-vs-add
+  tier: deep
+  type: recall
+  q: What is the difference between COPY and ADD?
+  a: COPY just copies files. ADD also extracts tar archives and fetches URLs — prefer COPY for predictability.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+
+- id: docker-dockerfile-arg-vs-env
+  tier: deep
+  type: elaborative
+  q: What is the difference between ARG and ENV?
+  a: ARG exists only during the build. ENV persists into the running container.
+  why: Referencing an ARG from your app at run time silently yields nothing.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+
+- id: docker-dockerfile-expose
+  tier: core
+  type: recall
+  q: Does EXPOSE make a port reachable?
+  a: No. It only documents the port — you still need -p at run time to publish it.
+  tags: [docker, dockerfile, networking]
+  verified: 2026-07-29
+  ref: '#build-vs-run'
+
+- id: docker-dockerfile-cmd
+  tier: core
+  type: recall
+  q: What does CMD provide?
+  a: The default command or arguments, easily overridden by appending a command to docker run.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#cmd-vs-entrypoint'
+
+- id: docker-dockerfile-entrypoint
+  tier: core
+  type: recall
+  q: What does ENTRYPOINT provide?
+  a: The executable that always runs. Overriding it requires the --entrypoint flag.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#cmd-vs-entrypoint'
+
+- id: docker-dockerfile-entrypoint-cmd-convention
+  tier: core
+  type: elaborative
+  q: What is the conventional way to combine ENTRYPOINT and CMD?
+  a: ENTRYPOINT for the binary, CMD for its default arguments.
+  why: Users can then override just the arguments without accidentally replacing your program.
+  tags: [docker, dockerfile]
+  verified: 2026-07-29
+  ref: '#cmd-vs-entrypoint'
+
+- id: docker-dockerfile-exec-form-signals
+  tier: deep
+  type: scenario
+  q: docker stop hangs for the full timeout instead of shutting down cleanly. What is a likely cause?
+  a: Shell form wraps the process in /bin/sh -c, which does not forward signals. Use the exec form instead.
+  tags: [docker, dockerfile, troubleshooting]
+  verified: 2026-07-29
+  ref: '#cmd-vs-entrypoint'
+
+- id: docker-dockerfile-apt-update-cache
+  tier: deep
+  type: scenario
+  q: Why should apt-get update and apt-get install share one RUN instruction?
+  a: A separate update layer gets cached, so a later install can resolve against a stale package index.
+  tags: [docker, dockerfile, build-cache, troubleshooting]
+  verified: 2026-07-29
+  ref: '#layer-discipline'
+
+- id: docker-dockerfile-build-context
+  tier: core
+  type: concept
+  q: What is the build context?
+  a: The directory sent to the daemon before a build starts — everything COPY can read from.
+  tags: [docker, dockerfile, build-context]
+  verified: 2026-07-29
+  ref: '#build-context'
+
+- id: docker-dockerfile-dockerignore
+  tier: core
+  type: elaborative
+  q: Why does .dockerignore matter for security, not just build speed?
+  a: Without it, COPY . . can bake secrets like .env into a layer that ships to your registry.
+  tags: [docker, dockerfile, build-context, security]
+  verified: 2026-07-29
+  ref: '#build-context'
+  sources:
+    - title: Docker Docs — .dockerignore
+      url: https://docs.docker.com/build/concepts/context/#dockerignore-files

@@ -1,269 +1,157 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Layout from '@theme/Layout';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import config from '@site/site.config';
+import { loadManifest, loadTopicCards, loadTopicsCards } from '@site/src/lib/cardStore';
+import {
+  createCardState,
+  reviewCard,
+  isDue,
+  sortByUrgency,
+  summarise,
+} from '@site/src/lib/sm2';
+import {
+  loadProgress,
+  saveProgress,
+  exportProgress,
+  shouldSuggestBackup,
+} from '@site/src/lib/storage';
+import CardBadges from '@site/src/components/CardBadges';
+import CardAnswer from '@site/src/components/CardAnswer';
 import styles from './revise.module.css';
-import { createCardState, reviewCard, isDue, sortByUrgency } from '../lib/sm2';
-import { loadProgress, saveProgress, exportProgress } from '../lib/storage';
 
-const GRADES = [
-  { key: '1', grade: 0, label: 'Again', color: '#ff5f56' },
-  { key: '2', grade: 1, label: 'Hard', color: '#ffbd2e' },
-  { key: '3', grade: 2, label: 'Good', color: '#4fd1a5' },
-  { key: '4', grade: 3, label: 'Easy', color: '#6fa8dc' },
-];
+/**
+ * Revise: pick one topic, self-test, and let the schedule build itself.
+ *
+ * To the learner this is a topic quiz. Underneath, every grade feeds SM-2, so
+ * spacing accumulates without anyone having to opt into a daily habit. That
+ * framing is deliberate — see .kiro-guide/plan.md section 4a.
+ */
 
-// Topic tag → display label. Falls back to the raw tag.
-const TOPIC_LABELS = {
-  linux: 'Linux',
-  docker: 'Docker',
-  kubernetes: 'Kubernetes',
-  terraform: 'Terraform',
-  bash: 'Bash',
-  python: 'Python',
-  networking: 'Networking',
-  git: 'Git',
-  cicd: 'CI/CD',
-};
+const ALL_TOPICS = '__all__';
 
-const TOPIC_ORDER = Object.keys(TOPIC_LABELS);
+const Status = Object.freeze({
+  LOADING: 'loading',
+  READY: 'ready',
+  ERROR: 'error',
+});
 
-function label(tag) {
-  return TOPIC_LABELS[tag] || tag;
-}
-
-/** Topic picker — the entry screen. */
-function TopicPicker({ topics, onSelect }) {
-  return (
-    <div className={styles.picker}>
-      <h1>Revise</h1>
-      <p className={styles.pickerDesc}>
-        Pick a topic and test yourself. Your grades quietly build a review
-        schedule, so cards you struggle with come back sooner.
-      </p>
-
-      <div className={styles.topicGrid}>
-        {topics.map((t) => (
-          <button
-            key={t.tag}
-            type="button"
-            className={styles.topicCard}
-            onClick={() => onSelect(t.tag)}
-          >
-            <span className={styles.topicName}>{label(t.tag)}</span>
-            <span className={styles.topicMeta}>
-              {t.total} cards
-              {t.due > 0 && <span className={styles.dueBadge}>{t.due} due</span>}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      <button type="button" className={styles.allTopicsBtn} onClick={() => onSelect('__all__')}>
-        Revise all topics
-      </button>
-    </div>
-  );
-}
-
-/** Single card with recall-before-reveal. */
-function ReviseCard({ card, revealed, onReveal, onGrade }) {
-  return (
-    <div className={styles.card}>
-      <div className={styles.cardMeta}>
-        <span className={styles[`tier_${card.tier}`]}>{card.tier}</span>
-        <span className={styles.type}>{card.type}</span>
-      </div>
-
-      <div className={styles.question}>
-        <span className={styles.qLabel}>Q:</span> {card.q}
-      </div>
-
-      {!revealed ? (
-        <button type="button" className={styles.revealBtn} onClick={onReveal}>
-          Show Answer
-        </button>
-      ) : (
-        <div className={styles.answerSection}>
-          <div className={styles.answer}>
-            <span className={styles.aLabel}>A:</span> {card.a}
-          </div>
-
-          {card.why && <div className={styles.why}>{card.why}</div>}
-
-          {Array.isArray(card.sources) && card.sources.length > 0 && (
-            <ul className={styles.sources}>
-              {card.sources.map((s) => (
-                <li key={s.url}>
-                  <a href={s.url} target="_blank" rel="noopener noreferrer">
-                    {s.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <p className={styles.gradePrompt}>How well did you recall this?</p>
-          <div className={styles.grades}>
-            {GRADES.map((g) => (
-              <button
-                key={g.grade}
-                type="button"
-                className={styles.gradeBtn}
-                style={{ borderColor: g.color, color: g.color }}
-                onClick={() => onGrade(g.grade)}
-                aria-label={`${g.label} (press ${g.key})`}
-              >
-                <span className={styles.gradeKey}>{g.key}</span>
-                {g.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** End-of-session summary. */
-function SessionComplete({ topic, reviewed, stats, onBack, onMore, hasMore }) {
-  return (
-    <div className={styles.complete}>
-      <h2>Session Complete</h2>
-      <p className={styles.completeSub}>
-        {reviewed} card{reviewed === 1 ? '' : 's'} reviewed
-        {topic !== '__all__' && ` in ${label(topic)}`}.
-      </p>
-
-      <div className={styles.statsGrid}>
-        <div className={styles.stat}>
-          <span className={styles.statNum}>{stats.tracked}</span>
-          <span className={styles.statLabel}>Cards in rotation</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statNum}>{stats.mature}</span>
-          <span className={styles.statLabel}>Mature (21d+)</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statNum}>{stats.learning}</span>
-          <span className={styles.statLabel}>Still learning</span>
-        </div>
-      </div>
-
-      <div className={styles.completeActions}>
-        {hasMore && (
-          <button type="button" className={styles.actionBtn} onClick={onMore}>
-            Keep Going
-          </button>
-        )}
-        <button type="button" className={styles.actionBtnSecondary} onClick={onBack}>
-          Pick Another Topic
-        </button>
-        <button type="button" className={styles.actionBtnSecondary} onClick={exportProgress}>
-          Export Progress
-        </button>
-      </div>
-    </div>
-  );
-}
+/** Map keyboard digits to grades, derived so config stays authoritative. */
+const KEY_TO_GRADE = new Map(
+  config.grades.map((entry, index) => [String(index + 1), entry.grade])
+);
 
 export default function RevisePage() {
-  const cardsUrl = useBaseUrl('/cards.json');
-  const [allCards, setAllCards] = useState([]);
+  const [manifest, setManifest] = useState(null);
+  const [status, setStatus] = useState(Status.LOADING);
   const [progress, setProgress] = useState({});
-  const [status, setStatus] = useState('loading');
 
   const [topic, setTopic] = useState(null);
   const [queue, setQueue] = useState([]);
   const [revealed, setRevealed] = useState(false);
-  const [reviewed, setReviewed] = useState(0);
-  const [sessionDone, setSessionDone] = useState(false);
+  const [reviewedCount, setReviewedCount] = useState(0);
+  const [sessionActive, setSessionActive] = useState(false);
+  // Distinct from sessionActive: the queue is fetched asynchronously, so there
+  // is a window with a chosen topic but no cards yet. Without this the
+  // "nothing due" screen would flash before the queue arrives.
+  const [queueLoading, setQueueLoading] = useState(false);
 
-  // Load cards + saved progress
+  // Manifest is small and card-free, so the topic picker renders immediately
+  // without downloading any card bodies.
   useEffect(() => {
     let cancelled = false;
 
-    async function init() {
-      try {
-        const resp = await fetch(cardsUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
+    loadManifest()
+      .then((data) => {
         if (cancelled) return;
-        setAllCards((data.cards || []).filter((c) => !c.deprecated));
+        setManifest(data);
         setProgress(loadProgress());
-        setStatus('ready');
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    }
+        setStatus(Status.READY);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.warn('Revise could not load the card manifest:', error?.message);
+        setStatus(Status.ERROR);
+      });
 
-    init();
     return () => {
       cancelled = true;
     };
-  }, [cardsUrl]);
+  }, []);
 
-  // Available topics with total + due counts.
-  // Grouped by card.topic (folder-derived), not tags — tags are cross-cutting
-  // and would double-count cards across topics.
-  const topics = useMemo(() => {
-    const counts = new Map();
-    for (const card of allCards) {
-      const tag = card.topic;
-      if (!tag) continue;
-      if (!counts.has(tag)) counts.set(tag, { tag, total: 0, due: 0 });
-      const entry = counts.get(tag);
-      entry.total += 1;
-      const state = progress[card.id];
-      if (!state || isDue(state)) entry.due += 1;
-    }
-    return [...counts.values()].sort((a, b) => {
-      const ai = TOPIC_ORDER.indexOf(a.tag);
-      const bi = TOPIC_ORDER.indexOf(b.tag);
-      // Unknown topics sort last, alphabetically
-      if (ai === -1 && bi === -1) return a.tag.localeCompare(b.tag);
-      if (ai === -1) return 1;
-      if (bi === -1) return -1;
-      return ai - bi;
+  const topicSummaries = useMemo(() => {
+    if (!manifest) return [];
+
+    return manifest.topics.map((entry) => {
+      // Without per-card state we cannot know exactly which cards are due, but
+      // an unseen card is always due, so total minus seen is a safe lower bound
+      // that never over-promises work.
+      const seenInTopic = Object.values(progress).filter(
+        (state) => state.topic === entry.topic
+      );
+      const seenDue = seenInTopic.filter(isDue).length;
+      const unseen = entry.cardCount - seenInTopic.length;
+
+      return {
+        topic: entry.topic,
+        label: entry.label,
+        total: entry.cardCount,
+        pageCount: entry.pages.length,
+        due: Math.max(0, unseen) + seenDue,
+      };
     });
-  }, [allCards, progress]);
+  }, [manifest, progress]);
 
-  const stats = useMemo(() => {
-    const tracked = Object.values(progress).filter((s) => s.reps > 0);
-    return {
-      tracked: tracked.length,
-      mature: tracked.filter((s) => s.interval >= 21).length,
-      learning: tracked.filter((s) => s.interval < 21).length,
-    };
-  }, [progress]);
+  const stats = useMemo(() => summarise(Object.values(progress)), [progress]);
 
-  /** Build a queue for a topic: due cards first (most overdue), then new. */
+  /**
+   * Build a due-first session queue for a topic.
+   *
+   * @param {string} topicId Topic slug, or ALL_TOPICS.
+   * @returns {Promise<object[]>}
+   */
   const buildQueue = useCallback(
-    (topicTag, limit = 20) => {
+    async (topicId) => {
       const pool =
-        topicTag === '__all__'
-          ? allCards
-          : allCards.filter((c) => c.topic === topicTag);
+        topicId === ALL_TOPICS
+          ? await loadTopicsCards(manifest.topics.map((t) => t.topic))
+          : await loadTopicCards(topicId);
 
-      const byId = new Map(pool.map((c) => [c.id, c]));
-      const states = pool.map((c) => progress[c.id] || createCardState(c.id));
+      const byId = new Map(pool.map((card) => [card.id, card]));
+      const states = pool.map(
+        (card) => progress[card.id] || createCardState(card.id)
+      );
 
-      const due = sortByUrgency(states.filter(isDue));
-      return due
-        .map((s) => byId.get(s.id))
+      return sortByUrgency(states.filter(isDue))
+        .map((state) => byId.get(state.id))
         .filter(Boolean)
-        .slice(0, limit);
+        .slice(0, config.srs.sessionSize);
     },
-    [allCards, progress]
+    [manifest, progress]
   );
 
-  function startTopic(topicTag) {
-    const q = buildQueue(topicTag);
-    setTopic(topicTag);
-    setQueue(q);
-    setReviewed(0);
-    setRevealed(false);
-    setSessionDone(q.length === 0);
-  }
+  const startTopic = useCallback(
+    async (topicId) => {
+      setTopic(topicId);
+      setRevealed(false);
+      setReviewedCount(0);
+      setQueue([]);
+      setQueueLoading(true);
+
+      try {
+        const nextQueue = await buildQueue(topicId);
+        setQueue(nextQueue);
+        // Activate only once cards are in hand, so the card renderer is never
+        // asked to draw an empty queue.
+        setSessionActive(nextQueue.length > 0);
+      } catch (error) {
+        console.warn('Could not build the review queue:', error?.message);
+        setSessionActive(false);
+      } finally {
+        setQueueLoading(false);
+      }
+    },
+    [buildQueue]
+  );
 
   const handleGrade = useCallback(
     (grade) => {
@@ -272,148 +160,325 @@ export default function RevisePage() {
 
       const current = progress[card.id] || createCardState(card.id);
       const next = reviewCard(current, grade);
-      const updated = { ...progress, [card.id]: next };
+
+      // Denormalise topic onto the saved state so due counts can be computed
+      // from progress alone, without loading every topic's cards.
+      const updated = { ...progress, [card.id]: { ...next, topic: card.topic } };
 
       setProgress(updated);
       saveProgress(updated);
-      setReviewed((n) => n + 1);
+      setReviewedCount((count) => count + 1);
       setRevealed(false);
 
       const remaining = queue.slice(1);
       setQueue(remaining);
-      if (remaining.length === 0) setSessionDone(true);
+      if (remaining.length === 0) setSessionActive(false);
     },
     [queue, progress]
   );
 
-  // Keyboard: Space to reveal, 1-4 to grade
+  // Keyboard-first: reveal, then grade, without leaving the keyboard.
   useEffect(() => {
-    function onKeyDown(e) {
-      if (topic === null || sessionDone || queue.length === 0) return;
+    if (!sessionActive || queue.length === 0) return undefined;
 
-      if (!revealed && e.code === 'Space') {
-        e.preventDefault();
+    const onKeyDown = (event) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      if (!revealed && event.code === config.keys.revealCode) {
+        event.preventDefault();
         setRevealed(true);
         return;
       }
-      if (revealed) {
-        const map = { 1: 0, 2: 1, 3: 2, 4: 3 };
-        if (e.key in map) {
-          e.preventDefault();
-          handleGrade(map[e.key]);
-        }
+      if (revealed && KEY_TO_GRADE.has(event.key)) {
+        event.preventDefault();
+        handleGrade(KEY_TO_GRADE.get(event.key));
       }
-    }
+    };
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [revealed, queue, sessionDone, topic, handleGrade]);
+  }, [revealed, sessionActive, queue.length, handleGrade]);
 
-  const pageTitle = 'Revise';
-  const pageDesc = 'Self-test one DevOps topic. Grades build a spaced review schedule.';
+  const pageMeta = {
+    title: 'Revise',
+    description:
+      'Self-test one DevOps topic. Grades quietly build a spaced review schedule.',
+  };
 
-  if (status === 'loading') {
+  if (status === Status.LOADING) {
     return (
-      <Layout title={pageTitle} description={pageDesc}>
+      <Layout {...pageMeta}>
         <div className={styles.container}>
-          <p className={styles.muted}>Loading cards…</p>
+          <p className={styles.muted}>Loading…</p>
         </div>
       </Layout>
     );
   }
 
-  if (status === 'error') {
+  if (status === Status.ERROR) {
     return (
-      <Layout title={pageTitle} description={pageDesc}>
+      <Layout {...pageMeta}>
         <div className={styles.container}>
           <p className={styles.muted}>
-            Could not load cards. Try a refresh, or run <code>npm run build</code> if
-            you are developing locally.
+            Could not load cards. Refresh to retry, or run{' '}
+            <code>npm run build</code> if you are developing locally.
           </p>
         </div>
       </Layout>
     );
   }
 
-  // Entry screen
   if (topic === null) {
     return (
-      <Layout title={pageTitle} description={pageDesc}>
+      <Layout {...pageMeta}>
         <div className={styles.container}>
-          <TopicPicker topics={topics} onSelect={startTopic} />
+          <TopicPicker
+            topics={topicSummaries}
+            onSelect={startTopic}
+            showBackupPrompt={shouldSuggestBackup()}
+          />
         </div>
       </Layout>
     );
   }
 
-  // Session finished
-  if (sessionDone) {
-    const remainingDue = buildQueue(topic).length;
+  if (queueLoading) {
     return (
-      <Layout title={pageTitle} description={pageDesc}>
+      <Layout {...pageMeta}>
         <div className={styles.container}>
-          {reviewed === 0 ? (
-            <div className={styles.complete}>
-              <h2>Nothing due right now</h2>
-              <p className={styles.completeSub}>
-                You have reviewed everything in{' '}
-                {topic === '__all__' ? 'all topics' : label(topic)} for now. Come back
-                later, or drill instead.
-              </p>
-              <div className={styles.completeActions}>
-                <button
-                  type="button"
-                  className={styles.actionBtnSecondary}
-                  onClick={() => setTopic(null)}
-                >
-                  Pick Another Topic
-                </button>
-              </div>
-            </div>
-          ) : (
-            <SessionComplete
-              topic={topic}
-              reviewed={reviewed}
-              stats={stats}
-              hasMore={remainingDue > 0}
-              onMore={() => startTopic(topic)}
-              onBack={() => setTopic(null)}
-            />
-          )}
+          <p className={styles.muted}>Loading questions…</p>
         </div>
       </Layout>
     );
   }
 
-  // Active session
+  const currentCard = queue[0];
+
+  // Session is over when there is nothing left to show. Checking the card
+  // rather than only the flag keeps this safe against any future state race.
+  if (!sessionActive || !currentCard) {
+    return (
+      <Layout {...pageMeta}>
+        <div className={styles.container}>
+          <SessionSummary
+            topicLabel={topicLabelFor(topicSummaries, topic)}
+            reviewedCount={reviewedCount}
+            stats={stats}
+            onPickAnother={() => setTopic(null)}
+            onContinue={() => startTopic(topic)}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout title={pageTitle} description={pageDesc}>
+    <Layout {...pageMeta}>
       <div className={styles.container}>
-        <div className={styles.header}>
+        <header className={styles.header}>
           <button
             type="button"
-            className={styles.backBtn}
+            className={styles.backButton}
             onClick={() => setTopic(null)}
           >
             ← Topics
           </button>
           <span className={styles.headerTopic}>
-            {topic === '__all__' ? 'All topics' : label(topic)}
+            {topicLabelFor(topicSummaries, topic)}
           </span>
-          <span className={styles.headerCount}>
-            {queue.length} left
-          </span>
-        </div>
+          <span className={styles.headerCount}>{queue.length} left</span>
+        </header>
 
-        <ReviseCard
-          card={queue[0]}
-          revealed={revealed}
-          onReveal={() => setRevealed(true)}
-          onGrade={handleGrade}
-        />
+        <article className={styles.card}>
+          <CardBadges tier={currentCard.tier} type={currentCard.type} />
 
-        <p className={styles.hint}>Space to reveal · 1–4 to grade</p>
+          <p className={styles.question}>
+            <span className={styles.questionLabel}>Q:</span> {currentCard.q}
+          </p>
+
+          {revealed ? (
+            <div className={styles.answerPanel}>
+              <CardAnswer card={currentCard} />
+
+              <p className={styles.gradePrompt}>How well did you recall this?</p>
+              <div className={styles.grades}>
+                {config.grades.map((entry, index) => (
+                  <button
+                    key={entry.grade}
+                    type="button"
+                    className={styles.gradeButton}
+                    style={{ borderColor: entry.color, color: entry.color }}
+                    onClick={() => handleGrade(entry.grade)}
+                    title={entry.hint}
+                    aria-label={`${entry.label} — ${entry.hint} (press ${index + 1})`}
+                  >
+                    <span className={styles.gradeKey}>{index + 1}</span>
+                    {entry.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className={styles.revealButton}
+              onClick={() => setRevealed(true)}
+            >
+              Show Answer
+            </button>
+          )}
+        </article>
+
+        <p className={styles.hint}>
+          {config.keys.reveal} to reveal · {config.keys.gradeHint}
+        </p>
       </div>
     </Layout>
+  );
+}
+
+/**
+ * @param {Array<{topic: string, label: string}>} topics
+ * @param {string} topicId
+ * @returns {string}
+ */
+function topicLabelFor(topics, topicId) {
+  if (topicId === ALL_TOPICS) return 'All topics';
+  return topics.find((t) => t.topic === topicId)?.label || topicId;
+}
+
+/**
+ * Entry screen: choose what to revise.
+ *
+ * @param {object} props
+ * @param {Array<object>} props.topics
+ * @param {(topic: string) => void} props.onSelect
+ * @param {boolean} props.showBackupPrompt
+ */
+function TopicPicker({ topics, onSelect, showBackupPrompt }) {
+  const totalDue = topics.reduce((sum, t) => sum + t.due, 0);
+
+  return (
+    <section className={styles.picker}>
+      <h1>Revise</h1>
+      <p className={styles.pickerDescription}>
+        Pick a topic and test yourself. Your grades quietly build a review
+        schedule, so questions you struggle with come back sooner.
+      </p>
+
+      {totalDue > 0 && (
+        <p className={styles.dueSummary}>
+          <strong>{totalDue}</strong> question{totalDue === 1 ? '' : 's'} ready to review
+        </p>
+      )}
+
+      <div className={styles.topicGrid}>
+        {topics.map((entry) => (
+          <button
+            key={entry.topic}
+            type="button"
+            className={styles.topicCard}
+            onClick={() => onSelect(entry.topic)}
+          >
+            <span className={styles.topicName}>{entry.label}</span>
+            <span className={styles.topicMeta}>
+              {entry.total} cards
+              {entry.due > 0 && <span className={styles.dueBadge}>{entry.due} due</span>}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className={styles.secondaryButton}
+        onClick={() => onSelect(ALL_TOPICS)}
+      >
+        Revise all topics
+      </button>
+
+      {showBackupPrompt && (
+        <p className={styles.backupPrompt}>
+          You have been revising for a while. Progress lives only in this browser —{' '}
+          <button type="button" className={styles.inlineButton} onClick={exportProgress}>
+            export a backup
+          </button>
+          .
+        </p>
+      )}
+    </section>
+  );
+}
+
+/**
+ * End-of-session screen.
+ *
+ * @param {object} props
+ * @param {string} props.topicLabel
+ * @param {number} props.reviewedCount
+ * @param {{tracked: number, mature: number, learning: number}} props.stats
+ * @param {() => void} props.onPickAnother
+ * @param {() => void} props.onContinue
+ */
+function SessionSummary({
+  topicLabel,
+  reviewedCount,
+  stats,
+  onPickAnother,
+  onContinue,
+}) {
+  const nothingWasDue = reviewedCount === 0;
+
+  return (
+    <section className={styles.complete}>
+      <h2>{nothingWasDue ? 'Nothing due right now' : 'Session complete'}</h2>
+
+      <p className={styles.completeSub}>
+        {nothingWasDue
+          ? `You are up to date on ${topicLabel}. Come back later, or try a drill instead.`
+          : `${reviewedCount} question${reviewedCount === 1 ? '' : 's'} reviewed in ${topicLabel}.`}
+      </p>
+
+      {!nothingWasDue && (
+        <div className={styles.statsGrid}>
+          <Stat value={stats.tracked} label="In rotation" />
+          <Stat
+            value={stats.mature}
+            label={`Mature (${config.srs.matureIntervalDays}d+)`}
+          />
+          <Stat value={stats.learning} label="Still learning" />
+        </div>
+      )}
+
+      <div className={styles.completeActions}>
+        {!nothingWasDue && (
+          <button type="button" className={styles.primaryButton} onClick={onContinue}>
+            Keep going
+          </button>
+        )}
+        <button type="button" className={styles.secondaryButton} onClick={onPickAnother}>
+          Pick another topic
+        </button>
+        {!nothingWasDue && (
+          <button type="button" className={styles.secondaryButton} onClick={exportProgress}>
+            Export progress
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * @param {object} props
+ * @param {number} props.value
+ * @param {string} props.label
+ */
+function Stat({ value, label }) {
+  return (
+    <div className={styles.stat}>
+      <span className={styles.statValue}>{value}</span>
+      <span className={styles.statLabel}>{label}</span>
+    </div>
   );
 }

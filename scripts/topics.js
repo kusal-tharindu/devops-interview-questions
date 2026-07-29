@@ -1,68 +1,149 @@
+/**
+ * Topic discovery for navbar and sidebar generation.
+ *
+ * Reads the docs/ tree at build time so adding a topic folder or a page never
+ * requires editing docusaurus.config.js or sidebars.js.
+ *
+ * Identity and ordering rules live in lib/content-paths.js — this module only
+ * shapes them for Docusaurus config consumption.
+ */
+
 const fs = require('fs');
 const path = require('path');
 
-const DOCS_DIR = path.join(__dirname, '..', 'docs');
+const config = require('../site.config');
+const {
+  DOCS_DIR,
+  findTopicDirs,
+  topicLabel,
+  compareTopics,
+} = require('./lib/content-paths');
 
-function isTopicDir(name) {
-  return !name.startsWith('_') && !name.startsWith('.');
+/** Markdown files that are pages, not partials. */
+function isPageFile(name) {
+  return name.endsWith('.md') && !name.startsWith('_');
 }
 
+/**
+ * Read a topic's _category_.json, if present.
+ *
+ * @param {string} topicPath
+ * @returns {object|null}
+ */
 function readCategoryMeta(topicPath) {
-  const categoryFile = path.join(topicPath, '_category_.json');
-  if (!fs.existsSync(categoryFile)) return null;
+  const file = path.join(topicPath, '_category_.json');
+  if (!fs.existsSync(file)) return null;
   try {
-    return JSON.parse(fs.readFileSync(categoryFile, 'utf8'));
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch (err) {
-    console.warn(`Warning: could not parse ${categoryFile}: ${err.message}`);
+    console.warn(`Warning: could not parse ${file}: ${err.message}`);
     return null;
   }
 }
 
 /**
- * Returns topic folder names found under docs/ (excluding _templates etc.),
- * used by sidebars.js to build one sidebar per topic.
+ * Front matter `sidebar_position`, used to pick a topic's landing page.
+ *
+ * @param {string} filePath
+ * @returns {number} Large fallback so unpositioned pages sort last.
  */
-function getTopicDirs() {
-  if (!fs.existsSync(DOCS_DIR)) return [];
-  return fs
-    .readdirSync(DOCS_DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && isTopicDir(entry.name))
-    .map((entry) => entry.name);
+function readSidebarPosition(filePath) {
+  try {
+    const head = fs.readFileSync(filePath, 'utf8').slice(0, 600);
+    const match = head.match(/^sidebar_position:\s*(\d+)/m);
+    return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+  } catch {
+    return Number.MAX_SAFE_INTEGER;
+  }
 }
 
 /**
- * Returns topic metadata (slug, label, position, firstDocId) sorted by
- * position, used by docusaurus.config.js to build the navbar dropdown.
- * firstDocId points at the first doc file in the topic (by sidebar_position
- * order, falling back to alphabetical), so the dropdown links straight to
- * content instead of an intermediate index page.
+ * Every page in a topic, recursively, as Docusaurus doc ids.
+ *
+ * @param {string} topic
+ * @returns {Array<{docId: string, position: number, depth: number}>}
  */
-function getTopicsForNavbar() {
-  const topics = getTopicDirs().map((slug) => {
-    const topicPath = path.join(DOCS_DIR, slug);
-    const meta = readCategoryMeta(topicPath);
+function findTopicPages(topic) {
+  const topicRoot = path.join(DOCS_DIR, topic);
+  if (!fs.existsSync(topicRoot)) return [];
 
-    const mdFiles = fs
-      .readdirSync(topicPath, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
-      .map((entry) => entry.name)
-      .sort();
+  const pages = [];
 
-    const firstFile = mdFiles[0];
-    const firstDocId = firstFile
-      ? `${slug}/${firstFile.replace(/\.md$/, '')}`
-      : slug;
+  const walk = (dir, depth) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith('.')) continue;
+      const fullPath = path.join(dir, entry.name);
 
-    return {
-      slug,
-      label: meta?.label ?? slug,
-      position: meta?.position ?? 999,
-      firstDocId,
-    };
-  });
+      if (entry.isDirectory()) {
+        if (entry.name.startsWith('_')) continue;
+        walk(fullPath, depth + 1);
+      } else if (isPageFile(entry.name)) {
+        const relative = path.relative(DOCS_DIR, fullPath).replace(/\.md$/, '');
+        pages.push({
+          docId: relative.split(path.sep).join('/'),
+          position: readSidebarPosition(fullPath),
+          depth,
+        });
+      }
+    }
+  };
 
-  topics.sort((a, b) => a.position - b.position);
-  return topics;
+  walk(topicRoot, 0);
+
+  // Shallowest first, then by declared position, then alphabetically. This makes
+  // a topic's top-level intro page its landing page even once subfolders exist.
+  return pages.sort(
+    (a, b) =>
+      a.depth - b.depth ||
+      a.position - b.position ||
+      a.docId.localeCompare(b.docId)
+  );
 }
 
-module.exports = { getTopicDirs, getTopicsForNavbar };
+/**
+ * Topic folder names, in display order.
+ *
+ * @returns {string[]}
+ */
+function getTopicDirs() {
+  return findTopicDirs().sort(compareTopics);
+}
+
+/**
+ * Topic metadata for the navbar dropdown.
+ *
+ * @returns {Array<{slug: string, label: string, firstDocId: string, pageCount: number}>}
+ */
+function getTopicsForNavbar() {
+  return getTopicDirs()
+    .map((slug) => {
+      const pages = findTopicPages(slug);
+      const meta = readCategoryMeta(path.join(DOCS_DIR, slug));
+
+      return {
+        slug,
+        label: meta?.label || topicLabel(slug),
+        firstDocId: pages[0] ? pages[0].docId : slug,
+        pageCount: pages.length,
+      };
+    })
+    .filter((topic) => topic.pageCount > 0);
+}
+
+/**
+ * Whether a topic has enough pages to be worth grouping into subfolders.
+ * Surfaced so the sidebar can collapse large topics by default.
+ *
+ * @param {string} topic
+ * @returns {boolean}
+ */
+function shouldCollapseTopic(topic) {
+  return findTopicPages(topic).length > config.contentTargets.groupPagesAfter;
+}
+
+module.exports = {
+  getTopicDirs,
+  getTopicsForNavbar,
+  findTopicPages,
+  shouldCollapseTopic,
+};

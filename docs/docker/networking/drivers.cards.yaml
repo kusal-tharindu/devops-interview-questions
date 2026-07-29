@@ -1,0 +1,117 @@
+- id: docker-net-default-driver
+  tier: core
+  type: recall
+  q: What is the default Docker network driver?
+  a: bridge — the container gets a private IP on a virtual switch, NATed to the outside.
+  tags: [docker, networking, drivers]
+  verified: 2026-07-29
+  ref: '#drivers'
+  sources:
+    - title: Docker Docs — Networking overview
+      url: https://docs.docker.com/engine/network/
+
+- id: docker-net-host-driver
+  tier: core
+  type: recall
+  q: What does the host network driver do?
+  a: Gives the container the host's network stack directly — no isolation, no NAT, no port mapping.
+  tags: [docker, networking, drivers]
+  verified: 2026-07-29
+  ref: '#drivers'
+
+- id: docker-net-none-driver
+  tier: deep
+  type: recall
+  q: When would you use the none network driver?
+  a: For a workload that must have no network access beyond loopback.
+  tags: [docker, networking, drivers]
+  verified: 2026-07-29
+  ref: '#drivers'
+
+- id: docker-net-overlay-driver
+  tier: deep
+  type: recall
+  q: What is the overlay driver for?
+  a: Networks that span multiple hosts, so containers on different machines share one address space.
+  tags: [docker, networking, drivers]
+  verified: 2026-07-29
+  ref: '#drivers'
+
+- id: docker-net-macvlan-driver
+  tier: trivia
+  type: recall
+  q: What does the macvlan driver give a container?
+  a: Its own MAC address on the physical LAN, so it appears to be a physical host.
+  tags: [docker, networking, drivers]
+  verified: 2026-07-29
+  ref: '#drivers'
+
+- id: docker-net-default-bridge-dns
+  tier: core
+  type: scenario
+  q: Two containers on the default bridge cannot reach each other by name. Why?
+  a: The built-in bridge has no embedded DNS. Only user-defined networks resolve container names.
+  why: Hardcoding IPs is not a fix — container IPs change on restart.
+  tags: [docker, networking, dns, troubleshooting]
+  verified: 2026-07-29
+  ref: '#user-defined-bridge'
+  sources:
+    - title: Docker Docs — Bridge networks
+      url: https://docs.docker.com/engine/network/drivers/bridge/
+
+- id: docker-net-create-network
+  tier: core
+  type: command
+  q: How do you create a user-defined bridge network?
+  a: docker network create app-net
+  tags: [docker, networking, commands]
+  verified: 2026-07-29
+  ref: '#user-defined-bridge'
+
+- id: docker-net-service-discovery
+  tier: core
+  type: recall
+  q: On a user-defined bridge, what hostname does one container use to reach another?
+  a: The other container's name, resolved by Docker's embedded DNS.
+  tags: [docker, networking, dns]
+  verified: 2026-07-29
+  ref: '#user-defined-bridge'
+
+- id: docker-net-expose-vs-publish
+  tier: core
+  type: recall
+  q: What is the difference between EXPOSE and -p?
+  a: EXPOSE only documents a port. -p actually publishes it to the host.
+  tags: [docker, networking, ports]
+  verified: 2026-07-29
+  ref: '#publishing-ports'
+
+- id: docker-net-publish-syntax
+  tier: core
+  type: command
+  q: How do you map host port 8080 to container port 80?
+  a: docker run -p 8080:80 image
+  tags: [docker, networking, ports, commands]
+  verified: 2026-07-29
+  ref: '#publishing-ports'
+
+- id: docker-net-bind-loopback
+  tier: deep
+  type: command
+  q: How do you publish a port so only the host itself can reach it?
+  a: Prefix the mapping with the interface, e.g. -p 127.0.0.1:8080:80
+  tags: [docker, networking, ports, security]
+  verified: 2026-07-29
+  ref: '#publishing-ports'
+
+- id: docker-net-iptables-bypass
+  tier: deep
+  type: elaborative
+  q: Why might a published container port still be reachable despite a host firewall rule?
+  a: Docker writes its own iptables rules and can bypass higher-level firewall tools like ufw.
+  tags: [docker, networking, security, troubleshooting]
+  verified: 2026-07-29
+  ref: '#publishing-ports'
+  sources:
+    - title: Docker Docs — Packet filtering and firewalls
+      url: https://docs.docker.com/engine/network/packet-filtering-firewalls/

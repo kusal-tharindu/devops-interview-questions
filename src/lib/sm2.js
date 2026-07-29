@@ -1,112 +1,188 @@
 /**
- * SM-2 Spaced Repetition Algorithm
+ * SM-2 spaced repetition scheduling.
  *
- * Based on the SuperMemo SM-2 algorithm by Piotr Wozniak.
- * Used by Anki and many other SRS tools.
+ * Based on the SuperMemo SM-2 algorithm, the same family Anki uses. All tuning
+ * constants come from site.config.js `srs` — no magic numbers here.
  *
- * Grades:
- *   0 = Again (complete failure)
- *   1 = Hard (significant difficulty)
- *   2 = Good (correct with some effort)
- *   3 = Easy (effortless recall)
+ * A caveat worth keeping honest about: the precise interval curve is not
+ * settled science. The literature establishes that expanding intervals beat
+ * massed practice, but not the exact multipliers. SM-2 is a well-understood
+ * default, not an optimum.
+ *
+ * Grades (see config.grades): 0 Again · 1 Hard · 2 Good · 3 Easy
  */
 
-const MIN_EASE = 1.3;
-const DEFAULT_EASE = 2.5;
+import config from '@site/site.config';
+
+const { srs } = config;
+
+/** Grade constants, so callers never pass bare integers. */
+export const Grade = Object.freeze({
+  AGAIN: 0,
+  HARD: 1,
+  GOOD: 2,
+  EASY: 3,
+});
 
 /**
- * Creates initial card state for a new card.
+ * @typedef {object} CardState
+ * @property {string} id Card id this state belongs to.
+ * @property {number} ease Ease factor; higher means longer intervals.
+ * @property {number} interval Days until the next review.
+ * @property {number} reps Consecutive successful reviews.
+ * @property {number} lapses Lifetime count of failed reviews.
+ * @property {string} due ISO date (YYYY-MM-DD) when the card is next due.
+ * @property {number|null} lastGrade Most recent grade, or null if never reviewed.
+ */
+
+/**
+ * Today as an ISO date string, local time.
+ *
+ * Local rather than UTC on purpose: "due today" should mean the learner's
+ * today, not a date that flips mid-evening in western timezones.
+ *
+ * @param {Date} [from]
+ * @returns {string} YYYY-MM-DD
+ */
+export function today(from = new Date()) {
+  const year = from.getFullYear();
+  const month = String(from.getMonth() + 1).padStart(2, '0');
+  const day = String(from.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * @param {number} days
+ * @param {Date} [from]
+ * @returns {string} ISO date `days` in the future.
+ */
+function dateAfter(days, from = new Date()) {
+  const target = new Date(from);
+  target.setDate(target.getDate() + days);
+  return today(target);
+}
+
+/**
+ * Fresh state for a card that has never been reviewed. Due immediately.
+ *
+ * @param {string} cardId
+ * @returns {CardState}
  */
 export function createCardState(cardId) {
   return {
     id: cardId,
-    ease: DEFAULT_EASE,
-    interval: 0, // days
+    ease: srs.defaultEase,
+    interval: 0,
     reps: 0,
     lapses: 0,
-    due: new Date().toISOString().slice(0, 10), // today
+    due: today(),
     lastGrade: null,
   };
 }
 
 /**
- * Calculates the next state after a review.
+ * Next interval after a successful review, before grade adjustment.
  *
- * @param {object} state - Current card state
- * @param {number} grade - 0=Again, 1=Hard, 2=Good, 3=Easy
- * @returns {object} Updated card state
+ * @param {CardState} state
+ * @returns {number} Days.
+ */
+function baseInterval(state) {
+  if (state.reps === 0) return srs.firstInterval;
+  if (state.reps === 1) return srs.secondInterval;
+  return Math.round(state.interval * state.ease);
+}
+
+/**
+ * Apply a review grade and produce the next scheduling state.
+ *
+ * Pure: returns new state, never mutates the input.
+ *
+ * @param {CardState} state Current state.
+ * @param {number} grade One of {@link Grade}.
+ * @returns {CardState} Updated state.
  */
 export function reviewCard(state, grade) {
-  const now = new Date().toISOString().slice(0, 10);
-  let { ease, interval, reps, lapses } = state;
+  const clampEase = (value) => Math.max(srs.minEase, value);
 
-  if (grade === 0) {
-    // Again — reset to learning
-    lapses += 1;
-    reps = 0;
-    interval = 0;
-    ease = Math.max(MIN_EASE, ease - 0.2);
-  } else {
-    // Successful review
-    if (reps === 0) {
-      // First successful review — 1 day
-      interval = 1;
-    } else if (reps === 1) {
-      // Second successful review — 6 days
-      interval = 6;
-    } else {
-      // Subsequent reviews — multiply by ease
-      interval = Math.round(interval * ease);
-    }
-
-    // Adjust ease based on grade
-    if (grade === 1) {
-      // Hard — shorter interval, decrease ease
-      interval = Math.max(1, Math.round(interval * 0.8));
-      ease = Math.max(MIN_EASE, ease - 0.15);
-    } else if (grade === 3) {
-      // Easy — longer interval, increase ease
-      interval = Math.round(interval * 1.3);
-      ease += 0.15;
-    }
-    // grade === 2 (Good) — no ease adjustment
-
-    reps += 1;
+  if (grade === Grade.AGAIN) {
+    return {
+      ...state,
+      ease: clampEase(state.ease - srs.easePenaltyAgain),
+      interval: 0,
+      reps: 0,
+      lapses: state.lapses + 1,
+      due: today(),
+      lastGrade: grade,
+    };
   }
 
-  // Calculate next due date
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + interval);
-  const due = dueDate.toISOString().slice(0, 10);
+  let interval = baseInterval(state);
+  let ease = state.ease;
+
+  if (grade === Grade.HARD) {
+    interval = Math.max(1, Math.round(interval * srs.intervalFactorHard));
+    ease = clampEase(ease - srs.easePenaltyHard);
+  } else if (grade === Grade.EASY) {
+    interval = Math.round(interval * srs.intervalFactorEasy);
+    ease = ease + srs.easeBonusEasy;
+  }
+  // Grade.GOOD leaves ease unchanged — that is the calibrated baseline.
 
   return {
-    id: state.id,
+    ...state,
     ease,
     interval,
-    reps,
-    lapses,
-    due,
+    reps: state.reps + 1,
+    lapses: state.lapses,
+    due: dateAfter(interval),
     lastGrade: grade,
   };
 }
 
 /**
- * Checks if a card is due for review today or earlier.
+ * @param {CardState} state
+ * @returns {boolean} True when the card is due today or overdue.
  */
 export function isDue(state) {
-  const today = new Date().toISOString().slice(0, 10);
-  return state.due <= today;
+  return !state || state.due <= today();
 }
 
 /**
- * Sorts cards so most overdue cards come first.
+ * @param {CardState} state
+ * @returns {boolean} True once the card is well established in memory.
+ */
+export function isMature(state) {
+  return Boolean(state) && state.interval >= srs.matureIntervalDays;
+}
+
+/**
+ * Order states most-urgent-first: oldest due date, then most-lapsed.
+ *
+ * Lapses break the tie so cards a learner keeps failing surface early, while
+ * attention is freshest.
+ *
+ * @param {CardState[]} states
+ * @returns {CardState[]} New sorted array.
  */
 export function sortByUrgency(states) {
-  const today = new Date().toISOString().slice(0, 10);
   return [...states].sort((a, b) => {
-    if (a.due < b.due) return -1;
-    if (a.due > b.due) return 1;
-    // Same due date — higher lapse count first
+    if (a.due !== b.due) return a.due < b.due ? -1 : 1;
     return b.lapses - a.lapses;
   });
+}
+
+/**
+ * Summarise a collection of card states.
+ *
+ * @param {CardState[]} states
+ * @returns {{tracked: number, mature: number, learning: number, dueNow: number}}
+ */
+export function summarise(states) {
+  const tracked = states.filter((s) => s.reps > 0 || s.lapses > 0);
+  return {
+    tracked: tracked.length,
+    mature: tracked.filter(isMature).length,
+    learning: tracked.filter((s) => !isMature(s)).length,
+    dueNow: states.filter(isDue).length,
+  };
 }

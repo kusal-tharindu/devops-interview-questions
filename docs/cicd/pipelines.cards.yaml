@@ -1,0 +1,141 @@
+- id: cicd-basics-ci-definition
+  tier: core
+  type: concept
+  q: What is Continuous Integration?
+  a: Automatically building and testing every pushed change so integration problems surface immediately.
+  tags: [cicd, fundamentals]
+  verified: 2026-07-29
+  ref: '#ci-cd-definitions'
+  sources:
+    - title: Martin Fowler — Continuous Integration
+      url: https://martinfowler.com/articles/continuousIntegration.html
+
+- id: cicd-basics-delivery-vs-deployment
+  tier: core
+  type: recall
+  q: What is the difference between Continuous Delivery and Continuous Deployment?
+  a: Delivery keeps a manual approval gate before production. Deployment releases automatically.
+  tags: [cicd, fundamentals]
+  verified: 2026-07-29
+  ref: '#ci-cd-definitions'
+
+- id: cicd-basics-pipeline-stages
+  tier: core
+  type: recall
+  q: What are the typical stages of a CI/CD pipeline?
+  a: Source trigger, build, test, staging, then production deploy.
+  tags: [cicd, pipelines]
+  verified: 2026-07-29
+  ref: '#ci-cd-definitions'
+
+- id: cicd-basics-artifact-meaning
+  tier: core
+  type: recall
+  q: What is a build artifact?
+  a: The deployable output of the build stage — a container image, binary or bundle.
+  tags: [cicd, pipelines, artifacts]
+  verified: 2026-07-29
+  ref: '#artifacts'
+
+- id: cicd-build-once-promote
+  tier: core
+  type: elaborative
+  q: Why should you build an artifact once and promote it through environments?
+  a: Rebuilding per environment means the thing you tested is not the thing you ship.
+  why: It also makes rollback trivial — redeploy the previous artifact instead of rebuilding under pressure.
+  tags: [cicd, pipelines, artifacts]
+  verified: 2026-07-29
+  ref: '#artifacts'
+
+- id: cicd-basics-blue-green
+  tier: core
+  type: concept
+  q: How does a blue-green deployment work?
+  a: Two full environments; deploy to the idle one, verify, then switch traffic. Rollback is switching back.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+  ref: '#strategies'
+
+- id: cicd-basics-canary
+  tier: core
+  type: concept
+  q: How does a canary deployment work?
+  a: Route a small percentage of traffic to the new version, watch metrics, then increase or roll back.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+  ref: '#strategies'
+
+- id: cicd-canary-needs-monitoring
+  tier: deep
+  type: elaborative
+  q: What does a canary deployment require to be worth doing?
+  a: Real observability — without metrics to watch it is just a slower rolling deploy.
+  tags: [cicd, deployment-strategies, observability]
+  verified: 2026-07-29
+  ref: '#strategies'
+
+- id: cicd-basics-rolling-update
+  tier: core
+  type: recall
+  q: How does a rolling deployment work, and what is its downside?
+  a: Instances are replaced in batches. Rollback is slow because you must roll forward again.
+  tags: [cicd, deployment-strategies]
+  verified: 2026-07-29
+  ref: '#strategies'
+
+- id: cicd-basics-rollback-strategy
+  tier: deep
+  type: scenario
+  q: A deploy introduces a critical bug. What is the fastest safe rollback?
+  a: Redeploy the previous known-good artifact — not a rebuild from an old commit.
+  tags: [cicd, deployment-strategies, troubleshooting]
+  verified: 2026-07-29
+  ref: '#artifacts'
+
+- id: cicd-basics-secret-storage
+  tier: core
+  type: recall
+  q: Where should pipeline credentials be stored?
+  a: In the platform's encrypted secret store, referenced by name — never in the workflow file.
+  tags: [cicd, security]
+  verified: 2026-07-29
+  ref: '#secrets'
+  sources:
+    - title: GitHub Actions — Security hardening
+      url: https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions
+
+- id: cicd-oidc-vs-static-keys
+  tier: deep
+  type: elaborative
+  q: Why prefer OIDC over long-lived static cloud keys in CI?
+  a: OIDC issues short-lived credentials per run, so there is no durable secret to leak.
+  tags: [cicd, security]
+  verified: 2026-07-29
+  ref: '#secrets'
+
+- id: cicd-pin-action-sha
+  tier: deep
+  type: elaborative
+  q: Why pin third-party CI actions to a commit SHA rather than a tag?
+  a: Tags are mutable, so a compromised upstream can repoint one and run its code with your credentials.
+  tags: [cicd, security]
+  verified: 2026-07-29
+  ref: '#secrets'
+
+- id: cicd-basics-pipeline-fails
+  tier: core
+  type: scenario
+  q: Tests pass locally but fail in CI. What do you check?
+  a: Runtime version, missing env vars, uncommitted files, stale cache, and filesystem case sensitivity.
+  tags: [cicd, troubleshooting]
+  verified: 2026-07-29
+  ref: '#local-vs-ci'
+
+- id: cicd-case-sensitivity
+  tier: deep
+  type: scenario
+  q: An import works on macOS but fails on a Linux CI runner. Why?
+  a: macOS is case-insensitive by default; Linux is not, so the path casing must match exactly.
+  tags: [cicd, troubleshooting]
+  verified: 2026-07-29
+  ref: '#local-vs-ci'

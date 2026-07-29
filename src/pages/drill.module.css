@@ -1,77 +1,76 @@
 .container {
   max-width: 720px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem 4rem;
 }
 
-/* Setup */
+.muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- Setup --- */
 .setup {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2rem 0;
 }
 
 .setup h1 {
   margin-bottom: 0.5rem;
 }
 
-.setupDesc {
+.setupDescription {
   color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 2rem;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 480px;
+  margin: 0 auto 2rem;
+  font-size: 0.95rem;
 }
 
-.setupOptions {
+.options {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.85rem;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
-.optLabel {
+.option {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
 }
 
 .select {
-  background: var(--site-surface-card, #141b2d);
-  border: 1px solid var(--site-border, rgba(255,255,255,0.08));
+  background: var(--site-surface-card);
+  border: 1px solid var(--site-border);
   border-radius: 6px;
   padding: 0.4rem 0.8rem;
   color: #fff;
   font-size: 0.9rem;
 }
 
+.select:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 1px;
+}
+
 .checkbox {
   width: 16px;
   height: 16px;
   accent-color: var(--ifm-color-primary);
-}
-
-.startBtn {
-  padding: 0.85rem 2.5rem;
-  border: none;
-  border-radius: 8px;
-  background: var(--ifm-color-primary);
-  color: #0a0e17;
-  font-weight: 700;
-  font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.2s;
 }
 
-.startBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(79, 209, 165, 0.25);
+.poolNote {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 1.5rem;
 }
 
-/* Drill header */
-.drillHeader {
+/* --- Session header --- */
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -81,6 +80,7 @@
 .progress {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
 }
 
 .timer {
@@ -88,45 +88,30 @@
   font-size: 1.1rem;
   color: var(--ifm-color-primary);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Card */
+/* --- Card --- */
 .card {
-  background: var(--site-surface-card, rgba(20, 27, 45, 0.7));
-  border: 1px solid var(--site-border, rgba(255,255,255,0.08));
+  background: var(--site-surface-card);
+  border: 1px solid var(--site-border);
   border-radius: 12px;
   padding: 2rem;
-}
-
-.cardMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
-}
-
-.tag {
-  font-size: 0.7rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .question {
   font-size: 1.15rem;
   line-height: 1.5;
-  margin-bottom: 1.5rem;
+  margin: 1.25rem 0 1.5rem;
 }
 
-.qLabel {
+.questionLabel {
   color: var(--ifm-color-primary);
   font-weight: 700;
+  margin-right: 0.25rem;
 }
 
-/* Explain it back */
+/* --- Explain it back --- */
 .explainBox {
   margin-bottom: 1.5rem;
 }
@@ -141,13 +126,13 @@
 .explainInput {
   width: 100%;
   background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--site-border, rgba(255,255,255,0.08));
+  border: 1px solid var(--site-border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   color: #fff;
   font-size: 0.9rem;
-  resize: vertical;
   font-family: inherit;
+  resize: vertical;
 }
 
 .explainInput:focus {
@@ -155,12 +140,22 @@
   border-color: var(--ifm-color-primary);
 }
 
-/* Reveal */
-.revealBtn {
+.yourExplanation {
+  font-size: 0.85rem;
+  color: rgba(79, 209, 165, 0.75);
+  margin-bottom: 0.9rem;
+  padding: 0.65rem 1rem;
+  background: rgba(79, 209, 165, 0.05);
+  border-left: 3px solid rgba(79, 209, 165, 0.3);
+  border-radius: 0 6px 6px 0;
+}
+
+/* --- Reveal / answer --- */
+.revealButton {
   display: block;
   width: 100%;
   padding: 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border: 1px dashed rgba(255, 255, 255, 0.16);
   border-radius: 8px;
   background: transparent;
   color: rgba(255, 255, 255, 0.5);
@@ -169,57 +164,24 @@
   transition: border-color 0.2s, color 0.2s;
 }
 
-.revealBtn:hover {
+.revealButton:hover {
   border-color: var(--ifm-color-primary);
   color: var(--ifm-color-primary);
 }
 
-/* Answer */
-.answerSection {
+.answerPanel {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 1.25rem;
 }
 
-.answer {
-  font-size: 1.05rem;
-  line-height: 1.5;
-  margin-bottom: 1rem;
-}
-
-.aLabel {
-  color: #27c93f;
-  font-weight: 700;
-}
-
-.why {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 1rem;
-  padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 6px;
-  border-left: 3px solid rgba(255, 255, 255, 0.1);
-}
-
-.yourExplain {
-  font-size: 0.85rem;
-  color: rgba(79, 209, 165, 0.7);
-  margin-bottom: 1rem;
-  padding: 0.6rem 1rem;
-  background: rgba(79, 209, 165, 0.05);
-  border-radius: 6px;
-  border-left: 3px solid rgba(79, 209, 165, 0.3);
-}
-
-/* Grade buttons */
-.gradeButtons {
+.outcomes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
-.gradeBtn {
+.outcomeButton {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -229,16 +191,17 @@
   border-radius: 8px;
   background: transparent;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
 }
 
-.gradeBtn:hover {
+.outcomeButton:hover {
   background: rgba(255, 255, 255, 0.04);
   transform: translateY(-1px);
 }
 
-.gradeKey {
+.outcomeKey {
   font-size: 0.65rem;
   opacity: 0.5;
   font-family: var(--ifm-font-family-monospace);
@@ -247,33 +210,40 @@
 .hint {
   text-align: center;
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.32);
   margin-top: 1rem;
 }
 
-/* Results */
+/* --- Results --- */
 .results {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2.5rem 1rem;
 }
 
 .results h2 {
   color: var(--ifm-color-primary);
+  margin-bottom: 0.75rem;
 }
 
-.resultTime {
+.resultsTime {
   font-family: var(--ifm-font-family-monospace);
   font-size: 2rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 1rem 0;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
 }
 
-.resultGrid {
+.resultsPace {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0.25rem 0 0;
+}
+
+.resultsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  margin: 2rem 0;
+  margin: 2rem 0 1rem;
 }
 
 .resultItem {
@@ -281,24 +251,74 @@
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.5);
 }
 
-.resultNum {
-  font-size: 2.5rem;
+.resultValue {
+  font-size: 2.4rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
-.resultPct {
-  font-size: 1.2rem;
+.resultLabel {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.accuracy {
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--ifm-color-primary);
   margin-bottom: 2rem;
 }
 
+/* --- Buttons --- */
+.primaryButton {
+  padding: 0.85rem 2.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--ifm-color-primary);
+  color: #0a0e17;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79, 209, 165, 0.25);
+}
+
+.primaryButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Mobile --- */
 @media screen and (max-width: 600px) {
-  .gradeButtons {
+  .container {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .card {
+    padding: 1.4rem 1.1rem;
+  }
+
+  .question {
+    font-size: 1.05rem;
+  }
+
+  .outcomes {
     grid-template-columns: 1fr;
+  }
+
+  .resultsGrid {
+    gap: 0.75rem;
+  }
+
+  .resultValue {
+    font-size: 1.8rem;
   }
 }

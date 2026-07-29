@@ -1,0 +1,138 @@
+- id: docker-images-layer-definition
+  tier: core
+  type: concept
+  q: What creates a new layer in a Docker image?
+  a: Any instruction that changes the filesystem — FROM, RUN, COPY, ADD.
+  tags: [docker, images, layers]
+  verified: 2026-07-29
+  ref: '#image-layers'
+  sources:
+    - title: Docker Docs — Images
+      url: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/
+
+- id: docker-images-container-layer
+  tier: core
+  type: recall
+  q: What does a container add on top of an image?
+  a: A single thin writable layer. Everything below it is read-only and shared.
+  tags: [docker, images, containers, layers]
+  verified: 2026-07-29
+  ref: '#image-layers'
+
+- id: docker-images-layer-sharing
+  tier: core
+  type: elaborative
+  q: How can 100 containers share one 200 MB image without using 20 GB?
+  a: They share the read-only layers; only the small writable layer is per-container.
+  tags: [docker, images, layers]
+  verified: 2026-07-29
+  ref: '#image-layers'
+
+- id: docker-images-delete-does-not-shrink
+  tier: deep
+  type: scenario
+  q: You add a RUN instruction that deletes a large file, but the image is the same size. Why?
+  a: Layers are additive — a later delete only hides the file. The bytes remain in the earlier layer.
+  why: Download, extract and delete in a single RUN so the file never lands in a committed layer.
+  tags: [docker, images, layers, troubleshooting]
+  verified: 2026-07-29
+  ref: '#image-layers'
+
+- id: docker-images-storage-driver
+  tier: deep
+  type: recall
+  q: What does a storage driver like overlay2 do?
+  a: Unions the stacked layers into one filesystem view for the container.
+  tags: [docker, images, layers]
+  verified: 2026-07-29
+  ref: '#image-layers'
+  sources:
+    - title: Docker Docs — Storage drivers
+      url: https://docs.docker.com/engine/storage/drivers/
+
+- id: docker-images-cache-invalidation
+  tier: core
+  type: concept
+  q: When does Docker reuse a cached build layer?
+  a: Only when that instruction and every instruction before it are unchanged.
+  tags: [docker, images, build-cache]
+  verified: 2026-07-29
+  ref: '#build-cache'
+  sources:
+    - title: Docker Docs — Build cache
+      url: https://docs.docker.com/build/cache/
+
+- id: docker-images-instruction-order
+  tier: core
+  type: elaborative
+  q: How should you order Dockerfile instructions for fast rebuilds?
+  a: Least frequently changing first — base image, then dependency manifest, then source code last.
+  tags: [docker, images, build-cache, performance]
+  verified: 2026-07-29
+  ref: '#build-cache'
+
+- id: docker-images-copy-manifest-first
+  tier: core
+  type: scenario
+  q: Every source edit reinstalls all your dependencies. What is the fix?
+  a: Copy the dependency manifest and install before copying the rest of the source.
+  tags: [docker, images, build-cache, troubleshooting]
+  verified: 2026-07-29
+  ref: '#build-cache'
+
+- id: docker-images-multistage-purpose
+  tier: core
+  type: concept
+  q: What problem do multi-stage builds solve?
+  a: Build tooling is needed to produce an artifact but not to run it, so only the final stage ships.
+  tags: [docker, images, multi-stage]
+  verified: 2026-07-29
+  ref: '#multi-stage'
+  sources:
+    - title: Docker Docs — Multi-stage builds
+      url: https://docs.docker.com/build/building/multi-stage/
+
+- id: docker-images-copy-from
+  tier: core
+  type: command
+  q: How do you copy an artifact from an earlier build stage?
+  a: COPY --from=stagename /path/in/stage /path/in/final
+  tags: [docker, images, multi-stage, commands]
+  verified: 2026-07-29
+  ref: '#multi-stage'
+
+- id: docker-images-small-image-security
+  tier: deep
+  type: elaborative
+  q: Beyond pull speed, why do smaller images matter?
+  a: Fewer packages means far less CVE surface to patch and audit.
+  tags: [docker, images, security]
+  verified: 2026-07-29
+  ref: '#multi-stage'
+
+- id: docker-images-tag-mutability
+  tier: core
+  type: recall
+  q: Is a Docker tag immutable?
+  a: No. A tag is a mutable pointer — only a digest identifies one exact image.
+  tags: [docker, images, tags]
+  verified: 2026-07-29
+  ref: '#tags-digests'
+
+- id: docker-images-latest-meaning
+  tier: core
+  type: recall
+  q: What does the latest tag actually guarantee?
+  a: Nothing. It is only the default tag name when none is given.
+  tags: [docker, images, tags]
+  verified: 2026-07-29
+  ref: '#tags-digests'
+
+- id: docker-images-pin-digest
+  tier: deep
+  type: elaborative
+  q: When should you pin an image by digest instead of tag?
+  a: Whenever builds must be reproducible — production base images and CI.
+  tags: [docker, images, tags, security]
+  verified: 2026-07-29
+  ref: '#tags-digests'

@@ -1,0 +1,120 @@
+- id: docker-arch-client-server
+  tier: core
+  type: concept
+  q: What are the three main components of Docker's architecture?
+  a: The docker CLI (client), dockerd (daemon), and a registry.
+  why: The CLI holds no state, which is why pointing DOCKER_HOST at another machine just works.
+  tags: [docker, architecture, fundamentals]
+  verified: 2026-07-29
+  ref: '#client-daemon-registry'
+  sources:
+    - title: Docker Docs — Architecture
+      url: https://docs.docker.com/get-started/docker-overview/
+
+- id: docker-arch-daemon-role
+  tier: core
+  type: recall
+  q: What is dockerd responsible for?
+  a: Building images and managing containers, networks and volumes on the host.
+  tags: [docker, architecture]
+  verified: 2026-07-29
+  ref: '#client-daemon-registry'
+
+- id: docker-arch-socket-risk
+  tier: deep
+  type: elaborative
+  q: Why is access to the Docker socket equivalent to root on the host?
+  a: dockerd runs as root, so anyone who can call it can mount the host filesystem into a container and escape.
+  why: This is why adding a user to the docker group is a privilege grant, not a convenience.
+  tags: [docker, architecture, security]
+  verified: 2026-07-29
+  ref: '#client-daemon-registry'
+
+- id: docker-arch-runc-role
+  tier: deep
+  type: recall
+  q: What does runc do?
+  a: Implements the OCI runtime spec — sets up namespaces and cgroups, execs the process, then exits.
+  tags: [docker, architecture, runtime]
+  verified: 2026-07-29
+  ref: '#runtime-stack'
+  sources:
+    - title: OCI Runtime Specification
+      url: https://github.com/opencontainers/runtime-spec/blob/main/spec.md
+
+- id: docker-arch-shim-purpose
+  tier: deep
+  type: elaborative
+  q: Why can you restart dockerd without killing running containers?
+  a: Each container's parent is its own containerd-shim, not the daemon, so the shim keeps it alive.
+  tags: [docker, architecture, runtime]
+  verified: 2026-07-29
+  ref: '#runtime-stack'
+
+- id: docker-arch-namespaces-purpose
+  tier: core
+  type: concept
+  q: What do Linux namespaces provide to a container?
+  a: Isolation of what a process can see — its own PIDs, network, mounts, hostname and IPC.
+  tags: [docker, architecture, linux, namespaces]
+  verified: 2026-07-29
+  ref: '#namespaces-cgroups'
+  sources:
+    - title: man 7 namespaces
+      url: https://man7.org/linux/man-pages/man7/namespaces.7.html
+
+- id: docker-arch-cgroups-purpose
+  tier: core
+  type: concept
+  q: What do cgroups provide to a container?
+  a: Resource limits — how much CPU, memory and I/O it may consume.
+  tags: [docker, architecture, linux, cgroups]
+  verified: 2026-07-29
+  ref: '#namespaces-cgroups'
+
+- id: docker-arch-pid-one
+  tier: core
+  type: recall
+  q: What PID does a container's main process see itself as?
+  a: PID 1, because of the pid namespace.
+  why: It also inherits PID 1 duties — if it does not reap children you get zombie processes.
+  tags: [docker, architecture, namespaces]
+  verified: 2026-07-29
+  ref: '#namespaces-cgroups'
+
+- id: docker-arch-container-vs-vm
+  tier: core
+  type: recall
+  q: What is the key structural difference between a container and a VM?
+  a: A container shares the host kernel; a VM boots its own guest kernel on a hypervisor.
+  tags: [docker, architecture, fundamentals]
+  verified: 2026-07-29
+  ref: '#container-vs-vm'
+
+- id: docker-arch-startup-speed
+  tier: core
+  type: elaborative
+  q: Why do containers start in milliseconds while VMs take much longer?
+  a: There is no guest kernel to boot and no hardware to emulate — it is just a process with a restricted view.
+  tags: [docker, architecture, fundamentals]
+  verified: 2026-07-29
+  ref: '#container-vs-vm'
+
+- id: docker-arch-vm-isolation-tradeoff
+  tier: deep
+  type: elaborative
+  q: When would you still choose a VM over a container?
+  a: When you need a hardware isolation boundary — a shared kernel means a kernel vulnerability has a shared blast radius.
+  why: Sandboxed runtimes like gVisor or Kata sit between the two options.
+  tags: [docker, architecture, security]
+  verified: 2026-07-29
+  ref: '#container-vs-vm'
+
+- id: docker-arch-cross-kernel
+  tier: deep
+  type: scenario
+  q: Why can a Linux container not run directly on a Windows kernel?
+  a: It depends on Linux namespaces and cgroups, so Docker Desktop runs a Linux VM underneath.
+  tags: [docker, architecture, troubleshooting]
+  verified: 2026-07-29
+  ref: '#namespaces-cgroups'

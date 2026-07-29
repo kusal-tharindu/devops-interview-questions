@@ -1,0 +1,147 @@
+- id: python-basics-list-definition
+  tier: core
+  type: recall
+  q: Is a Python list mutable?
+  a: Yes — you can append, remove and modify elements after creation.
+  tags: [python, data-types, fundamentals]
+  verified: 2026-07-29
+  ref: '#mutability'
+
+- id: python-basics-tuple-definition
+  tier: core
+  type: recall
+  q: Is a Python tuple mutable?
+  a: No — it cannot be changed after creation.
+  tags: [python, data-types, fundamentals]
+  verified: 2026-07-29
+  ref: '#mutability'
+
+- id: python-basics-list-vs-tuple
+  tier: core
+  type: elaborative
+  q: Why can a tuple be a dict key but a list cannot?
+  a: A key must be hashable, and a mutable object's hash could change after insertion.
+  tags: [python, data-types]
+  verified: 2026-07-29
+  ref: '#mutability'
+  sources:
+    - title: Python — Data structures
+      url: https://docs.python.org/3/tutorial/datastructures.html
+
+- id: python-mutable-default-arg
+  tier: deep
+  type: scenario
+  q: A function with "hosts=[]" as a default accumulates values across calls. Why?
+  a: The default is evaluated once at definition time, so every call shares the same list.
+  why: Use None as the default and create the list inside the function.
+  tags: [python, functions, troubleshooting]
+  verified: 2026-07-29
+  ref: '#mutability'
+
+- id: python-basics-args-purpose
+  tier: core
+  type: recall
+  q: What does *args collect?
+  a: Extra positional arguments, as a tuple.
+  tags: [python, functions]
+  verified: 2026-07-29
+  ref: '#args-kwargs'
+
+- id: python-basics-kwargs-purpose
+  tier: core
+  type: recall
+  q: What does **kwargs collect?
+  a: Extra keyword arguments, as a dict.
+  tags: [python, functions]
+  verified: 2026-07-29
+  ref: '#args-kwargs'
+
+- id: python-basics-args-kwargs-order
+  tier: core
+  type: recall
+  q: What order must parameters appear in a Python signature?
+  a: Positional, then *args, then keyword-only, then **kwargs.
+  tags: [python, functions]
+  verified: 2026-07-29
+  ref: '#args-kwargs'
+  sources:
+    - title: Python — Defining functions
+      url: https://docs.python.org/3/tutorial/controlflow.html#more-on-defining-functions
+
+- id: python-basics-args-naming
+  tier: deep
+  type: recall
+  q: Are the names args and kwargs required?
+  a: No, they are convention. The * and ** operators do the work.
+  tags: [python, functions]
+  verified: 2026-07-29
+  ref: '#args-kwargs'
+
+- id: python-basics-venv-purpose
+  tier: core
+  type: concept
+  q: What problem does a virtual environment solve?
+  a: It isolates a project's packages so versions cannot conflict and the system Python stays untouched.
+  tags: [python, venv, fundamentals]
+  verified: 2026-07-29
+  ref: '#venv'
+  sources:
+    - title: Python — Virtual environments
+      url: https://docs.python.org/3/tutorial/venv.html
+
+- id: python-basics-venv-create
+  tier: core
+  type: command
+  q: How do you create a virtual environment?
+  a: python -m venv .venv
+  tags: [python, venv, commands]
+  verified: 2026-07-29
+  ref: '#venv'
+
+- id: python-basics-venv-activate
+  tier: core
+  type: command
+  q: How do you activate a virtual environment on Linux or macOS?
+  a: source .venv/bin/activate
+  tags: [python, venv, commands]
+  verified: 2026-07-29
+  ref: '#venv'
+
+- id: python-venv-which-python
+  tier: deep
+  type: scenario
+  q: An installed package is not importable. What is the fastest thing to check?
+  a: which python — activation only reorders PATH, so you are probably in a different environment than you think.
+  tags: [python, venv, troubleshooting]
+  verified: 2026-07-29
+  ref: '#venv'
+
+- id: python-basics-pip-freeze
+  tier: core
+  type: command
+  q: How do you capture exact installed versions to a file?
+  a: python -m pip freeze > requirements.txt
+  tags: [python, dependencies, commands]
+  verified: 2026-07-29
+  ref: '#dependencies'
+
+- id: python-basics-pip-install-reqs
+  tier: core
+  type: command
+  q: How do you install from a requirements file?
+  a: python -m pip install -r requirements.txt
+  tags: [python, dependencies, commands]
+  verified: 2026-07-29
+  ref: '#dependencies'
+
+- id: python-pin-dependencies
+  tier: deep
+  type: elaborative
+  q: Why pin exact dependency versions for a deployed application?
+  a: Unpinned ranges mean builds today and next month can install different code — the same problem as using latest for an image.
+  tags: [python, dependencies, security]
+  verified: 2026-07-29
+  ref: '#dependencies'
+  sources:
+    - title: pip — Requirements files
+      url: https://pip.pypa.io/en/stable/user_guide/#requirements-files

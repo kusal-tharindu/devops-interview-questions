@@ -1,204 +1,292 @@
 # Contributing Guide
 
-Thanks for wanting to contribute! Here's how to add questions and topics.
+Thanks for helping out. This guide covers how content is structured, how to add
+it, and the code conventions if you are touching the site itself.
 
-## Architecture
+## How content is organised
 
-Content lives in two file types per topic:
+Every documentation page is a **pair of files**:
 
 ```
-docs/<topic>/basics.md              ← Concept page (mental model + <TopicQA /> + learn more)
-docs/<topic>/basics.cards.yaml      ← Flashcards (parsed at build time → cards.json)
+docs/docker/images.md              ← the theory you write, free-form Markdown
+docs/docker/images.cards.yaml      ← the questions drawn from that theory
 ```
 
-The Markdown file holds the mental model prose and renders the cards as a
-collapsible Q&A list. The `.cards.yaml` file is the single source of truth for
-card content.
+- **Topic** = the first folder under `docs/` (`docker`)
+- **Page** = the file name (`images`)
 
-One card you write powers all three study modes:
+Pages can be grouped in subfolders and the topic stays the same:
 
-| Mode | Route | What it does |
-|------|-------|--------------|
-| **Learn** | `/<topic>/<page>` | Mental model, then all cards as collapsible Q&A |
-| **Revise** | `/revise` | Pick one topic, self-test, grades build a spaced schedule |
-| **Drill** | `/drill` | All topics mixed and timed, does not touch the schedule |
-
-## How to Add Cards
-
-1. Fork this repository
-2. Find the right `.cards.yaml` file under `docs/<topic>/`
-3. Add a card block following the schema below
-4. Run `npm run validate:cards` to verify
-5. Submit a Pull Request
-
-### Card Schema
-
-```yaml
-- id: topic-subtopic-short-slug
-  tier: core
-  type: recall
-  q: Your question here?
-  a: Short, precise answer.
-  why: Optional elaboration shown after reveal.
-  tags: [topic, subtopic]
-  verified: 2026-07-29
-  version: "1.9"
-  sources:
-    - title: Official Doc Title
-      url: https://link-to-official-docs
+```
+docs/docker/networking/_category_.json     ← group label and position
+docs/docker/networking/drivers.md          ← topic: docker, page: networking/drivers
+docs/docker/networking/drivers.cards.yaml
 ```
 
-### Required Fields
+Nothing needs registering. The navbar, sidebar, Revise topic list, homepage
+counts and card data are all generated from this tree at build time.
 
-| Field | Format | Description |
-|-------|--------|-------------|
-| `id` | `{topic}-{subtopic}-{slug}` | Unique ID. Lowercase, hyphens, 3+ segments. **Never reuse.** |
-| `tier` | `core` \| `deep` \| `trivia` | Difficulty/importance level |
-| `type` | `recall` \| `concept` \| `elaborative` \| `scenario` \| `cloze` \| `command` | Card type |
-| `q` | string | The question. One question = one fact. |
-| `a` | string | Shortest correct answer. |
-| `tags` | array | For filtering and interleaving. Include the topic name. |
-| `verified` | `YYYY-MM-DD` | Last date someone confirmed this is correct. |
+### One card powers three modes
 
-### Optional Fields
-
-| Field | Description |
-|-------|-------------|
-| `why` | Elaboration shown after reveal (explains why the answer matters) |
-| `version` | Tool version the card is true for (e.g., `k8s: 1.31`) |
-| `sources` | Array of `{title, url}` — official docs only |
-| `deprecated` | Set to `true` to retire a card without breaking user progress |
-
-### Do not set `topic` by hand
-
-The build injects a `topic` field on every card, derived from the folder the
-`.cards.yaml` file lives in. A card in `docs/kubernetes/` gets `topic: kubernetes`.
-
-This is what decides which topic page a card appears on and which group it falls
-under in Revise. **Tags do not control topic membership.** Tags are free-form and
-cross-cutting — a Kubernetes card can be tagged `networking` for discoverability
-without leaking onto the Networking page.
-
-### Tags vs topic
-
-| | `topic` | `tags` |
+| Mode | Where | What it does |
 |---|---|---|
-| Set by | The build, from the folder name | You |
-| Controls | Topic page + Revise grouping | Search, cross-referencing |
-| Cardinality | Exactly one | Any number |
+| **Learn** | The topic page | Theory, then that page's questions as a collapsible list |
+| **Revise** | `/revise` | Self-test one topic; grades build a spaced schedule |
+| **Drill** | `/drill` | Timed, all topics mixed. Never touches the schedule. |
 
-Always include the topic name as the first tag anyway — it keeps cards readable
-on their own.
+Write a card once and it appears in all three.
 
-### ID Convention
+## Adding a page
 
-Format: `{topic}-{subtopic}-{2-4 word slug}`
+1. Create `docs/<topic>/<page>.md`:
 
-```
-linux-fs-etc-purpose
-docker-basics-image-vs-container
-k8s-pods-crashloop-diagnose
-terraform-state-purpose
-```
-
-The build script checks for duplicate IDs across all files. If two cards share an ID, the build fails.
-
-### Card Types
-
-- **`recall`** — atomic fact. Q/A pair.
-- **`concept`** — tests the mental model, not a detail.
-- **`elaborative`** — a "why" or "how" question.
-- **`scenario`** — symptom → diagnosis (troubleshooting).
-- **`cloze`** — fill the gap in a statement.
-- **`command`** — "write the command that does X."
-
-### Tiers
-
-- **`core`** (~60%) — every DevOps engineer should know this cold
-- **`deep`** (~30%) — senior / specialist depth
-- **`trivia`** (~10%) — real but rarely critical
-
-## Card Quality Checklist
-
-Before submitting, verify:
-
-- [ ] One question = one fact (atomic)
-- [ ] Answer is the shortest correct formulation
-- [ ] ID follows the naming convention and is globally unique
-- [ ] `verified` date is today (you checked the fact is still true)
-- [ ] Tags include the topic name
-- [ ] `npm run validate:cards` passes
-- [ ] Sources link to official docs (not blogs)
-
-## Adding a New Topic
-
-1. Create `docs/<topic-name>/` folder (lowercase, hyphens)
-2. Add `_category_.json`:
-   ```json
-   {
-     "label": "Topic Name",
-     "position": 10,
-     "link": {
-       "type": "generated-index",
-       "description": "One-line description."
-     }
-   }
-   ```
-3. Add `basics.md` with the mental model, the Q&A list, and further reading:
    ```markdown
    ---
-   title: Basics
-   sidebar_position: 1
-   displayed_sidebar: topicNameSidebar
-   description: One-line SEO description
+   title: Images & Layers
+   sidebar_position: 3
+   displayed_sidebar: dockerSidebar
+   description: One line for SEO and search results
    ---
 
    import TopicQA from '@site/src/components/TopicQA';
 
-   # Topic Name Basics
+   # Images & Layers
 
-   ## Mental model
+   ## The one-sentence version
 
-   2-3 paragraphs building the picture before drilling.
+   The single idea the rest of the page builds on.
+
+   ## Some concept {#some-concept}
+
+   Explain it properly. Use tables, command examples and Mermaid diagrams.
 
    ## Questions
 
-   <TopicQA topic="topic-name" />
+   <TopicQA />
 
    ## Learn more
 
-   - [Link 1](url)
+   - [Official docs](https://example.com)
    ```
-   The `topic` prop must match the folder name exactly.
-4. Add `basics.cards.yaml` with at least 15-20 cards
-5. The navbar, sidebar, Revise topic list, and stats all update automatically on build
 
-**Minimum viable topic: 20 core cards + one concept page.** Below that, cards become orphans in memory.
+   `<TopicQA />` takes no props — it resolves its own topic and page from the
+   file path, so it cannot drift out of sync.
 
-## CRUD Operations
+2. Create `docs/<topic>/<page>.cards.yaml` with the questions.
 
-| Action | How | Notes |
-|--------|-----|-------|
-| Add card | Add block to `.cards.yaml` | Build validates uniqueness |
-| Edit card | Change q/a/fields, keep same `id`, bump `verified` | User progress preserved |
-| Delete card | Remove the block | Engine ignores orphan localStorage state |
-| Retire card | Add `deprecated: true` | Optional — engine skips it |
+3. Run `npm run content:check` to validate, then `npm start` to view.
 
-**Rule: never reuse a deleted ID for a different question.**
+### Writing the theory
 
-## Local Development
+The theory page is the part cards cannot replace. Aim for:
+
+- **A one-sentence version at the top.** The single idea everything else hangs off.
+- **Anchored sections** (`## Layers {#image-layers}`) so cards can link back.
+- **Diagrams over paragraphs** where structure matters. Use Mermaid — it is text,
+  so it diffs in review and needs no image files.
+- **Tables for comparisons.** Merge vs rebase, TCP vs UDP, tier vs tier.
+- **Real commands**, not pseudocode.
+- **Why, not just what.** "Deleting a file in a later layer only hides it" is worth
+  more than a list of instruction names.
+
+Keep it yours. Condensed notes on what actually confused you beat a
+comprehensive textbook nobody reads.
+
+### Diagrams
+
+Fence a Mermaid block like any code block:
+
+````markdown
+```mermaid
+flowchart LR
+  A["Dockerfile"] --> B["Image"] --> C["Container"]
+```
+````
+
+## Card schema
+
+```yaml
+- id: docker-images-layer-definition
+  tier: core
+  type: concept
+  q: What creates a new layer in a Docker image?
+  a: Any instruction that changes the filesystem — FROM, RUN, COPY, ADD.
+  why: Optional elaboration, shown after the answer is revealed.
+  tags: [docker, images, layers]
+  verified: 2026-07-29
+  ref: '#image-layers'
+  version: '1.9'
+  sources:
+    - title: Docker Docs — Images
+      url: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/
+```
+
+### Required fields
+
+| Field | Format | Notes |
+|---|---|---|
+| `id` | `{topic}-{subtopic}-{slug}` | Unique forever. See below. |
+| `tier` | `core` \| `deep` \| `trivia` | Importance |
+| `type` | see table below | Card shape |
+| `q` | string | One question, one fact |
+| `a` | string | The shortest correct answer |
+| `tags` | array | Free-form; include the topic name |
+| `verified` | `YYYY-MM-DD` | When you last confirmed this is still true |
+
+### Optional fields
+
+| Field | Purpose |
+|---|---|
+| `why` | Elaboration shown after reveal |
+| `ref` | Anchor on this page, e.g. `'#image-layers'`. Renders a "Read the theory" link in Revise and Drill. |
+| `version` | Tool version the answer is true for |
+| `sources` | List of `{ title, url }` — official docs preferred |
+| `deprecated` | `true` retires a card without breaking saved progress |
+
+### Never set these
+
+`topic`, `page` and `pageUrl` are injected by the build from the file location.
+The validator rejects them if authored by hand.
+
+### Card types
+
+| Type | Use for |
+|---|---|
+| `recall` | One atomic fact |
+| `concept` | The mental model, not a detail |
+| `elaborative` | A "why" or "how" question |
+| `scenario` | Symptom to diagnosis. Where interviews actually live. |
+| `cloze` | Fill the gap |
+| `command` | "Write the command that does X" |
+
+### Tiers
+
+| Tier | Share | Meaning |
+|---|---|---|
+| `core` | ~60% | Every DevOps engineer should know this cold |
+| `deep` | ~30% | Senior or specialist depth |
+| `trivia` | ~10% | Real but rarely load-bearing. Excluded from drills by default. |
+
+### IDs are permanent
+
+An id is the key for a learner's saved review schedule. Once published:
+
+- **Never reuse a deleted id for a different question.** Someone's progress would
+  attach to the wrong card.
+- **Do** keep the id when rewriting a question — progress carries over.
+- Splitting one card into two? Retire the old id, create two new ones.
+
+The build fails on duplicate ids across the whole repo.
+
+## Writing good cards
+
+The single most common mistake is putting several facts in one card. Split them.
+
+```yaml
+# Bad — one question, eight facts. Impossible to grade honestly.
+- q: What is the Filesystem Hierarchy Standard?
+  a: /etc is config, /var is logs, /tmp is temporary, /home is users, ...
+```
+
+```yaml
+# Good — each fact recalled and scheduled on its own
+- q: What does /etc hold?
+  a: System-wide configuration files.
+- q: What does /var hold?
+  a: Variable data — logs, caches and spool files.
+```
+
+Checklist before opening a PR:
+
+- [ ] One question, one fact
+- [ ] The answer is the shortest correct phrasing
+- [ ] `ref` points at a real anchor on the page
+- [ ] `verified` is the date you actually checked it
+- [ ] `sources` link to official docs, not blog posts
+- [ ] `npm run content:check` passes
+
+## Adding a topic
+
+1. `docs/<topic>/_category_.json`:
+
+   ```json
+   {
+     "label": "Ansible",
+     "position": 10,
+     "link": {
+       "type": "generated-index",
+       "description": "One line describing the topic."
+     }
+   }
+   ```
+
+2. Add your first page pair (above).
+
+3. Optionally add a label and position in `site.config.js` under `topics`. Skipping
+   this still works — the topic falls back to a title-cased folder name and sorts
+   last.
+
+A topic is worth publishing at roughly **20 core cards plus one theory page**.
+Below about five cards per page they sit disconnected in memory and get failed
+repeatedly, which is worse than not having them.
+
+## CRUD operations
+
+| Action | How | Effect on saved progress |
+|---|---|---|
+| Add | New block with a new id | None |
+| Edit | Change any field, keep the id | Preserved |
+| Delete | Remove the block | Orphan state is ignored harmlessly |
+| Retire | Add `deprecated: true` | Preserved, card is skipped |
+
+## Code conventions
+
+If you are changing the site rather than the content:
+
+**Configuration goes in `site.config.js`.** Site metadata, GitHub URLs, tiers,
+card types, SM-2 tuning, grade labels and keyboard hints all live there. If a
+value appears in two files, it belongs in config. Never hardcode a repo URL or a
+tier name in a component.
+
+**Layers, and which one to touch:**
+
+| Layer | Files | Responsibility |
+|---|---|---|
+| Config | `site.config.js` | Every tunable value |
+| Pipeline | `scripts/` | Parse, validate and emit card data |
+| Data access | `src/lib/cardStore.js` | The only place that fetches card data |
+| Domain | `src/lib/sm2.js`, `storage.js` | Scheduling and persistence, pure and testable |
+| UI | `src/components/`, `src/pages/` | Presentation only |
+
+Components must not `fetch()` directly — go through `cardStore`. That indirection
+is why the on-disk data layout can change without touching the UI.
+
+**Other conventions:**
+
+- JSDoc on exported functions, with a note on *why* when the reason is not obvious
+- No magic numbers or strings; import them from config
+- Comments explain reasoning, not mechanics
+- Shared card UI lives in `CardBadges` and `CardAnswer` so the three modes cannot drift
+- Keyboard support and `aria-*` attributes on anything interactive
+- Every page must work at 360px wide
+
+## Local development
 
 ```bash
 npm install
-npm run start          # Dev server at localhost:3000
-npm run validate:cards # Check card schema without full build
-npm run build          # Full production build
+npm start             # dev server with hot reload
+npm run content:check # validate cards without a full build
+npm run build         # production build
+npm run serve         # serve the production build
 ```
 
-## Reporting Issues
+## Branching
 
-- Wrong answer? Open an issue with the card ID
-- Stale info? Same — include the correct version/date
-- Bad formulation? Suggest a rewrite in the issue
+Work on `stg`, then open a PR into `main`. Pushing to `main` deploys to
+production automatically; pushing to `stg` does not.
 
-Thank you for helping engineers remember what matters.
+## Reporting problems
+
+- **Wrong answer** — open an issue with the card id
+- **Out of date** — include the correct value and the version you checked
+- **Badly formulated** — suggest a rewrite; multi-fact cards are always worth splitting

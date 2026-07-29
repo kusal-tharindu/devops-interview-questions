@@ -1,0 +1,133 @@
+- id: git-basics-commit-contents
+  tier: core
+  type: concept
+  q: What does a Git commit contain?
+  a: A tree snapshot of tracked files, metadata, and pointer(s) to its parent commit(s).
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+  ref: '#commit-graph'
+  sources:
+    - title: Pro Git — Git Basics
+      url: https://git-scm.com/book/en/v2/Getting-Started-Git-Basics
+
+- id: git-basics-branch-definition
+  tier: core
+  type: recall
+  q: What is a Git branch, physically?
+  a: A small file containing one commit SHA — a movable pointer, not a copy.
+  why: This is why creating a branch is instant regardless of repository size.
+  tags: [git, branching]
+  verified: 2026-07-29
+  ref: '#commit-graph'
+
+- id: git-basics-head-meaning
+  tier: core
+  type: recall
+  q: What is HEAD?
+  a: A pointer to the currently checked-out branch, or to a commit directly in detached HEAD state.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+  ref: '#commit-graph'
+
+- id: git-basics-staging-area
+  tier: core
+  type: concept
+  q: What is the staging area for?
+  a: An intermediate layer where you select exactly which changes go into the next commit.
+  why: It is what makes "git add -p" possible — stage one hunk and leave the rest.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+  ref: '#three-areas'
+
+- id: git-basics-three-areas
+  tier: core
+  type: recall
+  q: What are Git's three areas?
+  a: Working directory, staging area (index), and the repository.
+  tags: [git, fundamentals]
+  verified: 2026-07-29
+  ref: '#three-areas'
+
+- id: git-basics-merge-vs-rebase
+  tier: core
+  type: elaborative
+  q: What is the difference between merge and rebase?
+  a: Merge preserves both histories with a merge commit. Rebase replays commits onto a new base, producing linear history with new SHAs.
+  tags: [git, branching, workflows]
+  verified: 2026-07-29
+  ref: '#merge-vs-rebase'
+
+- id: git-basics-rebase-shared-danger
+  tier: core
+  type: elaborative
+  q: Why should you never rebase commits others have already pulled?
+  a: Rebase writes new SHAs, so collaborators end up with divergent history and a broken next pull.
+  tags: [git, branching, workflows]
+  verified: 2026-07-29
+  ref: '#merge-vs-rebase'
+  sources:
+    - title: Pro Git — Rewriting History
+      url: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
+
+- id: git-basics-fast-forward
+  tier: deep
+  type: recall
+  q: What is a fast-forward merge?
+  a: When the target branch has not diverged, Git just moves the pointer forward with no merge commit.
+  tags: [git, branching]
+  verified: 2026-07-29
+  ref: '#merge-vs-rebase'
+
+- id: git-basics-reset-vs-revert
+  tier: core
+  type: recall
+  q: What is the difference between git reset and git revert?
+  a: Revert adds a new commit that inverts a previous one. Reset moves the branch pointer, rewriting history.
+  tags: [git, undo, commands]
+  verified: 2026-07-29
+  ref: '#undo'
+
+- id: git-basics-revert-shared-safe
+  tier: core
+  type: recall
+  q: Which undo command is safe on a shared branch, and why?
+  a: revert — it adds a new commit rather than rewriting history others already have.
+  tags: [git, undo, workflows]
+  verified: 2026-07-29
+  ref: '#undo'
+
+- id: git-basics-reset-hard-danger
+  tier: core
+  type: scenario
+  q: What does git reset --hard do to uncommitted work?
+  a: Discards it with no prompt and no easy recovery.
+  tags: [git, undo, troubleshooting]
+  verified: 2026-07-29
+  ref: '#undo'
+
+- id: git-basics-reflog-recovery
+  tier: deep
+  type: scenario
+  q: You reset to the wrong commit and lost work. How do you recover it?
+  a: git reflog to find the previous HEAD SHA, then branch or check out from it.
+  tags: [git, undo, troubleshooting]
+  verified: 2026-07-29
+  ref: '#reflog'
+
+- id: git-basics-detached-head-rescue
+  tier: deep
+  type: scenario
+  q: You committed in detached HEAD state. How do you keep that work?
+  a: Create a branch at the current commit, which makes it reachable and safe from garbage collection.
+  tags: [git, troubleshooting]
+  verified: 2026-07-29
+  ref: '#reflog'
+
+- id: git-basics-fetch-vs-pull
+  tier: core
+  type: recall
+  q: What is the difference between git fetch and git pull?
+  a: Fetch downloads remote changes without touching your working tree. Pull is fetch plus merge or rebase.
+  tags: [git, remotes, commands]
+  verified: 2026-07-29
+  ref: '#commit-graph'

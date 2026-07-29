@@ -1,0 +1,9 @@
+{
+  "label": "Networking",
+  "position": 4,
+  "collapsed": true,
+  "link": {
+    "type": "generated-index",
+    "description": "How Docker connects containers to each other and to the outside world."
+  }
+}

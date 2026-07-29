@@ -27,8 +27,8 @@ yarn-error.log*
 # Internal tracking notes, not for the public repo
 .kiro-guide/
 
-# Generated at build/dev time from docs/ - see scripts/generate-topic-stats.js
+# Generated at build/dev time from docs/ - see scripts/build-content.js
 src/data/topics.json
-
-# Generated at build/dev time from docs/ - see scripts/parse-cards.js
+static/cards/
+# Superseded by static/cards/ - ignored so stale local copies never ship
 static/cards.json

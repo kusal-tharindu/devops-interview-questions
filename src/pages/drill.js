@@ -1,274 +1,454 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Layout from '@theme/Layout';
+import config from '@site/site.config';
+import { loadAllCards } from '@site/src/lib/cardStore';
+import CardBadges from '@site/src/components/CardBadges';
+import CardAnswer from '@site/src/components/CardAnswer';
 import styles from './drill.module.css';
 
-const GRADES = [
-  { key: '1', label: 'Wrong', color: '#ff5f56' },
-  { key: '2', label: 'Unsure', color: '#ffbd2e' },
-  { key: '3', label: 'Correct', color: '#4fd1a5' },
-];
+/**
+ * Drill: timed, mixed-topic cramming.
+ *
+ * Interleaved by design — a real interview jumps between Terraform, Linux and
+ * troubleshooting, and blocked practice produces worse transfer than mixed.
+ *
+ * Deliberately does NOT write to the SM-2 schedule (config.drill.affectsSchedule).
+ * Cram-session grades are low-quality signal and would distort long-term
+ * intervals built up in Revise.
+ */
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
+const Status = Object.freeze({
+  LOADING: 'loading',
+  READY: 'ready',
+  ERROR: 'error',
+});
+
+const Phase = Object.freeze({
+  SETUP: 'setup',
+  RUNNING: 'running',
+  RESULTS: 'results',
+});
+
+/** Tiers that appear in a drill unless the learner opts in to the rest. */
+const DEFAULT_DRILL_TIERS = config.cards.tiers
+  .filter((tier) => tier.defaultInDrill)
+  .map((tier) => tier.id);
+
+const OUTCOME_BY_KEY = new Map(
+  config.drill.outcomes.map((outcome, index) => [String(index + 1), outcome.id])
+);
+
+/**
+ * Fisher-Yates shuffle.
+ *
+ * @template T
+ * @param {T[]} items
+ * @returns {T[]} New shuffled array.
+ */
+function shuffle(items) {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+    [result[i], result[j]] = [result[j], result[i]];
   }
-  return a;
+  return result;
 }
 
-function DrillCard({ card, revealed, onReveal, onNext, showExplain }) {
-  const [explanation, setExplanation] = useState('');
-
-  return (
-    <div className={styles.card}>
-      <div className={styles.cardMeta}>
-        {card.tags && card.tags.slice(0, 3).map((t) => (
-          <span key={t} className={styles.tag}>{t}</span>
-        ))}
-      </div>
-
-      <div className={styles.question}>
-        <span className={styles.qLabel}>Q:</span> {card.q}
-      </div>
-
-      {!revealed && showExplain && (card.type === 'concept' || card.type === 'elaborative') && (
-        <div className={styles.explainBox}>
-          <label className={styles.explainLabel}>Explain it back (optional):</label>
-          <textarea
-            className={styles.explainInput}
-            placeholder="Write your explanation in plain language..."
-            value={explanation}
-            onChange={(e) => setExplanation(e.target.value)}
-            rows={3}
-          />
-        </div>
-      )}
-
-      {!revealed ? (
-        <button className={styles.revealBtn} onClick={onReveal}>
-          Show Answer
-        </button>
-      ) : (
-        <div className={styles.answerSection}>
-          <div className={styles.answer}>
-            <span className={styles.aLabel}>A:</span> {card.a}
-          </div>
-          {card.why && (
-            <div className={styles.why}>{card.why}</div>
-          )}
-          {explanation && (
-            <div className={styles.yourExplain}>
-              <strong>Your explanation:</strong> {explanation}
-            </div>
-          )}
-          <div className={styles.gradeButtons}>
-            {GRADES.map((g) => (
-              <button
-                key={g.key}
-                className={styles.gradeBtn}
-                style={{ borderColor: g.color, color: g.color }}
-                onClick={() => { setExplanation(''); onNext(g.key); }}
-              >
-                <span className={styles.gradeKey}>{g.key}</span>
-                {g.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+/**
+ * @param {number} totalSeconds
+ * @returns {string} m:ss
+ */
+function formatDuration(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 export default function DrillPage() {
   const [allCards, setAllCards] = useState([]);
+  const [status, setStatus] = useState(Status.LOADING);
+
+  const [phase, setPhase] = useState(Phase.SETUP);
+  const [size, setSize] = useState(config.drill.defaultSize);
+  const [includeAllTiers, setIncludeAllTiers] = useState(false);
+  const [showExplainBox, setShowExplainBox] = useState(true);
+
   const [queue, setQueue] = useState([]);
+  const [totalCards, setTotalCards] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [score, setScore] = useState({ correct: 0, unsure: 0, wrong: 0 });
-  const [total, setTotal] = useState(0);
-  const [timer, setTimer] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [showExplain, setShowExplain] = useState(true);
-  const [cardCount, setCardCount] = useState(20);
-  const [started, setStarted] = useState(false);
+  const [tally, setTally] = useState({});
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    async function init() {
-      try {
-        const resp = await fetch('/devops-interview-questions/cards.json');
-        const data = await resp.json();
-        setAllCards(data.cards.filter((c) => !c.deprecated));
-      } catch (err) {
-        console.error('Failed to load cards:', err);
-      }
-      setLoading(false);
-    }
-    init();
+    let cancelled = false;
+
+    loadAllCards()
+      .then((cards) => {
+        if (cancelled) return;
+        setAllCards(cards);
+        setStatus(Status.READY);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.warn('Drill could not load cards:', error?.message);
+        setStatus(Status.ERROR);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Timer
+  // Timer runs only while questions remain.
   useEffect(() => {
-    let interval;
-    if (running) {
-      interval = setInterval(() => setTimer((t) => t + 1), 1000);
-    }
+    if (phase !== Phase.RUNNING) return undefined;
+    const interval = setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => clearInterval(interval);
-  }, [running]);
+  }, [phase]);
 
-  // Keyboard shortcuts
-  const handleKeyDown = useCallback((e) => {
-    if (!started || queue.length === 0) return;
-    if (!revealed && e.code === 'Space') {
-      e.preventDefault();
-      setRevealed(true);
-      return;
-    }
-    if (revealed && ['1', '2', '3'].includes(e.key)) {
-      e.preventDefault();
-      handleNext(e.key);
-    }
-  }, [revealed, queue, started]);
+  const eligibleCards = useMemo(() => {
+    if (includeAllTiers) return allCards;
+    return allCards.filter((card) => DEFAULT_DRILL_TIERS.includes(card.tier));
+  }, [allCards, includeAllTiers]);
+
+  const startDrill = useCallback(() => {
+    const selected = shuffle(eligibleCards).slice(0, size);
+    setQueue(selected);
+    setTotalCards(selected.length);
+    setTally({});
+    setElapsed(0);
+    setRevealed(false);
+    setPhase(selected.length > 0 ? Phase.RUNNING : Phase.SETUP);
+  }, [eligibleCards, size]);
+
+  const recordOutcome = useCallback(
+    (outcomeId) => {
+      setTally((previous) => ({
+        ...previous,
+        [outcomeId]: (previous[outcomeId] || 0) + 1,
+      }));
+      setRevealed(false);
+
+      const remaining = queue.slice(1);
+      setQueue(remaining);
+      if (remaining.length === 0) setPhase(Phase.RESULTS);
+    },
+    [queue]
+  );
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+    if (phase !== Phase.RUNNING) return undefined;
 
-  function startDrill() {
-    const shuffled = shuffle(allCards).slice(0, cardCount);
-    setQueue(shuffled);
-    setTotal(shuffled.length);
-    setScore({ correct: 0, unsure: 0, wrong: 0 });
-    setTimer(0);
-    setRunning(true);
-    setStarted(true);
-    setRevealed(false);
-  }
+    const onKeyDown = (event) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      // Let the explain-it-back textarea take the spacebar.
+      if (event.target instanceof HTMLTextAreaElement) return;
 
-  function handleNext(grade) {
-    if (grade === '3') setScore((s) => ({ ...s, correct: s.correct + 1 }));
-    else if (grade === '2') setScore((s) => ({ ...s, unsure: s.unsure + 1 }));
-    else setScore((s) => ({ ...s, wrong: s.wrong + 1 }));
+      if (!revealed && event.code === config.keys.revealCode) {
+        event.preventDefault();
+        setRevealed(true);
+        return;
+      }
+      if (revealed && OUTCOME_BY_KEY.has(event.key)) {
+        event.preventDefault();
+        recordOutcome(OUTCOME_BY_KEY.get(event.key));
+      }
+    };
 
-    setRevealed(false);
-    setQueue((q) => q.slice(1));
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [phase, revealed, recordOutcome]);
 
-    if (queue.length <= 1) {
-      setRunning(false);
-    }
-  }
+  const pageMeta = {
+    title: 'Interview Drill',
+    description:
+      'Timed, mixed-topic DevOps drill. Simulates the jump between topics in a real interview.',
+  };
 
-  function formatTime(secs) {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
-
-  if (loading) {
+  if (status === Status.LOADING) {
     return (
-      <Layout title="Interview Drill" description="Timed interview simulation drill">
-        <div className={styles.container}><p>Loading...</p></div>
-      </Layout>
-    );
-  }
-
-  // Setup screen
-  if (!started) {
-    return (
-      <Layout title="Interview Drill" description="Timed interview simulation drill">
+      <Layout {...pageMeta}>
         <div className={styles.container}>
-          <div className={styles.setup}>
-            <h1>Interview Drill</h1>
-            <p className={styles.setupDesc}>
-              Timed, mixed-topic drill that simulates a real interview. No scheduling side effects — purely for practice.
-            </p>
-            <div className={styles.setupOptions}>
-              <label className={styles.optLabel}>
-                Cards:
-                <select
-                  value={cardCount}
-                  onChange={(e) => setCardCount(Number(e.target.value))}
-                  className={styles.select}
-                >
-                  <option value={10}>10 (Quick)</option>
-                  <option value={20}>20 (Standard)</option>
-                  <option value={30}>30 (Deep)</option>
-                  <option value={50}>50 (Marathon)</option>
-                </select>
-              </label>
-              <label className={styles.optLabel}>
-                <input
-                  type="checkbox"
-                  checked={showExplain}
-                  onChange={(e) => setShowExplain(e.target.checked)}
-                  className={styles.checkbox}
-                />
-                Show "explain it back" box
-              </label>
-            </div>
-            <button className={styles.startBtn} onClick={startDrill}>
-              Start Drill
-            </button>
-          </div>
+          <p className={styles.muted}>Loading…</p>
         </div>
       </Layout>
     );
   }
 
-  // Results screen
-  if (queue.length === 0 && started) {
-    const pct = total > 0 ? Math.round((score.correct / total) * 100) : 0;
+  if (status === Status.ERROR) {
     return (
-      <Layout title="Drill Results" description="Interview drill results">
+      <Layout {...pageMeta}>
         <div className={styles.container}>
-          <div className={styles.results}>
-            <h2>Drill Complete</h2>
-            <div className={styles.resultTime}>{formatTime(timer)}</div>
-            <div className={styles.resultGrid}>
-              <div className={styles.resultItem}>
-                <span className={styles.resultNum} style={{ color: '#4fd1a5' }}>{score.correct}</span>
-                <span>Correct</span>
-              </div>
-              <div className={styles.resultItem}>
-                <span className={styles.resultNum} style={{ color: '#ffbd2e' }}>{score.unsure}</span>
-                <span>Unsure</span>
-              </div>
-              <div className={styles.resultItem}>
-                <span className={styles.resultNum} style={{ color: '#ff5f56' }}>{score.wrong}</span>
-                <span>Wrong</span>
-              </div>
-            </div>
-            <div className={styles.resultPct}>{pct}% accuracy</div>
-            <button className={styles.startBtn} onClick={() => { setStarted(false); }}>
-              New Drill
-            </button>
-          </div>
+          <p className={styles.muted}>
+            Could not load cards. Refresh to retry, or run{' '}
+            <code>npm run build</code> if you are developing locally.
+          </p>
         </div>
       </Layout>
     );
   }
 
-  // Active drill
+  if (phase === Phase.SETUP) {
+    return (
+      <Layout {...pageMeta}>
+        <div className={styles.container}>
+          <DrillSetup
+            availableCount={eligibleCards.length}
+            size={size}
+            onSizeChange={setSize}
+            includeAllTiers={includeAllTiers}
+            onIncludeAllTiersChange={setIncludeAllTiers}
+            showExplainBox={showExplainBox}
+            onShowExplainBoxChange={setShowExplainBox}
+            onStart={startDrill}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (phase === Phase.RESULTS) {
+    return (
+      <Layout {...pageMeta}>
+        <div className={styles.container}>
+          <DrillResults
+            tally={tally}
+            total={totalCards}
+            elapsed={elapsed}
+            onRestart={() => setPhase(Phase.SETUP)}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout title="Interview Drill" description="Timed interview simulation">
+    <Layout {...pageMeta}>
       <div className={styles.container}>
-        <div className={styles.drillHeader}>
+        <header className={styles.header}>
           <span className={styles.progress}>
-            {total - queue.length + 1} / {total}
+            {totalCards - queue.length + 1} / {totalCards}
           </span>
-          <span className={styles.timer}>{formatTime(timer)}</span>
-        </div>
+          <span className={styles.timer}>{formatDuration(elapsed)}</span>
+        </header>
+
         <DrillCard
           card={queue[0]}
           revealed={revealed}
+          showExplainBox={showExplainBox}
           onReveal={() => setRevealed(true)}
-          onNext={handleNext}
-          showExplain={showExplain}
+          onOutcome={recordOutcome}
         />
-        <p className={styles.hint}>Space to reveal · 1-3 to grade</p>
+
+        <p className={styles.hint}>
+          {config.keys.reveal} to reveal · {config.keys.drillGradeHint}
+        </p>
       </div>
     </Layout>
+  );
+}
+
+/**
+ * @param {object} props
+ * @param {number} props.availableCount
+ * @param {number} props.size
+ * @param {(size: number) => void} props.onSizeChange
+ * @param {boolean} props.includeAllTiers
+ * @param {(value: boolean) => void} props.onIncludeAllTiersChange
+ * @param {boolean} props.showExplainBox
+ * @param {(value: boolean) => void} props.onShowExplainBoxChange
+ * @param {() => void} props.onStart
+ */
+function DrillSetup({
+  availableCount,
+  size,
+  onSizeChange,
+  includeAllTiers,
+  onIncludeAllTiersChange,
+  showExplainBox,
+  onShowExplainBoxChange,
+  onStart,
+}) {
+  return (
+    <section className={styles.setup}>
+      <h1>Interview Drill</h1>
+      <p className={styles.setupDescription}>
+        Timed, all topics mixed, random order — the way a real interview moves.
+        Nothing here affects your Revise schedule.
+      </p>
+
+      <div className={styles.options}>
+        <label className={styles.option} htmlFor="drill-size">
+          Questions
+          <select
+            id="drill-size"
+            className={styles.select}
+            value={size}
+            onChange={(event) => onSizeChange(Number(event.target.value))}
+          >
+            {config.drill.sizeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className={styles.option}>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={includeAllTiers}
+            onChange={(event) => onIncludeAllTiersChange(event.target.checked)}
+          />
+          Include trivia-tier questions
+        </label>
+
+        <label className={styles.option}>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={showExplainBox}
+            onChange={(event) => onShowExplainBoxChange(event.target.checked)}
+          />
+          Show &ldquo;explain it back&rdquo; box
+        </label>
+      </div>
+
+      <p className={styles.poolNote}>{availableCount} questions in the pool</p>
+
+      <button
+        type="button"
+        className={styles.primaryButton}
+        onClick={onStart}
+        disabled={availableCount === 0}
+      >
+        Start drill
+      </button>
+    </section>
+  );
+}
+
+/**
+ * A single drill question.
+ *
+ * The explain-it-back box is the Feynman step: writing an explanation in your
+ * own words before revealing turns a passive reveal into active generation.
+ * Nothing is graded or stored — it exists to surface your own vagueness.
+ *
+ * @param {object} props
+ * @param {object} props.card
+ * @param {boolean} props.revealed
+ * @param {boolean} props.showExplainBox
+ * @param {() => void} props.onReveal
+ * @param {(outcomeId: string) => void} props.onOutcome
+ */
+function DrillCard({ card, revealed, showExplainBox, onReveal, onOutcome }) {
+  const [explanation, setExplanation] = useState('');
+
+  // Clear the draft when the question changes.
+  useEffect(() => {
+    setExplanation('');
+  }, [card.id]);
+
+  const wantsExplanation =
+    showExplainBox && (card.type === 'concept' || card.type === 'elaborative');
+
+  return (
+    <article className={styles.card}>
+      <CardBadges tier={card.tier} type={card.type} tags={card.tags} maxTags={2} />
+
+      <p className={styles.question}>
+        <span className={styles.questionLabel}>Q:</span> {card.q}
+      </p>
+
+      {!revealed && wantsExplanation && (
+        <div className={styles.explainBox}>
+          <label className={styles.explainLabel} htmlFor={`explain-${card.id}`}>
+            Explain it back, in your own words (optional)
+          </label>
+          <textarea
+            id={`explain-${card.id}`}
+            className={styles.explainInput}
+            rows={3}
+            value={explanation}
+            placeholder="If you cannot say it simply, you do not know it well enough yet."
+            onChange={(event) => setExplanation(event.target.value)}
+          />
+        </div>
+      )}
+
+      {revealed ? (
+        <div className={styles.answerPanel}>
+          <CardAnswer card={card}>
+            {explanation.trim() && (
+              <div className={styles.yourExplanation}>
+                <strong>What you wrote:</strong> {explanation}
+              </div>
+            )}
+          </CardAnswer>
+
+          <div className={styles.outcomes}>
+            {config.drill.outcomes.map((outcome, index) => (
+              <button
+                key={outcome.id}
+                type="button"
+                className={styles.outcomeButton}
+                style={{ borderColor: outcome.color, color: outcome.color }}
+                onClick={() => onOutcome(outcome.id)}
+                aria-label={`${outcome.label} (press ${index + 1})`}
+              >
+                <span className={styles.outcomeKey}>{index + 1}</span>
+                {outcome.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button type="button" className={styles.revealButton} onClick={onReveal}>
+          Show Answer
+        </button>
+      )}
+    </article>
+  );
+}
+
+/**
+ * @param {object} props
+ * @param {Record<string, number>} props.tally
+ * @param {number} props.total
+ * @param {number} props.elapsed
+ * @param {() => void} props.onRestart
+ */
+function DrillResults({ tally, total, elapsed, onRestart }) {
+  const correct = tally.correct || 0;
+  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const perQuestion = total > 0 ? Math.round(elapsed / total) : 0;
+
+  return (
+    <section className={styles.results}>
+      <h2>Drill complete</h2>
+      <p className={styles.resultsTime}>{formatDuration(elapsed)}</p>
+      <p className={styles.resultsPace}>
+        about {perQuestion}s per question
+      </p>
+
+      <div className={styles.resultsGrid}>
+        {config.drill.outcomes.map((outcome) => (
+          <div key={outcome.id} className={styles.resultItem}>
+            <span className={styles.resultValue} style={{ color: outcome.color }}>
+              {tally[outcome.id] || 0}
+            </span>
+            <span className={styles.resultLabel}>{outcome.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className={styles.accuracy}>{accuracy}% accuracy</p>
+
+      <button type="button" className={styles.primaryButton} onClick={onRestart}>
+        New drill
+      </button>
+    </section>
   );
 }

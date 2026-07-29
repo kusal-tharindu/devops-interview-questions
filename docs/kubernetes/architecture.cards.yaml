@@ -1,0 +1,251 @@
+- id: k8s-arch-what-is
+  tier: core
+  type: concept
+  q: What is Kubernetes, in terms of how it operates?
+  a: A reconciliation engine — you declare desired state and controllers continuously act to close the gap with actual state.
+  tags: [kubernetes, architecture, fundamentals]
+  verified: 2026-07-29
+  ref: '#reconciliation'
+  sources:
+    - title: Kubernetes — Cluster architecture
+      url: https://kubernetes.io/docs/concepts/architecture/
+
+- id: k8s-arch-deleted-pod-returns
+  tier: core
+  type: scenario
+  q: You delete a pod managed by a Deployment and it comes back. Why?
+  a: The delete succeeded, but actual state no longer matched desired state, so the controller recreated it.
+  tags: [kubernetes, architecture, troubleshooting]
+  verified: 2026-07-29
+  ref: '#reconciliation'
+
+- id: k8s-arch-control-plane
+  tier: core
+  type: recall
+  q: Which components make up the Kubernetes control plane?
+  a: kube-apiserver, etcd, kube-scheduler and controller-manager.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-apiserver-role
+  tier: core
+  type: recall
+  q: What is the role of kube-apiserver?
+  a: The single entry point — it validates every request and is the only component that talks to etcd.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-etcd-purpose
+  tier: core
+  type: recall
+  q: What does etcd store?
+  a: All cluster state and configuration. It is the single source of truth.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-scheduler-purpose
+  tier: core
+  type: recall
+  q: What does kube-scheduler do?
+  a: Assigns each unscheduled pod to a node based on resources and constraints.
+  tags: [kubernetes, architecture]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-kubelet-purpose
+  tier: core
+  type: recall
+  q: What does the kubelet do?
+  a: Runs on each node and ensures the pods assigned to it are actually running.
+  tags: [kubernetes, architecture, nodes]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-node-notready-containers
+  tier: deep
+  type: scenario
+  q: A node loses contact with the control plane. Do its containers stop?
+  a: No. They keep running; the control plane just marks the node NotReady and reschedules elsewhere.
+  tags: [kubernetes, architecture, troubleshooting]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-pod-definition
+  tier: core
+  type: concept
+  q: What is a Pod?
+  a: The smallest deployable unit — one or more containers sharing a network namespace and volumes.
+  tags: [kubernetes, pods, fundamentals]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-pod-ephemeral
+  tier: core
+  type: recall
+  q: Are pods durable?
+  a: No. They are ephemeral and get new names and IPs whenever recreated.
+  tags: [kubernetes, pods]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-deployment-purpose
+  tier: core
+  type: concept
+  q: What does a Deployment manage?
+  a: ReplicaSets — declaring how many pod replicas should exist and how updates roll out.
+  tags: [kubernetes, deployments, workloads]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-replicaset-purpose
+  tier: deep
+  type: recall
+  q: What does a ReplicaSet guarantee?
+  a: That exactly N identical pods exist at all times.
+  tags: [kubernetes, deployments, workloads]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-service-purpose
+  tier: core
+  type: concept
+  q: Why do Services exist?
+  a: Pods are ephemeral with changing IPs, so a Service gives a stable name and address selecting pods by label.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+  ref: '#workloads'
+  sources:
+    - title: Kubernetes — Service
+      url: https://kubernetes.io/docs/concepts/services-networking/service/
+
+- id: k8s-arch-statefulset-when
+  tier: deep
+  type: elaborative
+  q: When do you need a StatefulSet instead of a Deployment?
+  a: When pods need stable identity, stable storage and ordered startup — databases and clustered systems.
+  tags: [kubernetes, workloads]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-service-clusterip
+  tier: core
+  type: recall
+  q: What does a ClusterIP Service provide?
+  a: A virtual IP reachable only from inside the cluster. This is the default type.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+  ref: '#service-types'
+
+- id: k8s-arch-service-nodeport
+  tier: core
+  type: recall
+  q: What does a NodePort Service add over ClusterIP?
+  a: A fixed port opened on every node, making the service reachable from outside the cluster.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+  ref: '#service-types'
+
+- id: k8s-arch-service-loadbalancer
+  tier: core
+  type: recall
+  q: What does a LoadBalancer Service add over NodePort?
+  a: A cloud-provisioned external load balancer in front of the node ports.
+  tags: [kubernetes, services, networking]
+  verified: 2026-07-29
+  ref: '#service-types'
+
+- id: k8s-arch-ingress-vs-loadbalancer
+  tier: deep
+  type: elaborative
+  q: Why use an Ingress instead of a LoadBalancer per service?
+  a: One load balancer handles host and path routing plus TLS for many services, instead of one cloud LB each.
+  tags: [kubernetes, networking, ingress]
+  verified: 2026-07-29
+  ref: '#service-types'
+
+- id: k8s-arch-ingress-needs-controller
+  tier: deep
+  type: recall
+  q: What does an Ingress resource need in order to do anything?
+  a: An Ingress controller running in the cluster, such as nginx or Traefik.
+  tags: [kubernetes, networking, ingress]
+  verified: 2026-07-29
+  ref: '#service-types'
+
+- id: k8s-arch-liveness-vs-readiness
+  tier: core
+  type: recall
+  q: What is the difference between a liveness and a readiness probe?
+  a: Readiness failure removes the pod from Service endpoints. Liveness failure restarts the container.
+  tags: [kubernetes, probes, health-checks]
+  verified: 2026-07-29
+  ref: '#probes'
+  sources:
+    - title: Kubernetes — Probes
+      url: https://kubernetes.io/docs/concepts/configuration/liveness-readiness-startup-probes/
+
+- id: k8s-arch-startup-probe-purpose
+  tier: deep
+  type: scenario
+  q: A slow-starting app restarts endlessly under a liveness probe. What fixes it?
+  a: A startup probe, which delays liveness checks until the app has finished booting.
+  tags: [kubernetes, probes, troubleshooting]
+  verified: 2026-07-29
+  ref: '#probes'
+
+- id: k8s-arch-namespace-purpose
+  tier: core
+  type: recall
+  q: What is a Namespace for?
+  a: Partitioning a cluster's resources for organisation and access control.
+  tags: [kubernetes, namespaces]
+  verified: 2026-07-29
+  ref: '#components'
+
+- id: k8s-arch-configmap-purpose
+  tier: core
+  type: recall
+  q: What is a ConfigMap?
+  a: Non-sensitive configuration as key-value pairs, consumed as env vars or mounted files.
+  tags: [kubernetes, configuration]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-secret-encoding
+  tier: core
+  type: elaborative
+  q: Are Kubernetes Secrets encrypted by default?
+  a: No — they are only base64-encoded. Encryption at rest must be configured explicitly.
+  tags: [kubernetes, configuration, security]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-crashloop-diagnose
+  tier: core
+  type: scenario
+  q: A pod is in CrashLoopBackOff. What do you check first?
+  a: kubectl logs for the crash reason, then kubectl describe pod for events like image pull errors or OOM kills.
+  tags: [kubernetes, troubleshooting, pods]
+  verified: 2026-07-29
+  ref: '#probes'
+
+- id: k8s-arch-rolling-update
+  tier: deep
+  type: elaborative
+  q: How does a Deployment perform a rolling update?
+  a: It creates a new ReplicaSet and shifts replicas across gradually, bounded by maxSurge and maxUnavailable.
+  tags: [kubernetes, deployments, updates]
+  verified: 2026-07-29
+  ref: '#workloads'
+
+- id: k8s-arch-kubectl-apply
+  tier: core
+  type: command
+  q: How do you apply a manifest to a cluster?
+  a: kubectl apply -f file.yaml
+  tags: [kubernetes, commands]
+  verified: 2026-07-29
+  ref: '#reconciliation'

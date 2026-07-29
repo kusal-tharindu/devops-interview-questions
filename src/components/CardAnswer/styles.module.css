@@ -1,0 +1,62 @@
+.answer {
+  font-size: 0.95rem;
+}
+
+.answerText {
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.label {
+  color: #27c93f;
+  font-weight: 700;
+  margin-right: 0.25rem;
+}
+
+.why {
+  margin: 0 0 0.9rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.87rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.025);
+  border-left: 3px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0 6px 6px 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.theoryLink {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.theoryLink:hover {
+  text-decoration: underline;
+}
+
+.stamp {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.32);
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.sources {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.83rem;
+}
+
+.sources li {
+  margin-bottom: 0.2rem;
+  color: rgba(255, 255, 255, 0.5);
+}

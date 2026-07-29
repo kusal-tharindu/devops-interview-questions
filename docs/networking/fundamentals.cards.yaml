@@ -1,0 +1,209 @@
+- id: net-basics-osi-purpose
+  tier: core
+  type: concept
+  q: What practical value does the OSI model give you?
+  a: A debugging order — isolate which layer is broken instead of guessing.
+  tags: [networking, osi, fundamentals]
+  verified: 2026-07-29
+  ref: '#layers'
+  sources:
+    - title: Cloudflare — What is the OSI Model?
+      url: https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/
+
+- id: net-basics-osi-layers
+  tier: core
+  type: recall
+  q: Name the 7 OSI layers from bottom to top.
+  a: Physical, Data link, Network, Transport, Session, Presentation, Application.
+  tags: [networking, osi]
+  verified: 2026-07-29
+  ref: '#layers'
+
+- id: net-basics-layer3-network
+  tier: core
+  type: recall
+  q: What happens at layer 3?
+  a: IP addressing and routing — deciding the path packets take between networks.
+  tags: [networking, osi]
+  verified: 2026-07-29
+  ref: '#layers'
+
+- id: net-basics-layer4-transport
+  tier: core
+  type: recall
+  q: What happens at layer 4?
+  a: End-to-end delivery via ports, with TCP or UDP semantics.
+  tags: [networking, osi]
+  verified: 2026-07-29
+  ref: '#layers'
+
+- id: net-basics-tcp-vs-udp
+  tier: core
+  type: recall
+  q: What is the key difference between TCP and UDP?
+  a: TCP is connection-oriented with guaranteed ordered delivery. UDP is connectionless best-effort.
+  tags: [networking, protocols, fundamentals]
+  verified: 2026-07-29
+  ref: '#tcp-udp'
+
+- id: net-basics-tcp-handshake
+  tier: core
+  type: recall
+  q: What are the three steps of the TCP handshake?
+  a: SYN, SYN-ACK, ACK.
+  tags: [networking, tcp]
+  verified: 2026-07-29
+  ref: '#tcp-udp'
+
+- id: net-basics-udp-use-cases
+  tier: deep
+  type: elaborative
+  q: When is UDP the better choice?
+  a: When late data is worse than missing data — DNS, streaming, VoIP, gaming.
+  tags: [networking, udp]
+  verified: 2026-07-29
+  ref: '#tcp-udp'
+
+- id: net-basics-dns-purpose
+  tier: core
+  type: concept
+  q: What does DNS do?
+  a: Resolves human-readable names into IP addresses.
+  tags: [networking, dns, fundamentals]
+  verified: 2026-07-29
+  ref: '#dns'
+  sources:
+    - title: Cloudflare — What is DNS?
+      url: https://www.cloudflare.com/learning/dns/what-is-dns/
+
+- id: net-basics-dns-record-a
+  tier: core
+  type: recall
+  q: What does a DNS A record map?
+  a: A name to an IPv4 address.
+  tags: [networking, dns]
+  verified: 2026-07-29
+  ref: '#dns'
+
+- id: net-basics-dns-record-cname
+  tier: core
+  type: recall
+  q: What does a CNAME record point to?
+  a: Another domain name, never directly to an IP.
+  tags: [networking, dns]
+  verified: 2026-07-29
+  ref: '#dns'
+
+- id: net-basics-dns-ttl
+  tier: deep
+  type: elaborative
+  q: Why should you lower a record's TTL before a planned migration?
+  a: TTL is the cache lifetime, so a high TTL means resolvers keep serving the old address after you change it.
+  tags: [networking, dns]
+  verified: 2026-07-29
+  ref: '#dns'
+
+- id: net-basics-dns-not-resolving
+  tier: core
+  type: scenario
+  q: A service works by IP but not by hostname. What is the likely cause?
+  a: DNS resolution — check /etc/resolv.conf and query the record with dig or nslookup.
+  tags: [networking, dns, troubleshooting]
+  verified: 2026-07-29
+  ref: '#dns'
+
+- id: net-basics-http-status-4xx
+  tier: core
+  type: recall
+  q: What does a 4xx status code indicate?
+  a: A client error — the request itself is the problem.
+  tags: [networking, http]
+  verified: 2026-07-29
+  ref: '#http-status'
+  sources:
+    - title: MDN — HTTP response status codes
+      url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+
+- id: net-basics-http-status-5xx
+  tier: core
+  type: recall
+  q: What does a 5xx status code indicate?
+  a: A server error — the request was valid but the server failed to fulfil it.
+  tags: [networking, http]
+  verified: 2026-07-29
+  ref: '#http-status'
+
+- id: net-basics-http-401-vs-403
+  tier: core
+  type: recall
+  q: What is the difference between 401 and 403?
+  a: 401 means not authenticated. 403 means authenticated but not permitted.
+  tags: [networking, http]
+  verified: 2026-07-29
+  ref: '#http-status'
+
+- id: net-basics-http-502-vs-504
+  tier: deep
+  type: scenario
+  q: Behind a load balancer, what do 502 and 504 tell you?
+  a: 502 means the gateway got a bad response from upstream; 504 means upstream did not answer in time. Both point past the proxy to the backend.
+  tags: [networking, http, troubleshooting]
+  verified: 2026-07-29
+  ref: '#http-status'
+
+- id: net-basics-port-well-known
+  tier: core
+  type: recall
+  q: What are the default ports for SSH, HTTP, HTTPS and DNS?
+  a: 22, 80, 443 and 53.
+  tags: [networking, ports]
+  verified: 2026-07-29
+  ref: '#layers'
+
+- id: net-basics-https-difference
+  tier: core
+  type: recall
+  q: What does HTTPS add over HTTP?
+  a: TLS encryption, so traffic cannot be read or tampered with in transit.
+  tags: [networking, http, security]
+  verified: 2026-07-29
+  ref: '#http-status'
+
+- id: net-basics-cidr-notation
+  tier: deep
+  type: recall
+  q: How many usable hosts are in a /24?
+  a: 254 — 256 addresses minus the network and broadcast addresses.
+  tags: [networking, subnetting]
+  verified: 2026-07-29
+  ref: '#addressing'
+
+- id: net-basics-private-ip-ranges
+  tier: deep
+  type: recall
+  q: What are the three RFC 1918 private ranges?
+  a: 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16.
+  tags: [networking, subnetting]
+  verified: 2026-07-29
+  ref: '#addressing'
+  sources:
+    - title: RFC 1918
+      url: https://datatracker.ietf.org/doc/html/rfc1918
+
+- id: net-basics-nat-purpose
+  tier: deep
+  type: elaborative
+  q: Why does NAT exist?
+  a: Private addresses are not routable on the internet, so NAT maps many private hosts onto one public address.
+  tags: [networking, nat]
+  verified: 2026-07-29
+  ref: '#addressing'
+
+- id: net-basics-reverse-proxy
+  tier: deep
+  type: recall
+  q: How does a reverse proxy differ from a forward proxy?
+  a: A reverse proxy fronts servers and receives client requests. A forward proxy fronts clients and forwards their outbound requests.
+  tags: [networking, proxy]
+  verified: 2026-07-29
+  ref: '#layers'
