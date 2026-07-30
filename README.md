@@ -85,7 +85,15 @@ Contributions welcome! See the [Contributing Guide](./CONTRIBUTING.md) for the c
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+This project uses a split license to keep contributions open while protecting the brand:
+
+| Layer | License | File |
+|-------|---------|------|
+| Code (scripts, components, engine) | [AGPL-3.0](./LICENSE) | `LICENSE` |
+| Content (questions, theory pages) | [CC BY-NC-SA 4.0](./LICENSE-CONTENT) | `LICENSE-CONTENT` |
+| Brand (logo, name, visual design) | All rights reserved | `LICENSE-BRAND` |
+
+**In plain terms:** you can study from it, contribute to it, and fork it for non-commercial use with credit. If you host a derivative publicly, your code changes must also be open-sourced. You cannot clone the brand identity for a competing project.
 
 ---
 

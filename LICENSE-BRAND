@@ -1,0 +1,43 @@
+Brand Assets — All Rights Reserved
+
+Copyright (c) 2026 Kusal Tharindu
+
+────────────────────────────────────────────────────────────────────────
+
+SCOPE
+
+The following are proprietary and NOT licensed for reuse:
+
+- The name "DevOps Interview Q&A" and "DevOps Recall"
+- The logo (static/img/logo.svg, static/img/logo.png)
+- The favicon (static/img/favicon.ico)
+- The social card image (static/img/social-card.png)
+- The visual design system: dark theme, teal accent (#4fd1a5),
+  glassmorphism navbar, overall page layout and styling
+- The CSS theme (src/css/custom.css) as a complete visual identity
+
+────────────────────────────────────────────────────────────────────────
+
+WHAT THIS MEANS
+
+If you fork this project, you must:
+
+1. Remove or replace the logo, favicon, and social card
+2. Choose a different name for your derivative project
+3. Change the color scheme and visual identity sufficiently that
+   your project is not visually confused with this one
+
+You may reference the original project by name for attribution
+purposes (e.g., "Based on DevOps Interview Q&A by kusal-tharindu").
+
+────────────────────────────────────────────────────────────────────────
+
+WHY
+
+Open contribution and open learning do not require giving away the
+brand. This restriction exists so that forks cannot impersonate the
+original project or mislead users about who maintains it.
+
+The code (AGPL-3.0) and content (CC BY-NC-SA 4.0) remain freely
+available for study, modification, and non-commercial redistribution.
+Only the visual identity is reserved.
