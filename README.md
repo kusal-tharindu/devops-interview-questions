@@ -1,49 +1,44 @@
 # DevOps Interview Questions & Answers
 
-A community-driven collection of DevOps interview questions and answers covering Linux, Docker, Terraform, Kubernetes, Bash, Python, and more.
+A free, open-source **spaced repetition system** for DevOps interview prep. Study the theory, then prove you remember it — spacing happens without you managing it.
 
-Live site: https://kusal-tharindu.github.io/devops-interview-questions/
+**Live site:** https://kusal-tharindu.github.io/devops-interview-questions/
 
-Each question includes a **short summary answer** for quick recall and **links to official documentation** for deeper learning.
+---
 
-## Topics
+## How It Works
 
-| Topic | Description |
-|-------|-------------|
-| [Linux](./docs/linux/) | File system, permissions, processes, networking |
-| [Docker](./docs/docker/) | Containers, images, networking, volumes |
-| [Terraform](./docs/terraform/) | IaC basics, state management, modules |
-| [Bash](./docs/bash/) | Shell scripting, text processing, automation |
-| [Python](./docs/python/) | Scripting, data types, DevOps automation |
+Three modes that match how people actually study:
 
-## How to Use
+| Mode | What it does |
+|------|-------------|
+| **Learn** | Browse a topic's theory page with diagrams, then work through its questions at your own pace |
+| **Revise** | Pick a topic, test yourself — your grades silently build a spaced review schedule (SM-2) |
+| **Drill** | Timed, all topics mixed, random order — cram the night before an interview |
 
-1. **Interview prep** — Read the question, try to recall the answer, then check the summary
-2. **Deep learning** — Follow the official doc links for full understanding
-3. **Quick reference** — Use key points as a cheat sheet
+Spacing is a side effect of Revise, not a daily habit you need to maintain. Progress lives in your browser's localStorage — no accounts, no tracking.
 
-## Q&A Format
+## Topics (185 questions)
 
-Each page follows this structure:
-
-```markdown
-## Q: [Question here]
-
-**Summary:**
-Short, clear explanation that covers the core concept.
-
-**Key points:**
-- Important fact 1
-- Important fact 2
-- Important fact 3
-
-**Learn more:**
-- [Official Doc Title](link)
-```
+| Topic | Questions | Pages |
+|-------|-----------|-------|
+| Linux | 13 | Filesystem |
+| Bash | 12 | Scripting |
+| Git | 14 | Fundamentals |
+| Networking | 22 | Fundamentals |
+| Docker | 51 | Architecture, Dockerfile, Images & Layers, Networking |
+| Kubernetes | 27 | Architecture |
+| Terraform | 16 | State & Workflow |
+| CI/CD | 15 | Pipelines |
+| Python | 15 | Fundamentals |
 
 ## Tech Stack
 
-This site is built with [Docusaurus](https://docusaurus.io/), a static site generator maintained by Meta's open source team. Content is plain Markdown under `docs/`.
+- [Docusaurus 3.10](https://docusaurus.io/) + React 18
+- Dark-only theme, teal accent, glassmorphism navbar
+- SM-2 spaced repetition engine (client-side, localStorage)
+- Cards in `.cards.yaml` files, compiled to JSON at build time
+- Mermaid diagrams for visual theory
 
 ## Local Development
 
@@ -51,35 +46,47 @@ Requires [Node.js](https://nodejs.org/) 20 or later.
 
 ```bash
 npm install
-npm run start
+npm run start            # Dev server at localhost:3000/devops-interview-questions/
+npm run content:check    # Validate card schema without full build
+npm run build            # Full production build
+npm run serve            # Serve production build locally
 ```
 
-This starts a local dev server at `http://localhost:3000` with hot reload.
+## Content Model
 
-To build a production bundle:
+Questions live in `.cards.yaml` files next to their theory `.md` page:
 
-```bash
-npm run build
+```
+docs/docker/architecture.md            ← Theory page
+docs/docker/architecture.cards.yaml    ← Questions for that page
 ```
 
-The build output goes to `build/` and is served with:
+Each card is atomic (one fact per card) and follows a strict schema:
 
-```bash
-npm run serve
+```yaml
+- id: docker-arch-daemon-role
+  tier: core          # core | deep | trivia
+  type: recall        # recall | concept | elaborative | scenario | cloze | command
+  q: What is the role of the Docker daemon?
+  a: It manages images, containers, networks, and volumes on the host.
+  tags: [docker, architecture]
+  verified: 2026-07-29
 ```
+
+The build validates all cards and fails on schema errors or duplicate IDs.
 
 ## Deployment
 
-Pushing to `main` automatically triggers a GitHub Actions workflow (`.github/workflows/deploy.yml`) that builds the site and publishes it to GitHub Pages. No manual deployment steps are needed.
+Pushing to `main` triggers a GitHub Actions workflow that builds and deploys to GitHub Pages. All changes go through `stg` first.
 
 ## Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](./CONTRIBUTING.md) before submitting a PR.
+Contributions welcome! See the [Contributing Guide](./CONTRIBUTING.md) for the card schema, quality checklist, and how to add content.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+MIT — see [LICENSE](./LICENSE).
 
 ---
 
-If this helped you, consider giving it a star!
+If this helped you prep, consider giving it a ⭐
