@@ -6,7 +6,7 @@ A free, open-source **spaced repetition system** for DevOps interview prep. Stud
 
 ---
 
-## How It Works:
+## How It Works
 
 Three modes that match how people actually study:
 
