@@ -24,8 +24,8 @@ const site = {
   shortTitle: 'DevOps Interview Q&A',
   tagline:
     'Study the theory, then prove you remember it. Linux, Docker, Kubernetes, Terraform, Bash, Python, Networking, Git, CI/CD.',
-  url: `https://${GITHUB_OWNER}.github.io`,
-  baseUrl: `/${GITHUB_REPO}/`,
+  url: 'https://devops.dtk2globle.com',
+  baseUrl: '/',
   organizationName: GITHUB_OWNER,
   projectName: GITHUB_REPO,
   defaultBranch: DEFAULT_BRANCH,
