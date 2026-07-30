@@ -10,6 +10,8 @@ on:
     paths-ignore:
       - 'README.md'
       - 'CONTRIBUTING.md'
+      - 'DISCLAIMER.md'
+      - 'TERMS.md'
       - 'LICENSE'
       - 'LICENSE-CONTENT'
       - 'LICENSE-BRAND'

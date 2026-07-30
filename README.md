@@ -95,6 +95,13 @@ This project uses a split license to keep contributions open while protecting th
 
 **In plain terms:** you can study from it, contribute to it, and fork it for non-commercial use with credit. If you host a derivative publicly, your code changes must also be open-sourced. You cannot clone the brand identity for a competing project.
 
+## Disclaimer & Terms
+
+- [Disclaimer](./DISCLAIMER.md) — trademark notices, no guarantee of accuracy, educational use only
+- [Terms and Conditions](./TERMS.md) — usage terms, liability, contribution licensing
+
+All referenced product names (Docker, Kubernetes, AWS, Terraform, etc.) are trademarks of their respective owners. This project is not affiliated with or endorsed by any of them.
+
 ---
 
 If this helped you prep, consider giving it a ⭐
