@@ -1,0 +1,62 @@
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+(CC BY-NC-SA 4.0)
+
+Copyright (c) 2026 Kusal Tharindu
+
+────────────────────────────────────────────────────────────────────────
+
+SCOPE
+
+This license applies to all educational content in this repository:
+- Question and answer cards (docs/**/*.cards.yaml)
+- Theory pages and written explanations (docs/**/*.md)
+- The docs/intro.md page
+- The CONTRIBUTING.md guide
+
+────────────────────────────────────────────────────────────────────────
+
+TERMS SUMMARY
+
+You are free to:
+
+  Share — copy and redistribute the material in any medium or format
+  Adapt — remix, transform, and build upon the material
+
+Under the following conditions:
+
+  Attribution (BY)
+    You must give appropriate credit, provide a link to the original
+    repository (https://github.com/kusal-tharindu/devops-interview-questions),
+    and indicate if changes were made.
+
+  NonCommercial (NC)
+    You may not use the material for commercial purposes. This includes
+    selling the content, placing it behind a paywall, or using it as the
+    primary content of a commercial product or service.
+
+  ShareAlike (SA)
+    If you remix, transform, or build upon the material, you must
+    distribute your contributions under the same license.
+
+────────────────────────────────────────────────────────────────────────
+
+WHAT THIS ALLOWS
+
+✓ Using the questions to study for interviews (personal use)
+✓ Forking and contributing improvements back to this project
+✓ Sharing individual questions or cards with attribution
+✓ Using the content in free educational materials with credit
+✓ Creating a derivative study tool, as long as it remains
+  non-commercial and credits this project
+
+WHAT THIS DOES NOT ALLOW
+
+✗ Selling the content or placing it behind a paywall
+✗ Using the cards/questions as primary content for a commercial app
+✗ Redistributing without attribution
+✗ Redistributing under a more permissive license
+
+────────────────────────────────────────────────────────────────────────
+
+The full legal text is available at:
+https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode

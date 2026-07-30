@@ -7,6 +7,14 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'LICENSE-CONTENT'
+      - 'LICENSE-BRAND'
+      - '.kiro-guide/**'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
