@@ -221,6 +221,103 @@ function TierBar({ counts = {}, total }) {
   );
 }
 
+const TOPIC_PAGE_PREVIEW = 4;
+
+function TopicCard({ topic, index }) {
+  const pages = topic.pages || [];
+  const visiblePages = pages.slice(0, TOPIC_PAGE_PREVIEW);
+  const hiddenPageCount = pages.length - visiblePages.length;
+  const readingMinutes = pages.reduce(
+    (sum, page) => sum + (page.readingMinutes || 0),
+    0
+  );
+  const questionLabel = `${topic.questionCount} question${
+    topic.questionCount === 1 ? '' : 's'
+  }`;
+
+  return (
+    <article className={styles.topicCard}>
+      <div className={styles.topicCardTop}>
+        <span className={styles.topicIcon}>
+          <TopicIcon slug={topic.slug} />
+        </span>
+        <span className={styles.topicIndex} aria-hidden="true">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+      </div>
+
+      <div className={styles.topicHeading}>
+        <Heading as="h3" className={styles.topicTitle}>
+          <Link
+            to={`/${topic.firstDocId}`}
+            className={styles.topicTitleLink}
+          >
+            {topic.label}
+          </Link>
+        </Heading>
+        <span className={styles.topicCount}>{questionLabel}</span>
+      </div>
+
+      <p className={styles.topicDescription}>
+        {topic.description ||
+          `Theory pages and questions for ${topic.label}.`}
+      </p>
+
+      <div className={styles.topicMetrics}>
+        <span>
+          <strong>{topic.pageCount}</strong> page
+          {topic.pageCount === 1 ? '' : 's'}
+        </span>
+        {readingMinutes > 0 && (
+          <>
+            <span className={styles.metricDivider} aria-hidden="true" />
+            <span>
+              <strong>{readingMinutes}</strong> min read
+            </span>
+          </>
+        )}
+      </div>
+
+      <TierBar counts={topic.tierCounts} total={topic.questionCount} />
+
+      <div className={styles.topicPages}>
+        <div className={styles.pagesHead}>
+          <span className={styles.pagesLabel}>Pages</span>
+          <span className={styles.pagesCount}>{pages.length}</span>
+        </div>
+
+        <ul className={styles.pageList}>
+          {visiblePages.map((page) => (
+            <li key={page.slug}>
+              <Link className={styles.pageLink} to={page.url}>
+                <span className={styles.pageTitle}>
+                  {page.sidebarLabel || page.title}
+                </span>
+                <span className={styles.pageMeta}>
+                  {page.questionCount} Q
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {hiddenPageCount > 0 && (
+          <p className={styles.morePages}>
+            +{hiddenPageCount} more page{hiddenPageCount === 1 ? '' : 's'}
+          </p>
+        )}
+      </div>
+
+      <div className={styles.topicFooter}>
+        <Link className={styles.topicCta} to={`/${topic.firstDocId}`}>
+          Open {topic.label}
+          <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function TopicLibrary({ totalQuestions }) {
   return (
     <section className={styles.section} id="library">
@@ -241,72 +338,9 @@ function TopicLibrary({ totalQuestions }) {
           </p>
         </header>
 
-        <div className={styles.topicList}>
+        <div className={styles.topicGrid}>
           {topicStats.topics.map((topic, index) => (
-            <article className={styles.topicRow} key={topic.slug}>
-              <span className={styles.topicIndex} aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-
-              <div className={styles.topicMain}>
-                <div className={styles.topicTitleRow}>
-                  <span className={styles.topicIcon}>
-                    <TopicIcon slug={topic.slug} />
-                  </span>
-                  <Heading as="h3" className={styles.topicTitle}>
-                    <Link
-                      to={`/${topic.firstDocId}`}
-                      className={styles.topicTitleLink}
-                    >
-                      {topic.label}
-                    </Link>
-                  </Heading>
-                </div>
-
-                <p className={styles.topicDescription}>
-                  {topic.description ||
-                    `Theory pages and questions for ${topic.label}.`}
-                </p>
-
-                <div className={styles.topicMetrics}>
-                  <span>
-                    <strong>{topic.questionCount}</strong> questions
-                  </span>
-                  <span className={styles.metricDivider} aria-hidden="true" />
-                  <span>
-                    <strong>{topic.pageCount}</strong> pages
-                  </span>
-                </div>
-
-                <TierBar
-                  counts={topic.tierCounts}
-                  total={topic.questionCount}
-                />
-              </div>
-
-              <div className={styles.topicPages}>
-                <p className={styles.pagesLabel}>Read</p>
-                <ul className={styles.pageList}>
-                  {(topic.pages || []).map((page) => (
-                    <li key={page.slug}>
-                      <Link className={styles.pageLink} to={page.url}>
-                        <span className={styles.pageTitle}>{page.title}</span>
-                        <span className={styles.pageMeta}>
-                          {page.questionCount} Q
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  className={styles.topicCta}
-                  to={`/${topic.firstDocId}`}
-                >
-                  Open {topic.label}
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-            </article>
+            <TopicCard topic={topic} index={index} key={topic.slug} />
           ))}
         </div>
       </div>
