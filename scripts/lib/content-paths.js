@@ -32,6 +32,23 @@ function isIgnored(name) {
 }
 
 /**
+ * Topics excluded from this build (config blocklist minus SHOW_HIDDEN
+ * overrides). Resolved once per process from the single source of truth in
+ * site.config.js. A hidden topic is skipped during discovery, so it never
+ * reaches the navbar, sidebar, card pipeline, or stats — and its (possibly
+ * unfinished) content is never parsed or validated.
+ */
+const HIDDEN_TOPICS = new Set(config.effectiveHiddenTopics());
+
+/**
+ * @param {string} topic First-level folder name under docs/.
+ * @returns {boolean} True if the topic is hidden from this build.
+ */
+function isHiddenTopic(topic) {
+  return HIDDEN_TOPICS.has(topic);
+}
+
+/**
  * Recursively collect every card deck under docs/.
  *
  * @param {string} [dir] Directory to walk. Defaults to the docs root.
@@ -46,6 +63,10 @@ function findCardFiles(dir = DOCS_DIR) {
 
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      // Skip hidden topics at the first level so their (possibly unfinished)
+      // card decks are never parsed or validated. The first path segment under
+      // DOCS_DIR is the topic.
+      if (dir === DOCS_DIR && isHiddenTopic(entry.name)) continue;
       results.push(...findCardFiles(fullPath));
     } else if (entry.name.endsWith(config.cards.fileSuffix)) {
       results.push(fullPath);
@@ -63,7 +84,12 @@ function findTopicDirs() {
   if (!fs.existsSync(DOCS_DIR)) return [];
   return fs
     .readdirSync(DOCS_DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && !isIgnored(entry.name))
+    .filter(
+      (entry) =>
+        entry.isDirectory() &&
+        !isIgnored(entry.name) &&
+        !isHiddenTopic(entry.name)
+    )
     .map((entry) => entry.name)
     .sort();
 }
@@ -140,4 +166,6 @@ module.exports = {
   topicLabel,
   topicPosition,
   compareTopics,
+  isHiddenTopic,
+  HIDDEN_TOPICS,
 };

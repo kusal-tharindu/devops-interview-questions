@@ -1,13 +1,10 @@
 ---
-title: Pipelines
+title: "CI/CD Pipelines"
+sidebar_label: "Pipelines"
 sidebar_position: 1
 displayed_sidebar: cicdSidebar
 description: CI/CD pipelines - CI vs CD, stages, artifacts, deployment strategies, rollback
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# CI/CD Pipelines
 
 ## The one-sentence version
 
@@ -109,10 +106,6 @@ A near-universal experience, and the causes are a short list:
 
 The last one bites regularly: `import ./Utils` works on macOS and fails on a Linux
 runner.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

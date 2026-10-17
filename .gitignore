@@ -27,8 +27,14 @@ yarn-error.log*
 # Internal tracking notes, not for the public repo
 .kiro-guide/
 
+# Local UI review screenshots
+.shots/
+
 # Generated at build/dev time from docs/ - see scripts/build-content.js
 src/data/topics.json
+src/data/preview.json
 static/cards/
+# Dedicated Q&A pages, generated from each theory page's cards - see scripts/lib/qa-pages.js
+docs/**/*-qa.md
 # Superseded by static/cards/ - ignored so stale local copies never ship
 static/cards.json

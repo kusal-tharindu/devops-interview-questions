@@ -23,7 +23,7 @@ const site = {
   title: 'DevOps Interview Questions & Answers',
   shortTitle: 'DevOps Interview Q&A',
   tagline:
-    'Study the theory, then prove you remember it. Linux, Docker, Kubernetes, Terraform, Bash, Python, Networking, Git, CI/CD.',
+    'Study the theory, then prove you remember it. Spaced-repetition interview prep for Linux, Docker, and the rest of the DevOps stack.',
   url: 'https://devops.dtk2globle.com',
   baseUrl: '/',
   organizationName: GITHUB_OWNER,
@@ -54,6 +54,8 @@ const paths = {
   manifestFile: 'index.json',
   /** Legacy aggregate stats consumed by the homepage. */
   statsFile: 'src/data/topics.json',
+  /** Curated cards shown in the landing-page preview, generated from content. */
+  previewFile: 'src/data/preview.json',
 };
 
 /**
@@ -178,6 +180,22 @@ const drill = {
 };
 
 /**
+ * Landing-page choices. The preview is generated from the card data at build
+ * time, so it can never quote a question that no longer exists — a missing id
+ * is skipped and reported by the content build.
+ */
+const home = {
+  /** Cards for the interactive hero preview, in display order. */
+  previewCardIds: [
+    'docker-arch-container-vs-vm',
+    'linux-fs-inode-exhaustion',
+    'docker-net-default-bridge-dns',
+    'docker-dockerfile-arg-vs-env',
+    'docker-images-delete-does-not-shrink',
+  ],
+};
+
+/**
  * Display labels and ordering for topics.
  *
  * A topic is a first-level folder under docs/. Anything not listed here still
@@ -208,7 +226,55 @@ const topics = {
     cicd: 'CI/CD',
     python: 'Python',
   },
+
+  /**
+   * Build-time visibility blocklist. A topic listed here (match the docs/
+   * folder name EXACTLY, case-sensitive) is excluded from the entire build —
+   * navbar, sidebar, generated card data, stats, and docs routes — while its
+   * files stay untouched on disk and in git. Remove a name to ship that topic;
+   * no other edit is needed.
+   *
+   * Preview a hidden topic locally without editing this list:
+   *   SHOW_HIDDEN=1            show every hidden topic
+   *   SHOW_HIDDEN=redis,foo    un-hide only the named topics for this run
+   * See effectiveHiddenTopics() below.
+   */
+  hidden: [
+    'Backend-fundamental',
+    'redis',
+    'bash',
+    'git',
+    'networking',
+    'kubernetes',
+    'terraform',
+    'cicd',
+    'python',
+  ],
 };
+
+/**
+ * The topic names actually hidden for this build, after applying the
+ * SHOW_HIDDEN environment override. This is the single source of truth every
+ * build script and config should consult — never read topics.hidden directly.
+ *
+ * @returns {string[]} Effectively-hidden topic folder names.
+ */
+function effectiveHiddenTopics() {
+  const configured = topics.hidden || [];
+  const show = (process.env.SHOW_HIDDEN || '').trim();
+
+  if (!show) return configured;
+  // "1" / "all" / "true" reveals everything.
+  if (/^(1|all|true)$/i.test(show)) return [];
+
+  const reveal = new Set(
+    show
+      .split(',')
+      .map((name) => name.trim())
+      .filter(Boolean)
+  );
+  return configured.filter((name) => !reveal.has(name));
+}
 
 /** Keyboard shortcuts, surfaced in UI hints so they stay in sync. */
 const keys = {
@@ -234,7 +300,9 @@ module.exports = {
   srs,
   grades,
   drill,
+  home,
   topics,
   keys,
   contentTargets,
+  effectiveHiddenTopics,
 };

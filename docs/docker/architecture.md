@@ -1,13 +1,10 @@
 ---
-title: Architecture
+title: "Docker Architecture"
+sidebar_label: "Architecture"
 sidebar_position: 2
 displayed_sidebar: dockerSidebar
 description: Docker architecture - daemon, client, registry, containerd, runc, namespaces and cgroups
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Docker Architecture
 
 ## The one-sentence version
 
@@ -112,10 +109,6 @@ The tradeoff is isolation strength for density and speed. A VM has a hardware
 boundary; a container shares the kernel, so a kernel vulnerability is a shared
 blast radius. That is the reason regulated workloads sometimes still require VMs,
 or a sandboxed runtime like gVisor or Kata.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

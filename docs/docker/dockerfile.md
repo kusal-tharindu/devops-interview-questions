@@ -5,10 +5,6 @@ displayed_sidebar: dockerSidebar
 description: Dockerfile instructions - FROM, RUN, COPY vs ADD, CMD vs ENTRYPOINT, EXPOSE, WORKDIR
 ---
 
-import TopicQA from '@site/src/components/TopicQA';
-
-# Dockerfile
-
 ## The one-sentence version
 
 A Dockerfile is a build recipe read top to bottom, where each instruction either
@@ -91,10 +87,6 @@ node_modules
 
 `.dockerignore` also matters for security: without it, `COPY . .` will happily
 bake your `.env` file into a layer that ships to your registry.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

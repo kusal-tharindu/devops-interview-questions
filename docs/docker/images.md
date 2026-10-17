@@ -5,10 +5,6 @@ displayed_sidebar: dockerSidebar
 description: Docker image layers, union filesystems, build cache ordering, multi-stage builds and tags
 ---
 
-import TopicQA from '@site/src/components/TopicQA';
-
-# Images & Layers
-
 ## The one-sentence version
 
 An image is a stack of read-only layers plus a manifest; a container is that
@@ -124,10 +120,6 @@ docker pull node:22@sha256:2a4e0b...   # exactly one image, forever
 Pin digests where reproducibility matters — base images in production builds and
 CI. `latest` in a production manifest is how you get a deploy that cannot be
 reproduced.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

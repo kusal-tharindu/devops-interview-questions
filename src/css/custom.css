@@ -3,6 +3,34 @@
  * Dark-only, modern terminal aesthetic with teal accent.
  */
 
+/* --- Self-hosted variable fonts ---
+   Latin subsets only, bundled through webpack so they respect baseUrl and get
+   content-hashed. No third-party font requests, no layout shift from a
+   late-swapping fallback. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/inter.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('./fonts/jetbrains-mono.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('./fonts/newsreader-italic.woff2') format('woff2');
+}
+
 /* --- Root Variables --- */
 [data-theme='dark'] {
   --ifm-color-primary: #4fd1a5;
@@ -14,6 +42,8 @@
   --ifm-color-primary-lightest: #a6ebd3;
   --ifm-code-font-size: 95%;
   --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --ifm-heading-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --ifm-heading-font-weight: 700;
   --ifm-line-height-base: 1.65;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
@@ -144,37 +174,21 @@ h1, h2, h3 {
   }
 }
 
-/* --- Docs pages --- */
-.markdown h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+/* --- Docs reading surface (base; the full treatment is below) --- */
+.theme-doc-markdown {
+  max-width: 720px;
+  color: #b9c4d3;
+  font-size: 1.02rem;
+  line-height: 1.75;
 }
 
-.markdown h2 {
-  margin-top: 2.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--site-border);
+.theme-doc-markdown h1 {
+  margin-bottom: 1rem;
+  font-size: 2.2rem;
 }
 
 article {
-  max-width: 800px;
-}
-
-/* --- Sidebar --- */
-.menu__link {
-  font-size: 0.88rem;
-  border-radius: 6px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.menu__link:hover {
-  background: rgba(79, 209, 165, 0.08);
-}
-
-.menu__link--active {
-  color: var(--ifm-color-primary) !important;
-  background: rgba(79, 209, 165, 0.1) !important;
-  font-weight: 600;
+  max-width: 720px;
 }
 
 /* --- Footer --- */

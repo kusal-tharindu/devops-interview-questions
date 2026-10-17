@@ -1,48 +1,66 @@
 ---
-title: Introduction
+title: "DevOps Recall"
+sidebar_label: "Introduction"
 sidebar_position: 0
 displayed_sidebar: introSidebar
+description: "How DevOps Recall works: short theory pages, practice checks, spaced review, and timed drills for DevOps interview preparation."
 ---
 
 # DevOps Recall
 
-A free, open-source spaced repetition system for DevOps engineers preparing for interviews or wanting to solidify their fundamentals.
+DevOps Recall is the study system behind **DevOps Interview Q&A**: short theory pages, atomic questions, and a review schedule that brings back what you are about to forget. It is free, open source, and runs entirely in your browser — no account, no tracking.
 
-## The problem
+## The problem {#the-problem}
 
-DevOps spans dozens of tools — Linux, Docker, Kubernetes, Terraform, Ansible, AWS, networking, CI/CD, monitoring — and no one can memorise everything from a single read. Studies show that **re-reading and highlighting are the least effective study techniques**, yet they are what most people default to.
+DevOps is broad: Linux, containers, networking, Kubernetes, infrastructure as code, CI/CD, and more. No one holds it all after one read. Re-reading and highlighting feel productive, but they are weak at building durable recall. They are also the habits most of us fall back on.
 
-## The solution
+## How it works {#how-it-works}
 
-This site applies two high-utility learning techniques backed by decades of cognitive science research:
+Two techniques do most of the work:
 
-1. **Retrieval practice** — you see the question and try to recall the answer *before* revealing it
-2. **Spaced repetition** — the SM-2 algorithm schedules your next review at the optimal interval to combat the forgetting curve
+1. **Retrieval practice.** You see a question and try to answer it *before* revealing the answer. The effort of recalling is what strengthens memory.
+2. **Spaced repetition.** Your grade feeds the SM-2 algorithm, which sets the next review interval. Questions you miss come back sooner; ones you know cold wait longer.
 
-## Three ways to use this
+You do not need to plan a study calendar. Revise keeps the schedule and tells you what is due when you return.
 
-### 1. Learn — pick a topic from the nav
-Each topic page opens with a **mental model**: a few paragraphs building the big picture, because memorising facts you do not understand is wasted effort. Below that is every question for that topic as a collapsible list.
+## Three ways to study {#three-ways-to-study}
 
-Read the question, answer it in your head, then expand to check yourself. Self-paced, nothing tracked.
+### 1. Learn {#learn}
 
-### 2. Revise (`/revise`) — test one topic
-Pick a tech stack and work through its questions, grading how well you recalled each one.
+Each theory page starts with a one-sentence summary, then builds the mental model behind it. Diagrams, commands, and failure modes are included where they help.
 
-To you it is a self-test. Underneath, your grades build a spaced review schedule, so questions you fumbled come back sooner and ones you know cold drop away. No daily habit required — the scheduling just happens.
+When a page has questions, the **Theory / Practice** switch at the top opens its practice check. Each question is collapsed by default: answer it in your head, then reveal the answer and explanation. Practice is self-paced and does not touch your review data.
 
-### 3. Drill (`/drill`) — cram before an interview
-Timed, all topics mixed, randomised order. A Terraform question, then Linux, then a troubleshooting scenario. Like the real thing.
+### 2. Revise {#revise}
 
-Drill deliberately does not touch your review schedule — cramming should not distort your long-term data.
+Choose one topic or a mixed session. Revise serves up to 20 due questions, one at a time. Answer from memory, reveal, then grade your recall: **Again**, **Hard**, **Good**, or **Easy**.
 
-## Principles
+Those grades update the schedule stored in this browser, so the next session serves what is due: missed questions sooner, familiar ones later.
 
-- **One card, one fact** — atomic questions are easier to remember than complex ones
-- **Recall before reveal** — never see an answer you haven't first tried to produce
-- **Version-stamped** — every card carries a verification date because DevOps facts expire
-- **Your data stays yours** — progress is in localStorage, no accounts, no tracking
+### 3. Drill {#drill}
 
-## Contributing
+Drill is a timed, randomised set drawn from every live topic: a Docker question, then Linux, then a troubleshooting scenario. Choose a set of 10, 20, 30, or 50 questions; the timer runs while you work.
 
-This is community-maintained. See the [Contributing Guide](https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md) for how to add cards, fix errors, or propose new topics.
+Drill deliberately does not write to your review schedule. Cramming is not a review, and its grades would distort the intervals you built in Revise.
+
+## What is live now {#what-is-live-now}
+
+The live library starts with two topics:
+
+- **[Linux](/linux/filesystem)** — the filesystem, inodes, hard and symbolic links, and the "disk is full but isn't" failure mode.
+- **[Docker](/docker/architecture)** — containers vs virtual machines, images, Dockerfiles, and networking.
+
+More topics will appear in **Learn** as they are ready.
+
+New here? Read [Linux: Filesystem](/linux/filesystem), take its [practice check](/linux/filesystem-qa), then [start a Revise session](/revise).
+
+## Principles {#principles}
+
+- **Atomic questions.** One idea per card, so a miss points to one gap.
+- **Recall before reveal.** Never read an answer you have not first tried to produce.
+- **Version-stamped.** Every card carries a verification date because DevOps facts expire.
+- **Local-first.** Progress stays in this browser. Export a backup from Revise before switching devices.
+
+## Contributing {#contributing}
+
+DevOps Recall is community-maintained. See the [Contributing Guide](https://github.com/kusal-tharindu/devops-interview-questions/blob/main/CONTRIBUTING.md) for how to add cards, fix errors, or propose a new topic. For a correction, opening an [issue](https://github.com/kusal-tharindu/devops-interview-questions/issues) is enough.

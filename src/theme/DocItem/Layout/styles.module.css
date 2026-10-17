@@ -1,0 +1,33 @@
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+.docItemContainer header + *,
+.docItemContainer article > *:first-child {
+  margin-top: 0;
+}
+
+@media (min-width: 997px) {
+  .docItemCol {
+    max-width: 75% !important;
+  }
+}
+
+.noTocContainer article,
+.noTocContainer :global(.theme-doc-markdown),
+.noTocContainer :global(.theme-doc-footer),
+.noTocContainer :global(.pagination-nav) {
+  max-width: 900px;
+}
+
+@media screen and (max-width: 996px) {
+  .noTocContainer article,
+  .noTocContainer :global(.theme-doc-markdown),
+  .noTocContainer :global(.theme-doc-footer),
+  .noTocContainer :global(.pagination-nav) {
+    max-width: 100%;
+  }
+}

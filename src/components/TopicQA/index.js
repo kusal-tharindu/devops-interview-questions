@@ -7,22 +7,13 @@ import CardAnswer from '@site/src/components/CardAnswer';
 import styles from './styles.module.css';
 
 /**
- * Learn mode: the questions for the current documentation page, as a
- * collapsible self-test list.
+ * Practice page: the questions for one theory page, as a collapsible self-test
+ * list.
  *
- * Usage in any topic page, with no props:
- *
- *   import TopicQA from '@site/src/components/TopicQA';
- *   <TopicQA />
- *
- * The component resolves its own content from the Docusaurus doc id, which is
- * identical to the card deck's `topic/page` identity by construction
- * (docs/docker/images.md <-> docs/docker/images.cards.yaml). That means a page
- * can never drift out of sync with its cards, and renaming a file needs no
- * corresponding edit here.
- *
- * Props exist only as an escape hatch for pages that need to show another
- * page's cards.
+ * Generated `<page>-qa` pages render this with explicit topic/page props. The
+ * props are optional so the component can also resolve its own content from a
+ * Docusaurus doc id; theory pages themselves no longer embed it — the automatic
+ * Theory/Practice header links to the generated practice route instead.
  */
 
 const TIER_ORDER = new Map(config.cards.tiers.map((tier, i) => [tier.id, i]));

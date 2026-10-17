@@ -1,0 +1,26 @@
+.track {
+  position: fixed;
+  top: var(--ifm-navbar-height);
+  left: 0;
+  right: 0;
+  z-index: 150;
+  height: 2px;
+  pointer-events: none;
+  background: rgba(230, 237, 246, 0.045);
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #2fc794, #7ddebb);
+  box-shadow: 0 0 12px rgba(79, 209, 165, 0.55);
+  transition: transform 0.08s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

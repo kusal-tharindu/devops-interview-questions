@@ -11,8 +11,50 @@
 
 const siteConfig = require('./site.config');
 const { getTopicsForNavbar } = require('./scripts/topics');
+// Custom token palette: the familiar shape of One Dark, brightened and warmed
+// to match the site's navy/emerald reading surface.
+const codeTheme = {
+  plain: { color: '#cdd7e3', backgroundColor: '#0b111b' },
+  styles: [
+    {
+      types: ['comment', 'prolog', 'doctype', 'cdata'],
+      style: { color: '#7f8b9d', fontStyle: 'italic' },
+    },
+    { types: ['punctuation'], style: { color: '#93a0b2' } },
+    {
+      types: ['property', 'tag', 'constant', 'symbol', 'deleted'],
+      style: { color: '#f0a0a0' },
+    },
+    { types: ['boolean', 'number'], style: { color: '#e5c07b' } },
+    {
+      types: ['selector', 'attr-name', 'string', 'char', 'builtin', 'inserted'],
+      style: { color: '#9be8cd' },
+    },
+    {
+      types: ['operator', 'entity', 'url', 'variable'],
+      style: { color: '#8bd3ff' },
+    },
+    { types: ['atrule', 'attr-value', 'keyword'], style: { color: '#c9a6ff' } },
+    {
+      types: ['function', 'class-name', 'key'],
+      style: { color: '#82b8ff' },
+    },
+    { types: ['regex', 'important'], style: { color: '#ffcb6b' } },
+    { types: ['namespace'], style: { opacity: 0.8 } },
+  ],
+};
 
 const { site, links } = siteConfig;
+
+// Hidden topics (site.config.js topics.hidden, minus any SHOW_HIDDEN override)
+// are excluded from the docs plugin so their pages never become routes. Built
+// from the same single source as the nav, sidebar, and card pipeline, so a
+// topic is hidden everywhere or nowhere — never half in. Draft topics often
+// lack frontmatter, which would break `onBrokenLinks: 'throw'`; excluding them
+// keeps the production build green until they are ready to ship.
+const hiddenTopicExcludes = siteConfig
+  .effectiveHiddenTopics()
+  .map((topic) => `${topic}/**`);
 
 // Built from the docs/ tree at build time, so a new topic folder appears in the
 // navbar and footer with no edit here.
@@ -60,10 +102,13 @@ const config = {
           sidebarPath: './sidebars.js',
           editUrl: links.editUrlBase,
           showLastUpdateTime: true,
+          // Keep hidden topics out of the generated routes. Their markdown
+          // stays on disk; it just is not built. See hiddenTopicExcludes above.
+          exclude: hiddenTopicExcludes,
         },
         blog: false,
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: ['./src/css/custom.css', './src/css/theory.css'],
         },
       }),
     ],
@@ -137,6 +182,7 @@ const config = {
       },
 
       prism: {
+        theme: codeTheme,
         additionalLanguages: ['bash', 'python', 'hcl', 'docker', 'yaml', 'json', 'ini'],
       },
     }),

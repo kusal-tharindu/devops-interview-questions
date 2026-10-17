@@ -1,13 +1,10 @@
 ---
-title: Architecture
+title: "Kubernetes Architecture"
+sidebar_label: "Architecture"
 sidebar_position: 1
 displayed_sidebar: kubernetesSidebar
 description: Kubernetes architecture - control plane, worker nodes, reconciliation loop, pods, deployments, services
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Kubernetes Architecture
 
 ## The one-sentence version
 
@@ -124,10 +121,6 @@ Two probes with different consequences, and mixing them up causes outages.
 A liveness probe that is too aggressive on a slow-starting app produces a restart
 loop: the app never finishes booting before being killed. That is what `startup`
 probes exist to prevent.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

@@ -5,10 +5,6 @@ displayed_sidebar: terraformSidebar
 description: Terraform state file, remote backends, state locking, plan vs apply, drift and idempotency
 ---
 
-import TopicQA from '@site/src/components/TopicQA';
-
-# State & Workflow
-
 ## The one-sentence version
 
 Terraform keeps a **state file** mapping your configuration to real cloud
@@ -93,10 +89,6 @@ idempotency, and it comes from diffing rather than executing blindly.
 outside Terraform. The next `plan` shows unexpected changes as Terraform tries to
 pull reality back to your configuration. This is the argument against mixing manual
 console edits with managed infrastructure: Terraform will faithfully undo them.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

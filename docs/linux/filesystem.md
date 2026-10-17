@@ -1,13 +1,10 @@
 ---
-title: Filesystem
+title: "Linux Filesystem"
+sidebar_label: "Filesystem"
 sidebar_position: 1
 displayed_sidebar: linuxSidebar
 description: Linux filesystem - FHS directory layout, inodes, hard vs symbolic links, inode exhaustion
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Linux Filesystem
 
 ## The one-sentence version
 
@@ -93,10 +90,6 @@ df -i    # inodes: 100% used   <- the actual problem
 Every file consumes an inode regardless of size, and the count is fixed at
 filesystem creation. Millions of tiny files — session data, unrotated logs, cache
 entries — exhaust inodes long before they exhaust bytes.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

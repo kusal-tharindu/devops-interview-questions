@@ -5,10 +5,6 @@ displayed_sidebar: dockerSidebar
 description: Docker network drivers - bridge, host, none, overlay, macvlan and when each applies
 ---
 
-import TopicQA from '@site/src/components/TopicQA';
-
-# Network Drivers
-
 ## The one-sentence version
 
 A Docker network driver decides what a container's `net` namespace looks like —
@@ -68,10 +64,6 @@ Omitting the host interface binds `0.0.0.0`, which on a cloud VM means the port 
 world-reachable if the firewall or security group allows it. Docker writes
 `iptables` rules directly and can therefore bypass some host firewall
 configurations — worth knowing before assuming `ufw` is protecting you.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

@@ -30,7 +30,7 @@ counts and card data are all generated from this tree at build time.
 
 | Mode | Where | What it does |
 |---|---|---|
-| **Learn** | The topic page | Theory, then that page's questions as a collapsible list |
+| **Learn** | The topic page and its Practice page | Theory first, then a collapsible self-test of that page's questions |
 | **Revise** | `/revise` | Self-test one topic; grades build a spaced schedule |
 | **Drill** | `/drill` | Timed, all topics mixed. Never touches the schedule. |
 
@@ -42,15 +42,12 @@ Write a card once and it appears in all three.
 
    ```markdown
    ---
-   title: Images & Layers
+   title: Docker Images & Layers
+   sidebar_label: Images & Layers
    sidebar_position: 3
    displayed_sidebar: dockerSidebar
    description: One line for SEO and search results
    ---
-
-   import TopicQA from '@site/src/components/TopicQA';
-
-   # Images & Layers
 
    ## The one-sentence version
 
@@ -60,17 +57,22 @@ Write a card once and it appears in all three.
 
    Explain it properly. Use tables, command examples and Mermaid diagrams.
 
-   ## Questions
-
-   <TopicQA />
-
    ## Learn more
 
    - [Official docs](https://example.com)
    ```
 
-   `<TopicQA />` takes no props — it resolves its own topic and page from the
-   file path, so it cannot drift out of sync.
+   **Don't add an H1, imports, or a Questions section.** The page header, the
+   Theory/Practice switch and the practice route are provided automatically:
+
+   - `title` is the page heading and the browser title.
+   - `sidebar_label` is optional. Use it when the rail should be shorter than
+     the heading (e.g. the page says "Docker Architecture", the rail says
+     "Architecture"). If omitted, `title` is used in both places.
+   - Start the body with `## The one-sentence version`. Section headings are
+     numbered automatically.
+   - The practice page at `<page>-qa` is generated from the page's cards. Don't
+     hand-write it, and don't add `<TopicQA />` to the theory page.
 
 2. Create `docs/<topic>/<page>.cards.yaml` with the questions.
 
@@ -102,6 +104,54 @@ flowchart LR
   A["Dockerfile"] --> B["Image"] --> C["Container"]
 ```
 ````
+
+### Images
+
+**Mermaid first.** If a diagram is boxes, arrows, or a flow, it belongs in a
+Mermaid block above, not an image file. Mermaid is text — it diffs cleanly in
+review and never adds weight to the repo. Reach for a real image file only when
+Mermaid genuinely cannot express it: a real network topology with provider
+logos, an annotated screenshot, a photo.
+
+When you do need one:
+
+1. **Compress before you commit.** Images live in `static/` forever — once
+   committed, they stay in git history even if later deleted. Run it through
+   [Squoosh](https://squoosh.app) or `pngquant`/`cwebp` before adding it.
+
+   ```bash
+   # PNG, lossy but visually lossless at this setting
+   pngquant --quality=65-80 my-diagram.png -o my-diagram.png
+
+   # or convert to WebP, usually half the size of an equivalent PNG
+   cwebp -q 80 my-diagram.png -o my-diagram.webp
+   ```
+
+2. **Budget:** aim for **under 150 KB** per image. Treat 300 KB as a hard
+   ceiling — if you're over that, it needs another compression pass or it
+   should be an SVG/Mermaid diagram instead. Screenshots and photos are the
+   usual culprits; crop and downscale before compressing.
+
+3. **Prefer SVG for anything vector** (exported from Excalidraw, draw.io,
+   etc.). SVG is text-based, scales to any screen without a resolution limit,
+   and typically compresses far smaller than the equivalent PNG.
+
+4. **Store in `static/img/`**, named `<topic>-<page>-<slug>.<ext>`:
+
+   ```
+   static/img/docker-architecture-runtime-stack.png
+   ```
+
+5. **Reference with an absolute path** starting at `/img/...` so it survives
+   any `baseUrl` change:
+
+   ```markdown
+   ![Runtime stack: dockerd, containerd, containerd-shim, runc](/img/docker-architecture-runtime-stack.png)
+   ```
+
+6. **Do not use third-party image hosts** (Imgur, personal CDNs, etc.). They've
+   broken entire sites' worth of links before when hosts change their
+   retention policy — images belong with the content that depends on them.
 
 ## Card schema
 

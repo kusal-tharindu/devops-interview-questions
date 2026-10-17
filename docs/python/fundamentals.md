@@ -1,13 +1,10 @@
 ---
-title: Fundamentals
+title: "Python Fundamentals"
+sidebar_label: "Fundamentals"
 sidebar_position: 1
 displayed_sidebar: pythonSidebar
 description: Python for DevOps - mutability, args and kwargs, virtual environments, dependency pinning
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Python Fundamentals
 
 ## The one-sentence version
 
@@ -112,10 +109,6 @@ The distinction that matters for automation:
 Pin for anything deployed. An unpinned dependency means a build today and a build
 next month can install different code, which is the same reproducibility problem as
 using `latest` for a container image.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

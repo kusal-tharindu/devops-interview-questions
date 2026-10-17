@@ -1,13 +1,10 @@
 ---
-title: Fundamentals
+title: "Networking Fundamentals"
+sidebar_label: "Fundamentals"
 sidebar_position: 1
 displayed_sidebar: networkingSidebar
 description: Networking fundamentals - OSI layers, TCP vs UDP, DNS resolution, HTTP status codes, CIDR and NAT
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Networking Fundamentals
 
 ## The one-sentence version
 
@@ -112,10 +109,6 @@ Two of the total are unusable: the network address and the broadcast address.
 The RFC 1918 private ranges — `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` —
 are not routable on the public internet, which is why NAT exists: it translates
 many private addresses onto one public one on the way out.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

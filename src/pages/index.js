@@ -1,143 +1,312 @@
-import React from 'react';
-import clsx from 'clsx';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 
 import config from '@site/site.config';
 import TopicIcon from '@site/src/components/TopicIcon';
-import TerminalHero from '@site/src/components/TerminalHero';
+import StudyCardPreview from '@site/src/components/StudyCardPreview';
+import { loadProgress } from '@site/src/lib/storage';
+import { summarise } from '@site/src/lib/sm2';
 import topicStats from '@site/src/data/topics.json';
+import previewData from '@site/src/data/preview.json';
 
 import styles from './index.module.css';
 
 /**
  * Landing page.
  *
- * Stats and the topic grid come from the generated topics.json, so the numbers
- * can never drift from the actual content. The three study modes are described
- * here in the same order the navbar presents them.
+ * Written as a field manual rather than a marketing page: the questions are
+ * real, the counts come from the generated content data, and the preview card
+ * is the actual thing you do on the Revise page. Keeping the page anchored to
+ * the product is what stops it going stale.
  */
 
-/** The three study modes, in the order a learner meets them. */
-const STUDY_MODES = [
-  {
-    step: '01',
-    title: 'Learn',
-    description:
-      'Pick a topic. Read the theory with diagrams, then work through its questions at your own pace.',
-    to: '/intro',
-    cta: 'Browse topics',
-  },
-  {
-    step: '02',
-    title: 'Revise',
-    description:
-      'Test yourself on one tech stack. Your grades quietly build a spaced schedule underneath.',
-    to: '/revise',
-    cta: 'Start revising',
-  },
-  {
-    step: '03',
-    title: 'Drill',
-    description:
-      'Timed, all topics mixed, random order. Cram the night before an interview.',
-    to: '/drill',
-    cta: 'Run a drill',
-  },
-];
+const TIER_COLORS = {
+  core: 'var(--ifm-color-primary)',
+  deep: '#6fa8dc',
+  trivia: '#8b95a8',
+};
 
-function HomepageHeader() {
+/**
+ * Read the learner's local schedule after hydration.
+ *
+ * Returns null on the server and on the first client render so the markup
+ * matches; the effect then swaps in the personalised line. No progress ever
+ * leaves this browser.
+ *
+ * @returns {null|{isNew: boolean, dueNow: number, mature: number, tracked: number}}
+ */
+function useStudyStatus() {
+  const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    const states = Object.values(loadProgress());
+    if (states.length === 0) {
+      setStatus({ isNew: true, dueNow: 0, mature: 0, tracked: 0 });
+      return;
+    }
+    const summary = summarise(states);
+    setStatus({ isNew: false, ...summary });
+  }, []);
+
+  return status;
+}
+
+function SectionLabel({ index, children }) {
   return (
-    <header className={clsx('hero', styles.heroBanner)}>
-      <div className="container">
-        <p className={styles.badge}>Open Source · Free Forever</p>
+    <p className={styles.sectionLabel}>
+      <span className={styles.sectionIndex}>{index}</span>
+      <span className={styles.sectionRule} aria-hidden="true" />
+      <span>{children}</span>
+    </p>
+  );
+}
 
-        <Heading as="h1" className="hero__title">
-          Master DevOps Fundamentals
-        </Heading>
+function ReviewStatus({ total }) {
+  const status = useStudyStatus();
 
-        <p className="hero__subtitle">
-          Study the theory, then prove you remember it. Spaced repetition built in.
-        </p>
+  const returning = Boolean(status && !status.isNew);
+  const text = returning
+    ? status.dueNow > 0
+      ? `${status.dueNow} due now · ${status.mature} mature · ${status.tracked} of ${total} seen`
+      : `Nothing due · ${status.mature} mature · ${status.tracked} of ${total} seen`
+    : `${config.srs.sessionSize} cards · about ten minutes`;
 
-        <div className={styles.buttons}>
-          <Link className={styles.btnPrimary} to="/revise">
-            Start Revising
-          </Link>
-          <Link className={styles.btnSecondary} to="/intro">
-            Browse Topics
-          </Link>
+  const percent =
+    returning && total > 0
+      ? Math.min(100, Math.round((status.tracked / total) * 100))
+      : 0;
+
+  return (
+    <div className={styles.reviewStatus}>
+      <div className={styles.reviewStatusRow}>
+        <span className={styles.reviewLabel}>
+          {returning ? 'Your queue' : 'First session'}
+        </span>
+        <span className={styles.reviewText} aria-live="polite">
+          {text}
+        </span>
+      </div>
+      {returning && (
+        <div
+          className={styles.reviewBar}
+          role="img"
+          aria-label={`${status.tracked} of ${total} cards seen`}
+        >
+          <span
+            className={styles.reviewFill}
+            style={{ width: `${percent}%` }}
+          />
         </div>
+      )}
+    </div>
+  );
+}
 
-        <TerminalHero />
+function Hero({ totalQuestions }) {
+  return (
+    <header className={styles.hero}>
+      <div className={styles.heroGlow} aria-hidden="true" />
+      <div className={styles.shell}>
+        <div className={styles.heroGrid}>
+          <div className={styles.heroCopy}>
+            <div className={styles.heroMeta}>
+              <span className={styles.liveDot} aria-hidden="true" />
+              <span>DevOps interview preparation</span>
+              <span className={styles.metaDivider} aria-hidden="true">
+                /
+              </span>
+              <span>{totalQuestions} questions</span>
+            </div>
+
+            <Heading as="h1" className={styles.heroTitle}>
+              Walk in knowing
+              <br />
+              <em className={styles.heroEm}>the answer.</em>
+            </Heading>
+
+            <p className={styles.heroLede}>
+              Short theory pages, atomic questions, and a review schedule that
+              keeps bringing the right ones back.
+            </p>
+
+            <div className={styles.heroActions}>
+              <Link className={styles.buttonPrimary} to="/revise">
+                Start a session
+                <span className={styles.buttonArrow} aria-hidden="true">
+                  →
+                </span>
+              </Link>
+              <Link className={styles.buttonGhost} to="/intro">
+                Read the theory
+              </Link>
+            </div>
+
+            <ReviewStatus total={totalQuestions} />
+          </div>
+
+          <StudyCardPreview cards={previewData.cards} />
+        </div>
       </div>
     </header>
   );
 }
 
-function StatsStrip() {
-  const stats = [
-    { value: topicStats.totalTopics, label: 'Topics' },
-    { value: topicStats.totalQuestions, label: 'Questions' },
-    { value: 'SM-2', label: 'Algorithm' },
-    { value: '0', label: 'Accounts needed' },
+function SpecRail({ totalQuestions, totalPages, totalTopics }) {
+  const specs = [
+    { value: totalQuestions, label: 'Questions' },
+    { value: totalPages, label: 'Theory pages' },
+    { value: totalTopics, label: 'Topics' },
+    { value: 'SM-2', label: 'Scheduling' },
+    { value: '0', label: 'Accounts' },
   ];
 
   return (
-    <div className={styles.statsStrip}>
-      <div className={styles.statsInner}>
-        {stats.map((stat, index) => (
-          <React.Fragment key={stat.label}>
-            {index > 0 && <span className={styles.statDivider} aria-hidden="true" />}
-            <div className={styles.statItem}>
-              <span className={styles.statNum}>{stat.value}</span>
-              <span className={styles.statLabel}>{stat.label}</span>
+    <div className={styles.specRail}>
+      <div className={styles.shell}>
+        <div className={styles.specGrid}>
+          {specs.map((spec) => (
+            <div className={styles.specCell} key={spec.label}>
+              <span className={styles.specValue}>{spec.value}</span>
+              <span className={styles.specLabel}>{spec.label}</span>
             </div>
-          </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TierBar({ counts = {}, total }) {
+  const tiers = config.cards.tiers.filter(
+    (tier) => (counts[tier.id] || 0) > 0
+  );
+
+  if (tiers.length === 0 || total === 0) return null;
+
+  const label = tiers
+    .map((tier) => `${counts[tier.id]} ${tier.label.toLowerCase()}`)
+    .join(', ');
+
+  return (
+    <div className={styles.tierBlock}>
+      <div className={styles.tierBar} role="img" aria-label={label}>
+        {tiers.map((tier) => (
+          <span
+            key={tier.id}
+            className={styles.tierSegment}
+            style={{
+              width: `${(counts[tier.id] / total) * 100}%`,
+              background: TIER_COLORS[tier.id] || 'rgba(230, 237, 246, 0.25)',
+            }}
+          />
+        ))}
+      </div>
+      <div className={styles.tierLegend}>
+        {tiers.map((tier) => (
+          <span className={styles.tierItem} key={tier.id}>
+            <span
+              className={styles.tierDot}
+              style={{
+                background: TIER_COLORS[tier.id] || 'rgba(230, 237, 246, 0.25)',
+              }}
+              aria-hidden="true"
+            />
+            {counts[tier.id]} {tier.label.toLowerCase()}
+          </span>
         ))}
       </div>
     </div>
   );
 }
 
-function TopicCards() {
+function TopicLibrary({ totalQuestions }) {
   return (
-    <section className={styles.topics}>
-      <div className="container">
-        <div className={styles.sectionHeader}>
-          <Heading as="h2" className={styles.sectionTitle}>
-            Topics
-          </Heading>
-          <p className={styles.sectionSub}>
-            Each topic pairs written theory with atomic questions and spaced review.
+    <section className={styles.section} id="library">
+      <div className={styles.shell}>
+        <header className={styles.sectionHeader}>
+          <div>
+            <SectionLabel index="01">Library</SectionLabel>
+            <Heading as="h2" className={styles.sectionTitle}>
+              Start with a topic.
+            </Heading>
+            <p className={styles.sectionIntro}>
+              Each topic pairs a written theory page with atomic questions that
+              feed the review queue.
+            </p>
+          </div>
+          <p className={styles.sectionAside}>
+            {topicStats.totalTopics} live · {totalQuestions} questions
           </p>
-        </div>
+        </header>
 
-        <div className={styles.grid}>
-          {topicStats.topics.map((topic) => (
-            <Link
-              to={`/${topic.firstDocId}`}
-              className={styles.card}
-              key={topic.slug}
-            >
-              <div className={styles.cardTop}>
-                <div className={styles.cardIcon}>
-                  <TopicIcon slug={topic.slug} />
+        <div className={styles.topicList}>
+          {topicStats.topics.map((topic, index) => (
+            <article className={styles.topicRow} key={topic.slug}>
+              <span className={styles.topicIndex} aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+
+              <div className={styles.topicMain}>
+                <div className={styles.topicTitleRow}>
+                  <span className={styles.topicIcon}>
+                    <TopicIcon slug={topic.slug} />
+                  </span>
+                  <Heading as="h3" className={styles.topicTitle}>
+                    <Link
+                      to={`/${topic.firstDocId}`}
+                      className={styles.topicTitleLink}
+                    >
+                      {topic.label}
+                    </Link>
+                  </Heading>
                 </div>
-                <span className={styles.cardCount}>
-                  {topic.questionCount} questions
-                </span>
+
+                <p className={styles.topicDescription}>
+                  {topic.description ||
+                    `Theory pages and questions for ${topic.label}.`}
+                </p>
+
+                <div className={styles.topicMetrics}>
+                  <span>
+                    <strong>{topic.questionCount}</strong> questions
+                  </span>
+                  <span className={styles.metricDivider} aria-hidden="true" />
+                  <span>
+                    <strong>{topic.pageCount}</strong> pages
+                  </span>
+                </div>
+
+                <TierBar
+                  counts={topic.tierCounts}
+                  total={topic.questionCount}
+                />
               </div>
 
-              <Heading as="h3" className={styles.cardTitle}>
-                {topic.label}
-              </Heading>
-
-              <p className={styles.cardDescription}>
-                {topic.pageCount} page{topic.pageCount === 1 ? '' : 's'} of theory
-              </p>
-            </Link>
+              <div className={styles.topicPages}>
+                <p className={styles.pagesLabel}>Read</p>
+                <ul className={styles.pageList}>
+                  {(topic.pages || []).map((page) => (
+                    <li key={page.slug}>
+                      <Link className={styles.pageLink} to={page.url}>
+                        <span className={styles.pageTitle}>{page.title}</span>
+                        <span className={styles.pageMeta}>
+                          {page.questionCount} Q
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  className={styles.topicCta}
+                  to={`/${topic.firstDocId}`}
+                >
+                  Open {topic.label}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </div>
@@ -145,30 +314,255 @@ function TopicCards() {
   );
 }
 
-function HowItWorks() {
-  return (
-    <section className={styles.howSection}>
-      <div className="container">
-        <div className={styles.sectionHeader}>
-          <Heading as="h2" className={styles.sectionTitle}>
-            Three Ways to Use It
-          </Heading>
-          <p className={styles.sectionSub}>
-            Learn it, check it, cram it. Spacing happens without you managing it.
-          </p>
-        </div>
+function Method({ totalPages }) {
+  const drillSizes = config.drill.sizeOptions.map((option) => option.value);
 
-        <div className={styles.stepsGrid}>
-          {STUDY_MODES.map((mode) => (
-            <div key={mode.step} className={styles.step}>
-              <span className={styles.stepNum}>{mode.step}</span>
-              <h3 className={styles.stepTitle}>{mode.title}</h3>
-              <p className={styles.stepDesc}>{mode.description}</p>
-              <Link to={mode.to} className={styles.stepLink}>
-                {mode.cta} →
-              </Link>
+  const steps = [
+    {
+      number: '01',
+      title: 'Learn',
+      kicker: 'Theory',
+      text: 'Start on a topic page. Each one is written to be read in one sitting, with diagrams and the exact commands interviewers ask about.',
+      meta: `${totalPages} pages · diagrams · examples`,
+      to: '/intro',
+      cta: 'Open the introduction',
+    },
+    {
+      number: '02',
+      title: 'Revise',
+      kicker: 'Spaced review',
+      text: 'Twenty cards from one topic. Grade your recall honestly; those grades decide when each card comes back.',
+      meta: `${config.srs.sessionSize} cards per session · saved locally`,
+      to: '/revise',
+      cta: 'Start revising',
+    },
+    {
+      number: '03',
+      title: 'Drill',
+      kicker: 'Timed',
+      text: 'A mixed, timed set for the final push. Drill deliberately does not touch your schedule — cramming is not a review.',
+      meta: `${drillSizes[0]}–${drillSizes[drillSizes.length - 1]} cards · mixed topics`,
+      to: '/drill',
+      cta: 'Run a drill',
+    },
+  ];
+
+  return (
+    <section className={styles.methodSection} id="method">
+      <div className={styles.shell}>
+        <div className={styles.methodGrid}>
+          <div className={styles.methodAside}>
+            <SectionLabel index="02">The method</SectionLabel>
+            <Heading as="h2" className={styles.sectionTitle}>
+              Read it once.
+              <br />
+              Then make it stick.
+            </Heading>
+            <p className={styles.sectionIntro}>
+              The library is the source material. Revise is where memory
+              actually forms. Drill is for the week you cannot afford to be
+              unsure.
+            </p>
+            <p className={styles.methodNote}>
+              One question bank. Three ways in.
+            </p>
+          </div>
+
+          <ol className={styles.stepList}>
+            {steps.map((step) => (
+              <li className={styles.step} key={step.number}>
+                <span className={styles.stepNumber} aria-hidden="true">
+                  {step.number}
+                </span>
+                <div className={styles.stepBody}>
+                  <div className={styles.stepHeader}>
+                    <Heading as="h3" className={styles.stepTitle}>
+                      {step.title}
+                    </Heading>
+                    <span className={styles.stepKicker}>{step.kicker}</span>
+                  </div>
+                  <p className={styles.stepText}>{step.text}</p>
+                  <div className={styles.stepFooter}>
+                    <span className={styles.stepMeta}>{step.meta}</span>
+                    <Link className={styles.textLink} to={step.to}>
+                      {step.cta}
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Schedule() {
+  const baseline = config.srs.secondInterval;
+
+  const rows = config.grades.map((grade) => {
+    let days = baseline;
+    if (grade.grade === 0) days = 0;
+    else if (grade.grade === 1) {
+      days = Math.max(1, Math.round(baseline * config.srs.intervalFactorHard));
+    } else if (grade.grade === 3) {
+      days = Math.round(baseline * config.srs.intervalFactorEasy);
+    }
+    return { ...grade, days };
+  });
+
+  const maxDays = Math.max(...rows.map((row) => row.days), 1);
+  const tickStep = maxDays > 12 ? 4 : 2;
+  const ticks = [];
+  for (let day = 0; day <= maxDays; day += tickStep) ticks.push(day);
+  if (ticks[ticks.length - 1] !== maxDays) ticks.push(maxDays);
+
+  return (
+    <section className={styles.scheduleSection} id="schedule">
+      <div className={styles.shell}>
+        <div className={styles.scheduleGrid}>
+          <div className={styles.scheduleCopy}>
+            <SectionLabel index="03">Scheduling</SectionLabel>
+            <Heading as="h2" className={styles.sectionTitle}>
+              You grade the recall.
+              <br />
+              It handles the rest.
+            </Heading>
+            <p className={styles.sectionIntro}>
+              Every grade updates an SM-2 schedule: ease, interval and next due
+              date. You never pick what to study next — the queue does.
+            </p>
+            <p className={styles.scheduleBody}>
+              The chart shows a card on its second successful review. From
+              there, intervals keep growing for as long as recall holds.
+            </p>
+            <Link className={styles.textLink} to="/revise">
+              Open the review queue
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          <div className={styles.schedulePanel}>
+            <div className={styles.chart}>
+              <div className={styles.chartHeader}>
+                <span className={styles.chartTitle}>
+                  Next review, by grade
+                </span>
+                <span className={styles.chartBadge}>SM-2 defaults</span>
+              </div>
+
+              <div className={styles.chartScale} aria-hidden="true">
+                <span className={styles.scaleSpacer} />
+                <div className={styles.scaleTicks}>
+                  {ticks.map((tick) => (
+                    <span key={tick}>{tick}</span>
+                  ))}
+                </div>
+                <span className={styles.scaleUnit}>days</span>
+              </div>
+
+              <div className={styles.chartRows}>
+                {rows.map((row) => {
+                  const percent = (row.days / maxDays) * 100;
+                  const label =
+                    row.days === 0
+                      ? 'today'
+                      : row.days === 1
+                        ? '1 day'
+                        : `${row.days} days`;
+
+                  return (
+                    <div className={styles.chartRow} key={row.grade}>
+                      <span className={styles.chartGrade}>
+                        <span
+                          className={styles.chartDot}
+                          style={{ background: row.color }}
+                          aria-hidden="true"
+                        />
+                        {row.label}
+                      </span>
+                      <div className={styles.chartTrack}>
+                        <span
+                          className={styles.chartBar}
+                          style={{
+                            width: `${percent}%`,
+                            background: row.color,
+                          }}
+                        />
+                        <span
+                          className={styles.chartMarker}
+                          style={{
+                            left: `${percent}%`,
+                            background: row.color,
+                          }}
+                        />
+                      </div>
+                      <span className={styles.chartValue}>{label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <p className={styles.chartNote}>
+                Good holds the baseline. Easy stretches it, Hard compresses it,
+                Again resets the card to today. Intervals expand from there.
+              </p>
             </div>
-          ))}
+
+            <dl className={styles.facts}>
+              <div className={styles.fact}>
+                <dt>Storage</dt>
+                <dd>This browser only</dd>
+              </div>
+              <div className={styles.fact}>
+                <dt>Backup</dt>
+                <dd>JSON export on Revise</dd>
+              </div>
+              <div className={styles.fact}>
+                <dt>Accounts</dt>
+                <dd>None required</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Closing({ totalQuestions, totalPages }) {
+  return (
+    <section className={styles.closingSection}>
+      <div className={styles.shell}>
+        <div className={styles.closingPanel}>
+          <span className={styles.closingGhost} aria-hidden="true">
+            ?
+          </span>
+          <SectionLabel index="04">Start here</SectionLabel>
+          <Heading as="h2" className={styles.closingTitle}>
+            The next question is the one that counts.
+          </Heading>
+          <p className={styles.closingCopy}>
+            Open a session and answer the first card. No sign-up, no email, no
+            streak to protect.
+          </p>
+          <div className={styles.closingActions}>
+            <Link className={styles.buttonPrimary} to="/revise">
+              Start a session
+              <span className={styles.buttonArrow} aria-hidden="true">
+                →
+              </span>
+            </Link>
+            <Link className={styles.buttonGhost} to="/intro">
+              Browse the library
+            </Link>
+          </div>
+          <p className={styles.closingMeta}>
+            {totalQuestions} questions · {totalPages} theory pages · progress
+            stays in your browser
+          </p>
         </div>
       </div>
     </section>
@@ -176,16 +570,32 @@ function HowItWorks() {
 }
 
 export default function Home() {
+  const totalPages = useMemo(
+    () =>
+      topicStats.topics.reduce((sum, topic) => sum + topic.pageCount, 0),
+    []
+  );
+
   return (
     <Layout
-      title="Spaced Repetition for DevOps Engineers"
+      title="DevOps interview prep that stays with you"
       description={config.site.tagline}
+      wrapperClassName={styles.page}
     >
-      <HomepageHeader />
-      <StatsStrip />
+      <Hero totalQuestions={topicStats.totalQuestions} />
+      <SpecRail
+        totalQuestions={topicStats.totalQuestions}
+        totalPages={totalPages}
+        totalTopics={topicStats.totalTopics}
+      />
       <main>
-        <TopicCards />
-        <HowItWorks />
+        <TopicLibrary totalQuestions={topicStats.totalQuestions} />
+        <Method totalPages={totalPages} />
+        <Schedule />
+        <Closing
+          totalQuestions={topicStats.totalQuestions}
+          totalPages={totalPages}
+        />
       </main>
     </Layout>
   );

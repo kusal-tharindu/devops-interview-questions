@@ -1,13 +1,10 @@
 ---
-title: Scripting
+title: "Bash Scripting"
+sidebar_label: "Scripting"
 sidebar_position: 1
 displayed_sidebar: bashSidebar
 description: Bash scripting - shebang, strict mode with set -euo pipefail, expansion, traps
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Bash Scripting
 
 ## The one-sentence version
 
@@ -109,10 +106,6 @@ trap cleanup EXIT
 
 `EXIT` fires on normal exit, on `set -e` abort, and on `SIGTERM`. Pairing
 `set -e` with a `trap ... EXIT` is what makes a script safe to run unattended.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 

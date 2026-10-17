@@ -1,13 +1,10 @@
 ---
-title: Fundamentals
+title: "Git Fundamentals"
+sidebar_label: "Fundamentals"
 sidebar_position: 1
 displayed_sidebar: gitSidebar
 description: Git fundamentals - commit graph, branches as pointers, staging area, merge vs rebase, reset vs revert
 ---
-
-import TopicQA from '@site/src/components/TopicQA';
-
-# Git Fundamentals
 
 ## The one-sentence version
 
@@ -117,10 +114,6 @@ git checkout -b rescue <sha>
 
 The same applies to commits made in detached `HEAD` state — create a branch at
 that commit and they are safe from garbage collection.
-
-## Questions
-
-<TopicQA />
 
 ## Learn more
 
