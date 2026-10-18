@@ -148,7 +148,18 @@ const config = {
           },
           { to: '/revise', position: 'left', label: 'Revise' },
           { to: '/drill', position: 'left', label: 'Drill' },
-          { href: links.github, label: 'GitHub', position: 'right' },
+          {
+            href: links.github,
+            label: 'GitHub',
+            position: 'right',
+            className: 'navbar__github',
+          },
+          {
+            to: '/revise',
+            label: 'Start a session',
+            position: 'right',
+            className: 'navbar__cta',
+          },
         ],
       },
 
