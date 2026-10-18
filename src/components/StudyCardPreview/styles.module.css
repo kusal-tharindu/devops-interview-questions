@@ -78,7 +78,7 @@
   padding: 0.85rem 1.5rem 1rem;
   border-bottom: 1px solid rgba(230, 237, 246, 0.07);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -136,7 +136,7 @@
   border: 1px solid rgba(230, 237, 246, 0.1);
   background: rgba(230, 237, 246, 0.035);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -217,7 +217,7 @@
 .whyLabel {
   display: block;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -243,7 +243,7 @@
 
 .why .whyLabel {
   color: rgba(230, 237, 246, 0.56);
-  font-size: 0.56rem;
+  font-size: 0.6875rem;
   margin-bottom: 0.2rem;
 }
 
@@ -323,7 +323,7 @@
   padding: 0.8rem 1.5rem;
   border-top: 1px solid rgba(230, 237, 246, 0.07);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: rgba(230, 237, 246, 0.5);
@@ -342,7 +342,7 @@
   gap: 0.3rem;
   color: var(--ifm-color-primary);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -370,7 +370,7 @@
   gap: 0.45rem;
   margin: 0.9rem 0 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   letter-spacing: 0.03em;
   color: rgba(230, 237, 246, 0.56);
   text-align: right;

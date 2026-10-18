@@ -53,16 +53,6 @@ function useStudyStatus() {
   return status;
 }
 
-function SectionLabel({ index, children }) {
-  return (
-    <p className={styles.sectionLabel}>
-      <span className={styles.sectionIndex}>{index}</span>
-      <span className={styles.sectionRule} aria-hidden="true" />
-      <span>{children}</span>
-    </p>
-  );
-}
-
 function ReviewStatus({ total }) {
   const status = useStudyStatus();
 
@@ -104,31 +94,41 @@ function ReviewStatus({ total }) {
   );
 }
 
+/** "Linux and Docker", "Linux, Docker and Git": follows the generated data. */
+function joinLabels(labels) {
+  if (labels.length <= 1) return labels.join('');
+  return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+}
+
 function Hero({ totalQuestions }) {
+  const topicList = joinLabels(topicStats.topics.map((topic) => topic.label));
+
   return (
     <header className={styles.hero}>
       <div className={styles.heroGlow} aria-hidden="true" />
       <div className={styles.shell}>
         <div className={styles.heroGrid}>
           <div className={styles.heroCopy}>
-            <div className={styles.heroMeta}>
-              <span className={styles.liveDot} aria-hidden="true" />
-              <span>DevOps interview preparation</span>
-              <span className={styles.metaDivider} aria-hidden="true">
-                /
+            <a
+              className={styles.heroMeta}
+              href={config.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Free and open source
+              <span className={styles.heroMetaLink}>
+                View on GitHub <span aria-hidden="true">↗</span>
               </span>
-              <span>{totalQuestions} questions</span>
-            </div>
+            </a>
 
             <Heading as="h1" className={styles.heroTitle}>
-              Walk in knowing
-              <br />
-              <em className={styles.heroEm}>the answer.</em>
+              DevOps interview prep that stays with you
             </Heading>
 
             <p className={styles.heroLede}>
-              Short theory pages, atomic questions, and a review schedule that
-              keeps bringing the right ones back.
+              {totalQuestions} questions across {topicList}, each tied to a
+              short theory page. A spaced-review schedule brings back the ones
+              you are about to forget.
             </p>
 
             <div className={styles.heroActions}>
@@ -150,31 +150,6 @@ function Hero({ totalQuestions }) {
         </div>
       </div>
     </header>
-  );
-}
-
-function SpecRail({ totalQuestions, totalPages, totalTopics }) {
-  const specs = [
-    { value: totalQuestions, label: 'Questions' },
-    { value: totalPages, label: 'Theory pages' },
-    { value: totalTopics, label: 'Topics' },
-    { value: 'SM-2', label: 'Scheduling' },
-    { value: '0', label: 'Accounts' },
-  ];
-
-  return (
-    <div className={styles.specRail}>
-      <div className={styles.shell}>
-        <div className={styles.specGrid}>
-          {specs.map((spec) => (
-            <div className={styles.specCell} key={spec.label}>
-              <span className={styles.specValue}>{spec.value}</span>
-              <span className={styles.specLabel}>{spec.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -223,7 +198,7 @@ function TierBar({ counts = {}, total }) {
 
 const TOPIC_PAGE_PREVIEW = 4;
 
-function TopicCard({ topic, index }) {
+function TopicCard({ topic }) {
   const pages = topic.pages || [];
   const visiblePages = pages.slice(0, TOPIC_PAGE_PREVIEW);
   const hiddenPageCount = pages.length - visiblePages.length;
@@ -240,9 +215,6 @@ function TopicCard({ topic, index }) {
       <div className={styles.topicCardTop}>
         <span className={styles.topicIcon}>
           <TopicIcon slug={topic.slug} />
-        </span>
-        <span className={styles.topicIndex} aria-hidden="true">
-          {String(index + 1).padStart(2, '0')}
         </span>
       </div>
 
@@ -318,29 +290,25 @@ function TopicCard({ topic, index }) {
   );
 }
 
-function TopicLibrary({ totalQuestions }) {
+function TopicLibrary() {
   return (
     <section className={styles.section} id="library">
       <div className={styles.shell}>
         <header className={styles.sectionHeader}>
           <div>
-            <SectionLabel index="01">Library</SectionLabel>
             <Heading as="h2" className={styles.sectionTitle}>
-              Start with a topic.
+              Start with a topic
             </Heading>
             <p className={styles.sectionIntro}>
-              Each topic pairs a written theory page with atomic questions that
-              feed the review queue.
+              Every page is a short read followed by the questions it answers.
+              More topics are on the way.
             </p>
           </div>
-          <p className={styles.sectionAside}>
-            {topicStats.totalTopics} live · {totalQuestions} questions
-          </p>
         </header>
 
         <div className={styles.topicGrid}>
-          {topicStats.topics.map((topic, index) => (
-            <TopicCard topic={topic} index={index} key={topic.slug} />
+          {topicStats.topics.map((topic) => (
+            <TopicCard topic={topic} key={topic.slug} />
           ))}
         </div>
       </div>
@@ -374,7 +342,7 @@ function Method({ totalPages }) {
       number: '03',
       title: 'Drill',
       kicker: 'Timed',
-      text: 'A mixed, timed set for the final push. Drill deliberately does not touch your schedule — cramming is not a review.',
+      text: 'A timed, shuffled set across topics for the week before an interview. It never touches your review schedule.',
       meta: `${drillSizes[0]}–${drillSizes[drillSizes.length - 1]} cards · mixed topics`,
       to: '/drill',
       cta: 'Run a drill',
@@ -386,19 +354,12 @@ function Method({ totalPages }) {
       <div className={styles.shell}>
         <div className={styles.methodGrid}>
           <div className={styles.methodAside}>
-            <SectionLabel index="02">The method</SectionLabel>
             <Heading as="h2" className={styles.sectionTitle}>
-              Read it once.
-              <br />
-              Then make it stick.
+              How it works
             </Heading>
             <p className={styles.sectionIntro}>
-              The library is the source material. Revise is where memory
-              actually forms. Drill is for the week you cannot afford to be
-              unsure.
-            </p>
-            <p className={styles.methodNote}>
-              One question bank. Three ways in.
+              Read the theory, review it on a schedule, then test yourself
+              under time pressure. All three use the same question bank.
             </p>
           </div>
 
@@ -458,15 +419,12 @@ function Schedule() {
       <div className={styles.shell}>
         <div className={styles.scheduleGrid}>
           <div className={styles.scheduleCopy}>
-            <SectionLabel index="03">Scheduling</SectionLabel>
             <Heading as="h2" className={styles.sectionTitle}>
-              You grade the recall.
-              <br />
-              It handles the rest.
+              Your grades set the schedule
             </Heading>
             <p className={styles.sectionIntro}>
-              Every grade updates an SM-2 schedule: ease, interval and next due
-              date. You never pick what to study next — the queue does.
+              Each grade updates an SM-2 schedule: ease, interval and next due
+              date. You don’t pick what to study next. The queue does.
             </p>
             <p className={styles.scheduleBody}>
               The chart shows a card on its second successful review. From
@@ -566,21 +524,17 @@ function Schedule() {
   );
 }
 
-function Closing({ totalQuestions, totalPages }) {
+function Closing() {
   return (
     <section className={styles.closingSection}>
       <div className={styles.shell}>
         <div className={styles.closingPanel}>
-          <span className={styles.closingGhost} aria-hidden="true">
-            ?
-          </span>
-          <SectionLabel index="04">Start here</SectionLabel>
           <Heading as="h2" className={styles.closingTitle}>
-            The next question is the one that counts.
+            Try a {config.srs.sessionSize}-card session
           </Heading>
           <p className={styles.closingCopy}>
-            Open a session and answer the first card. No sign-up, no email, no
-            streak to protect.
+            It takes about ten minutes. There is no account to create, and your
+            progress stays in this browser.
           </p>
           <div className={styles.closingActions}>
             <Link className={styles.buttonPrimary} to="/revise">
@@ -590,13 +544,9 @@ function Closing({ totalQuestions, totalPages }) {
               </span>
             </Link>
             <Link className={styles.buttonGhost} to="/intro">
-              Browse the library
+              Read the introduction
             </Link>
           </div>
-          <p className={styles.closingMeta}>
-            {totalQuestions} questions · {totalPages} theory pages · progress
-            stays in your browser
-          </p>
         </div>
       </div>
     </section>
@@ -617,19 +567,11 @@ export default function Home() {
       wrapperClassName={styles.page}
     >
       <Hero totalQuestions={topicStats.totalQuestions} />
-      <SpecRail
-        totalQuestions={topicStats.totalQuestions}
-        totalPages={totalPages}
-        totalTopics={topicStats.totalTopics}
-      />
       <main>
-        <TopicLibrary totalQuestions={topicStats.totalQuestions} />
+        <TopicLibrary />
         <Method totalPages={totalPages} />
         <Schedule />
-        <Closing
-          totalQuestions={topicStats.totalQuestions}
-          totalPages={totalPages}
-        />
+        <Closing />
       </main>
     </Layout>
   );

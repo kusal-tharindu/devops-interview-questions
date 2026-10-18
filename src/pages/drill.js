@@ -424,14 +424,10 @@ function DrillSetup({
   return (
     <section className={styles.setup}>
       <header className={styles.masthead}>
-        <p className={styles.kicker}>
-          <span className={styles.liveDot} aria-hidden="true" />
-          Interview drill
-        </p>
-        <h1 className={styles.title}>Practice the jump.</h1>
+        <h1 className={styles.title}>Interview drill</h1>
         <p className={styles.lede}>
-          A timed set drawn from every live topic, in random order. Grade
-          yourself honestly, then see where you actually stand.
+          A timed, shuffled set across every topic, closer to how a real
+          interview jumps around. Grade yourself, then see where you stand.
         </p>
       </header>
 
@@ -526,7 +522,6 @@ function DrillSetup({
               <p className={styles.panelLabel}>Session setup</p>
               <h2>Set the length</h2>
             </div>
-            <span className={styles.readyBadge}>Ready</span>
           </div>
 
           <div className={styles.field}>
@@ -784,11 +779,8 @@ function DrillResults({ tally, topicTally, total, elapsed, onRestart }) {
   return (
     <section className={styles.results}>
       <header className={styles.resultsHead}>
-        <p className={styles.kicker}>
-          <span className={styles.liveDot} aria-hidden="true" />
-          Drill complete
-        </p>
-        <h1 className={styles.title}>That&rsquo;s the run.</h1>
+        <p className={styles.kicker}>Interview drill</p>
+        <h1 className={styles.title}>Drill complete</h1>
         <p className={styles.lede}>
           Nothing was written to your review schedule. Use this as a snapshot of
           where you are today, not a scorecard.

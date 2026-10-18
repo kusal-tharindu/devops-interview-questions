@@ -94,13 +94,10 @@
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  margin-bottom: 1.15rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
   font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--site-muted);
+  color: var(--site-muted-strong);
   text-decoration: none;
 }
 
@@ -109,19 +106,8 @@
   text-decoration: none;
 }
 
-.topicRailKicker {
-  display: block;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.51rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--site-muted);
-}
-
 .topicRailTitle {
   display: block;
-  margin-top: 0.35rem;
   font-size: 1.32rem;
   font-weight: 650;
   line-height: 1.15;
@@ -131,11 +117,10 @@
 
 .topicRailMeta {
   display: block;
-  margin-top: 0.4rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
-  letter-spacing: 0.04em;
-  color: var(--site-muted);
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--site-muted-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Page rows: numbered, quiet until active. */
@@ -164,7 +149,7 @@
   width: 1.25rem;
   flex: none;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.52rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: rgba(230, 237, 246, 0.28);
@@ -192,62 +177,80 @@
   color: var(--theory-accent) !important;
 }
 
-/* Nested category (e.g. Docker > Networking) */
+/* Nested category (e.g. Docker > Networking): reads as a row in the same
+   list, not as a section heading, with its pages hung off a guide line. */
 .theme-doc-sidebar-item-category {
-  margin-top: 0.35rem;
+  margin-top: 0.15rem;
 }
 
 .theme-doc-sidebar-item-category
   > .menu__list-item-collapsible
   > .menu__link {
+  gap: 0.55rem;
   padding: 0.5rem 0.6rem;
-  border-radius: 6px;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  border-radius: 7px;
+  font-size: 0.86rem;
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--site-muted);
+  line-height: 1.3;
+  color: rgba(230, 237, 246, 0.64);
+}
+
+.theme-doc-sidebar-item-category
+  > .menu__list-item-collapsible
+  > .menu__link::before {
+  content: '';
+  width: 1.25rem;
+  height: 0.75rem;
+  flex: none;
+  background: currentColor;
+  opacity: 0.4;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'/%3E%3C/svg%3E")
+    left center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'/%3E%3C/svg%3E")
+    left center / contain no-repeat;
 }
 
 .theme-doc-sidebar-item-category
   > .menu__list-item-collapsible
   > .menu__link:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.theme-doc-sidebar-item-category .menu__list {
-  padding-left: 0.25rem;
+.theme-doc-sidebar-item-category .menu__link--sublist-caret::after {
+  min-width: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  background-size: 0.85rem 0.85rem;
+  opacity: 0.45;
 }
 
-.theme-doc-sidebar-item-category .menu__caret {
-  opacity: 0.55;
+.theme-doc-sidebar-item-category > .menu__list {
+  margin: 0.15rem 0 0.25rem 1.05rem;
+  padding-left: 0.45rem;
+  border-left: 1px solid var(--theory-border);
 }
 
-/* Utility actions pinned under the page list. */
+/* Study actions pinned under the page list. */
 .topicRailActions {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
   margin-top: auto;
-  padding: 1.15rem 0.35rem 0;
+  padding: 1rem 0.2rem 0;
   border-top: 1px solid var(--theory-border);
 }
 
 .topicRailAction {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 0.6rem;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--site-muted);
+  column-gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--theory-border);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.02);
+  color: #e6edf6;
   text-decoration: none;
   transition:
     background 0.15s ease,
@@ -255,21 +258,47 @@
     color 0.15s ease;
 }
 
-.topicRailAction span {
-  margin-left: auto;
+.topicRailActionTitle {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.topicRailAction:first-child {
-  border-color: rgba(79, 209, 165, 0.2);
-  background: rgba(79, 209, 165, 0.055);
+.topicRailActionHint {
+  grid-column: 1;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--site-muted-strong);
+}
+
+.topicRailActionArrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--site-muted);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.topicRailAction--primary {
+  border-color: rgba(79, 209, 165, 0.28);
+  background: rgba(79, 209, 165, 0.07);
+}
+
+.topicRailAction--primary .topicRailActionTitle,
+.topicRailAction--primary .topicRailActionArrow {
   color: var(--theory-accent);
 }
 
 .topicRailAction:hover {
-  color: var(--theory-accent);
-  border-color: rgba(79, 209, 165, 0.3);
-  background: rgba(79, 209, 165, 0.08);
+  color: #ffffff;
+  border-color: rgba(79, 209, 165, 0.4);
+  background: rgba(79, 209, 165, 0.1);
   text-decoration: none;
+}
+
+.topicRailAction:hover .topicRailActionArrow {
+  color: var(--theory-accent);
+  transform: translateX(2px);
 }
 
 /* Generated practice pages stay out of the rail. */
@@ -296,7 +325,7 @@
   display: block;
   margin-bottom: 0.8rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -375,7 +404,7 @@
   background: rgba(13, 19, 29, 0.6);
   color: rgba(230, 237, 246, 0.65);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-align: left;
@@ -515,7 +544,7 @@
   margin: 0 0 0.7rem;
   border: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -623,7 +652,7 @@
   border: 0;
   border-bottom: 1px solid var(--theory-border);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -747,7 +776,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.51rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -815,7 +844,7 @@
 
 .theme-doc-markdown .theme-admonition-heading {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -875,7 +904,7 @@
 
 .theme-doc-footer .last-updated {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   font-style: normal;
   letter-spacing: 0.03em;
 }
@@ -908,7 +937,7 @@
 .pagination-nav__sublabel {
   margin-bottom: 0.3rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -937,7 +966,7 @@
 .breadcrumbs {
   margin-bottom: 1.25rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   color: var(--site-muted);
 }

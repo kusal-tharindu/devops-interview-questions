@@ -248,7 +248,7 @@ h1, h2, h3 {
   top: 0.65rem;
   left: 0.85rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.48rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -275,7 +275,7 @@ h1, h2, h3 {
 .navbar__item.dropdown .dropdown__link::before {
   content: counter(nav-topic, decimal-leading-zero);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   color: rgba(238, 243, 248, 0.32);
 }
 
@@ -398,6 +398,13 @@ h1, h2, h3 {
     font-size: 0.9rem;
   }
 
+  /* The display rules on .navbar__link above outrank Infima's mobile hide, so
+     restate it for the bar. Every item is still in the drawer; only the CTA
+     stays in the bar while there is room for it. */
+  .navbar__inner .navbar__item:not(.navbar__cta) {
+    display: none;
+  }
+
   /* backdrop-filter creates a containing block for position:fixed children,
      which traps .navbar-sidebar inside the 64px-tall nav. Remove it when the
      sidebar is open so the drawer can span the full viewport. */
@@ -482,6 +489,12 @@ h1, h2, h3 {
     background: rgba(3, 6, 11, 0.62);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .navbar__inner > .navbar__items--right > .navbar__cta {
+    display: none;
   }
 }
 

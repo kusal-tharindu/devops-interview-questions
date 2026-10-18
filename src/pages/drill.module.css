@@ -51,7 +51,7 @@
 
 .shell {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1140px;
   margin: 0 auto;
   padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.25rem, 4vw, 2rem) 5rem;
 }
@@ -78,30 +78,25 @@
   gap: 0.55rem;
   margin: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--drill-dim);
 }
 
-.liveDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--drill-accent);
-  box-shadow: 0 0 0 4px rgba(79, 209, 165, 0.09);
-  flex: none;
-}
-
 .title {
   margin: 1.15rem 0 0;
-  font-size: clamp(2.55rem, 4.7vw, 4rem);
+  font-size: clamp(2.25rem, 4vw, 3rem);
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.045em;
   color: #f5f8fb;
   text-wrap: balance;
+}
+
+.title:first-child {
+  margin-top: 0;
 }
 
 .lede {
@@ -116,7 +111,7 @@
 .panelLabel {
   margin: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -270,7 +265,7 @@
 .briefNumber {
   padding-top: 0.2rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.06em;
   color: var(--drill-accent);
 }
@@ -328,7 +323,7 @@
   border-radius: 6px;
   background: rgba(230, 237, 246, 0.025);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--drill-muted);
@@ -363,7 +358,7 @@
 .poolNote {
   margin: 0.55rem 0 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -384,19 +379,6 @@
   color: #f1f5f9;
 }
 
-.readyBadge {
-  flex: none;
-  padding: 0.25rem 0.55rem;
-  border: 1px solid rgba(79, 209, 165, 0.24);
-  border-radius: 999px;
-  background: rgba(79, 209, 165, 0.06);
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.51rem;
-  font-weight: 500;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--drill-accent);
-}
 
 .field {
   margin-top: 1.5rem;
@@ -405,7 +387,7 @@
 .fieldLabel {
   margin: 0 0 0.6rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -458,7 +440,7 @@
 
 .sizeLabel {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.49rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -564,7 +546,7 @@
 .poolCount {
   margin: 0 0 0.8rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -615,7 +597,7 @@
 
 .sessionLabel {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -658,7 +640,7 @@
   background: transparent;
   color: var(--drill-muted);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.52rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -730,7 +712,7 @@
   border-radius: 6px;
   background: rgba(79, 209, 165, 0.06);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -749,7 +731,7 @@
 .questionKicker {
   display: block;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -780,7 +762,7 @@
   gap: 0.5rem;
   margin-bottom: 0.55rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -791,7 +773,7 @@
   padding: 0.1rem 0.35rem;
   border: 1px solid var(--drill-border);
   border-radius: 99px;
-  font-size: 0.46rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.06em;
   color: var(--drill-dim);
 }
@@ -857,7 +839,7 @@
   border-radius: 5px;
   background: rgba(230, 237, 246, 0.05);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.51rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.03em;
   color: rgba(230, 237, 246, 0.55);
@@ -885,7 +867,7 @@
 
 .yourExplanation strong {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -899,7 +881,7 @@
 .outcomePrompt {
   margin: 0 0 0.65rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -936,7 +918,7 @@
 
 .outcomeKey {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.5rem;
+  font-size: 0.6875rem;
   color: rgba(230, 237, 246, 0.35);
 }
 
@@ -949,7 +931,7 @@
 
 .outcomeHint {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.49rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(230, 237, 246, 0.36);
@@ -963,7 +945,7 @@
   max-width: 760px;
   margin: 1rem auto 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--drill-dim);
   text-align: center;
@@ -980,7 +962,7 @@
   border-radius: 4px;
   background: rgba(230, 237, 246, 0.04);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.49rem;
+  font-size: 0.6875rem;
   color: rgba(230, 237, 246, 0.45);
 }
 
@@ -1064,7 +1046,7 @@
 .ringLabel {
   margin-top: 0.35rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -1073,7 +1055,7 @@
 .ringNote {
   margin: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--drill-muted);
@@ -1099,7 +1081,7 @@
 
 .statLabel {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.51rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -1115,7 +1097,7 @@
 
 .stat small {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.49rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--drill-muted);
@@ -1145,7 +1127,7 @@
 
 .breakdownMeta {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.49rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -1220,7 +1202,7 @@
 
 .topicScore {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   color: var(--drill-muted);
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -1269,7 +1251,7 @@
 .resultsNote {
   margin: 1.2rem 0 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--drill-dim);
@@ -1469,7 +1451,7 @@
 
 @media screen and (max-width: 380px) {
   .sizeLabel {
-    font-size: 0.45rem;
+    font-size: 0.6875rem;
   }
 
   .outcomeHint {

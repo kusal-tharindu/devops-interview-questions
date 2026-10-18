@@ -30,7 +30,7 @@
 
 .shell {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1140px;
   margin: 0 auto;
   padding-inline: clamp(1.25rem, 4vw, 2rem);
 }
@@ -62,7 +62,7 @@
   gap: 0.5rem;
   margin: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -73,18 +73,10 @@
   justify-content: flex-start;
 }
 
-.kickerDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--rs-accent);
-  box-shadow: 0 0 0 4px rgba(79, 209, 165, 0.1);
-  flex: none;
-}
 
 .title {
   margin: 1.3rem 0 0;
-  font-size: clamp(2.7rem, 5vw, 4.1rem);
+  font-size: clamp(2.25rem, 4vw, 3rem);
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.045em;
@@ -107,6 +99,10 @@
   color: #d9e7e1;
 }
 
+.title:first-child {
+  margin-top: 0;
+}
+
 .lede {
   max-width: 36rem;
   margin: 1.3rem 0 0;
@@ -116,26 +112,7 @@
   text-wrap: pretty;
 }
 
-.metaRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--rs-dim);
-}
 
-.metaDot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(230, 237, 246, 0.25);
-}
 
 /* --------------------------------------------------------------------------
    Data strip
@@ -180,7 +157,7 @@
 
 .statLabel {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.56rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -203,29 +180,8 @@
   margin-bottom: 1.75rem;
 }
 
-.sectionLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0 0 0.9rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--rs-dim);
-}
 
-.sectionIndex {
-  color: var(--rs-accent);
-}
 
-.sectionRule {
-  width: 24px;
-  height: 1px;
-  background: rgba(79, 209, 165, 0.42);
-  flex: none;
-}
 
 .sectionTitle {
   margin: 0;
@@ -244,21 +200,10 @@
   color: var(--rs-body);
 }
 
-.sectionAside {
-  margin: 0 0 0.2rem;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--rs-dim);
-  text-align: right;
-  white-space: nowrap;
-}
 
 .topicGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 0.9rem;
 }
 
@@ -294,13 +239,6 @@
   margin-bottom: 1rem;
 }
 
-.topicIndex {
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
-  letter-spacing: 0.05em;
-  color: var(--rs-dim);
-  font-variant-numeric: tabular-nums;
-}
 
 .topicIcon {
   display: inline-flex;
@@ -327,7 +265,7 @@
   border-radius: 999px;
   background: rgba(79, 209, 165, 0.1);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -352,7 +290,7 @@
 .topicMeta {
   margin-top: 0.35rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--rs-dim);
 }
@@ -380,7 +318,7 @@
   gap: 0.5rem;
   margin-top: 0.4rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.52rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--rs-dim);
 }
@@ -453,7 +391,7 @@
 
 .mixedKicker {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -579,7 +517,7 @@
 .sessionPosition {
   margin-left: auto;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--rs-dim);
@@ -643,7 +581,7 @@
   gap: 0.4rem;
   min-width: 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.58rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--rs-dim);
@@ -673,7 +611,7 @@
   border-radius: 5px;
   background: rgba(230, 237, 246, 0.03);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -789,7 +727,7 @@
   border-radius: 4px;
   background: rgba(230, 237, 246, 0.04);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.56rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   line-height: 1.4;
   color: rgba(230, 237, 246, 0.55);
@@ -810,7 +748,7 @@
   padding: 0.78rem 1.4rem;
   border-top: 1px solid rgba(230, 237, 246, 0.07);
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--rs-dim);
@@ -824,7 +762,7 @@
 .answerLabel {
   display: block;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.56rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -852,7 +790,7 @@
   display: block;
   margin-bottom: 0.2rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.53rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -915,7 +853,7 @@
 .gradePrompt {
   margin: 0 0 0.6rem;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.56rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -962,13 +900,29 @@
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.035);
 }
 
+.gradeText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.gradeNext {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--rs-dim);
+  font-variant-numeric: tabular-nums;
+}
+
 .gradeKey {
   margin-left: auto;
   padding: 0.02rem 0.28rem;
   border: 1px solid rgba(230, 237, 246, 0.1);
   border-radius: 3px;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.52rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   line-height: 1.4;
   color: var(--rs-dim);
@@ -993,7 +947,7 @@
 .panelLabel {
   display: block;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.54rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -1115,7 +1069,7 @@
   margin: 0 0 2rem;
   text-align: center;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.57rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--rs-dim);
 }
@@ -1200,7 +1154,7 @@
 
 .summaryStatLabel {
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.52rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1283,7 +1237,7 @@
 .summaryNote {
   margin: 1.5rem 0 0;
   font-family: var(--ifm-font-family-monospace);
-  font-size: 0.55rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--rs-dim);
 }
@@ -1441,11 +1395,6 @@
     gap: 0.8rem;
   }
 
-  .sectionAside {
-    margin: 0;
-    text-align: left;
-  }
-
   .topicGrid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1570,7 +1519,7 @@
   }
 
   .context {
-    font-size: 0.54rem;
+    font-size: 0.6875rem;
   }
 }
 

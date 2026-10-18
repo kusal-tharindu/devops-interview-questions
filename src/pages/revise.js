@@ -11,6 +11,7 @@ import {
   theoryLink,
 } from '@site/src/lib/cardStore';
 import {
+  Grade,
   createCardState,
   isDue,
   isMature,
@@ -93,6 +94,14 @@ function pageLabel(page) {
     .join(' / ');
 }
 
+/** Short label for the interval a grade would schedule. */
+function formatInterval(days) {
+  if (days <= 0) return 'Today';
+  if (days === 1) return '1 day';
+  if (days < 60) return `${days} days`;
+  return `${Math.round(days / 30)} mo`;
+}
+
 function topicLabelFor(topics, topicId) {
   if (topicId === ALL_TOPICS) return 'All topics';
   return topics.find((entry) => entry.topic === topicId)?.label || topicId;
@@ -112,7 +121,7 @@ export default function RevisePage() {
   const [queueLoading, setQueueLoading] = useState(false);
 
   const revealRef = useRef(null);
-  const firstGradeRef = useRef(null);
+  const gradeFocusRef = useRef(null);
   const summaryRef = useRef(null);
   const pickerHeadingRef = useRef(null);
   const hasInteracted = useRef(false);
@@ -169,6 +178,8 @@ export default function RevisePage() {
         pageCount: entry.pages.length,
         seen,
         mature,
+        review: seenDue,
+        fresh: unseen,
         due: unseen + seenDue,
         seenPercent: entry.cardCount
           ? Math.round((seen / entry.cardCount) * 100)
@@ -179,10 +190,19 @@ export default function RevisePage() {
 
   const stats = useMemo(() => summarise(Object.values(progress)), [progress]);
 
-  const totalDue = useMemo(
-    () => topicSummaries.reduce((sum, entry) => sum + entry.due, 0),
+  const totals = useMemo(
+    () =>
+      topicSummaries.reduce(
+        (sum, entry) => ({
+          due: sum.due + entry.due,
+          review: sum.review + entry.review,
+          fresh: sum.fresh + entry.fresh,
+        }),
+        { due: 0, review: 0, fresh: 0 }
+      ),
     [topicSummaries]
   );
+  const totalDue = totals.due;
 
   const totalQuestions = manifest?.totalCards ?? 0;
 
@@ -228,6 +248,31 @@ export default function RevisePage() {
     },
     [buildQueue]
   );
+
+  // Deep link from a theory page: /revise?topic=docker opens that queue.
+  // Only a slug present in the manifest is accepted; the query is then
+  // dropped so "Topics" and a reload land on the picker as usual.
+  const deepLinkHandled = useRef(false);
+  useEffect(() => {
+    if (status !== Status.READY || !manifest || deepLinkHandled.current) return;
+    deepLinkHandled.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get('topic');
+    if (!requested) return;
+
+    params.delete('topic');
+    const query = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`
+    );
+
+    if (manifest.topics.some((entry) => entry.topic === requested)) {
+      startTopic(requested);
+    }
+  }, [status, manifest, startTopic]);
 
   const endSession = useCallback(() => {
     setTopic(null);
@@ -313,7 +358,7 @@ export default function RevisePage() {
   // Keep focus on the next useful control as the card changes.
   useEffect(() => {
     if (!hasInteracted.current) return;
-    const target = revealed ? firstGradeRef.current : revealRef.current;
+    const target = revealed ? gradeFocusRef.current : revealRef.current;
     target?.focus({ preventScroll: true });
   }, [revealed, currentCardId]);
 
@@ -353,8 +398,7 @@ export default function RevisePage() {
         <TopicPicker
           topics={topicSummaries}
           stats={stats}
-          totalDue={totalDue}
-          totalQuestions={totalQuestions}
+          totals={totals}
           onSelect={startTopic}
           showBackupPrompt={showBackupPrompt}
           onExport={exportProgress}
@@ -397,12 +441,13 @@ export default function RevisePage() {
         topicLabel={topicLabelFor(topicSummaries, topic)}
         cardTopicLabel={topicLabelFor(topicSummaries, currentCard.topic)}
         currentCard={currentCard}
+        currentState={progress[currentCard.id] || createCardState(currentCard.id)}
         reviewedCount={reviewedCount}
         sessionTotal={sessionTotal}
         revealed={revealed}
         stats={stats}
         revealRef={revealRef}
-        firstGradeRef={firstGradeRef}
+        gradeFocusRef={gradeFocusRef}
         onReveal={revealAnswer}
         onGrade={handleGrade}
         onEnd={endSession}
@@ -480,8 +525,7 @@ function QueueLoading({ topicLabel }) {
 function TopicPicker({
   topics,
   stats,
-  totalDue,
-  totalQuestions,
+  totals,
   onSelect,
   showBackupPrompt,
   onExport,
@@ -489,47 +533,30 @@ function TopicPicker({
 }) {
   return (
     <>
-      <PageHeader
-        totalQuestions={totalQuestions}
-        totalTopics={topics.length}
-        headingRef={headingRef}
-      />
-      <StatsStrip
-        totalDue={totalDue}
-        stats={stats}
-        sessionSize={config.srs.sessionSize}
-      />
+      <PageHeader headingRef={headingRef} />
+      <StatsStrip totals={totals} stats={stats} />
 
       <section className={styles.pickerSection} aria-labelledby="revise-topics">
         <header className={styles.sectionHeader}>
           <div>
-            <SectionLabel index="01">Sessions</SectionLabel>
             <h2 id="revise-topics" className={styles.sectionTitle}>
-              Choose a topic.
+              Pick a topic
             </h2>
             <p className={styles.sectionIntro}>
-              Pick one stack for this session. The queue serves what is due
-              first, up to {config.srs.sessionSize} questions at a time.
+              Overdue questions come first, then new ones, up to{' '}
+              {config.srs.sessionSize} per session.
             </p>
           </div>
-          <p className={styles.sectionAside}>
-            {topics.length} topics · {totalQuestions} questions
-          </p>
         </header>
 
         <div className={styles.topicGrid}>
-          {topics.map((entry, index) => (
-            <TopicCard
-              key={entry.topic}
-              entry={entry}
-              index={index}
-              onSelect={onSelect}
-            />
+          {topics.map((entry) => (
+            <TopicCard key={entry.topic} entry={entry} onSelect={onSelect} />
           ))}
         </div>
 
         <MixedSessionCard
-          totalDue={totalDue}
+          totalDue={totals.due}
           topicCount={topics.length}
           onSelect={onSelect}
         />
@@ -540,37 +567,26 @@ function TopicPicker({
   );
 }
 
-function PageHeader({ totalQuestions, totalTopics, headingRef }) {
+function PageHeader({ headingRef }) {
   return (
     <header className={styles.pageHeader}>
-      <p className={styles.kicker}>
-        <span className={styles.kickerDot} aria-hidden="true" />
-        Study / Spaced review
-      </p>
       <h1 className={styles.title} ref={headingRef} tabIndex={-1}>
-        Make it <em>stick.</em>
+        Revise
       </h1>
       <p className={styles.lede}>
-        A short session, one topic at a time. Answer from memory, grade
-        honestly, and let the schedule decide what comes back.
+        Answer from memory, then grade yourself. Your grade decides when each
+        question comes back. Progress is saved in this browser.
       </p>
-      <div className={styles.metaRow}>
-        <span>{totalQuestions} questions</span>
-        <span className={styles.metaDot} aria-hidden="true" />
-        <span>{totalTopics} topics</span>
-        <span className={styles.metaDot} aria-hidden="true" />
-        <span>progress stays in this browser</span>
-      </div>
     </header>
   );
 }
 
-function StatsStrip({ totalDue, stats, sessionSize }) {
+function StatsStrip({ totals, stats }) {
   const items = [
-    { value: totalDue, label: 'Due now', accent: true },
-    { value: stats.tracked, label: 'In rotation' },
+    { value: totals.review, label: 'Due for review', accent: totals.review > 0 },
+    { value: totals.fresh, label: 'New' },
+    { value: stats.learning, label: 'Learning' },
     { value: stats.mature, label: 'Mature' },
-    { value: sessionSize, label: 'Session max' },
   ];
 
   return (
@@ -592,18 +608,16 @@ function StatsStrip({ totalDue, stats, sessionSize }) {
   );
 }
 
-function SectionLabel({ index, children }) {
-  return (
-    <p className={styles.sectionLabel}>
-      <span className={styles.sectionIndex}>{index}</span>
-      <span className={styles.sectionRule} aria-hidden="true" />
-      <span>{children}</span>
-    </p>
-  );
+function dueLabel({ review, fresh }) {
+  const parts = [];
+  if (review > 0) parts.push(`${review} due`);
+  if (fresh > 0) parts.push(`${fresh} new`);
+  return parts.length ? parts.join(' · ') : 'Caught up';
 }
 
-function TopicCard({ entry, index, onSelect }) {
+function TopicCard({ entry, onSelect }) {
   const caughtUp = entry.due === 0;
+  const label = dueLabel(entry);
 
   return (
     <button
@@ -611,13 +625,10 @@ function TopicCard({ entry, index, onSelect }) {
       className={styles.topicCard}
       onClick={() => onSelect(entry.topic)}
       aria-label={`Review ${entry.label}: ${
-        caughtUp ? 'no questions due' : `${entry.due} due`
+        caughtUp ? 'no questions due' : label
       }`}
     >
       <span className={styles.topicTop}>
-        <span className={styles.topicIndex}>
-          {String(index + 1).padStart(2, '0')}
-        </span>
         <span className={styles.topicIcon} aria-hidden="true">
           <TopicIcon slug={entry.topic} />
         </span>
@@ -628,7 +639,7 @@ function TopicCard({ entry, index, onSelect }) {
               : styles.dueBadge
           }
         >
-          {caughtUp ? 'Caught up' : `${entry.due} due`}
+          {label}
         </span>
       </span>
 
@@ -682,11 +693,11 @@ function MixedSessionCard({ totalDue, topicCount, onSelect }) {
       </span>
       <span className={styles.mixedCopy}>
         <span className={styles.mixedKicker}>Mixed session</span>
-        <span className={styles.mixedTitle}>Everything that&apos;s due.</span>
+        <span className={styles.mixedTitle}>All topics in one queue</span>
         <span className={styles.mixedMeta}>
           {caughtUp
             ? 'Nothing due across your topics right now.'
-            : `${totalDue} questions across ${topicCount} topics.`}
+            : `${totalDue} questions ready across ${topicCount} topics.`}
         </span>
       </span>
       <span className={styles.mixedAction}>
@@ -717,12 +728,13 @@ function SessionView({
   topicLabel,
   cardTopicLabel,
   currentCard,
+  currentState,
   reviewedCount,
   sessionTotal,
   revealed,
   stats,
   revealRef,
-  firstGradeRef,
+  gradeFocusRef,
   onReveal,
   onGrade,
   onEnd,
@@ -811,7 +823,11 @@ function SessionView({
                 <kbd className={styles.kbd}>Space</kbd>
               </button>
             ) : (
-              <Grades onGrade={onGrade} firstGradeRef={firstGradeRef} />
+              <Grades
+                state={currentState}
+                onGrade={onGrade}
+                gradeFocusRef={gradeFocusRef}
+              />
             )}
           </div>
 
@@ -820,9 +836,6 @@ function SessionView({
               {currentCard.verified
                 ? `Verified ${formatVerified(currentCard.verified)}`
                 : 'From the question bank'}
-            </span>
-            <span>
-              {position} <span aria-hidden="true">/</span> {sessionTotal}
             </span>
           </footer>
 
@@ -902,27 +915,34 @@ function ReviseAnswer({ card }) {
   );
 }
 
-function Grades({ onGrade, firstGradeRef }) {
+function Grades({ state, onGrade, gradeFocusRef }) {
   return (
     <div className={styles.gradeBlock}>
       <p className={styles.gradePrompt}>How well did you recall it?</p>
       <div className={styles.grades} role="group" aria-label="Grade your recall">
-        {config.grades.map((entry, index) => (
-          <button
-            key={entry.grade}
-            type="button"
-            className={styles.gradeButton}
-            style={{ '--grade-color': entry.color }}
-            ref={index === 0 ? firstGradeRef : undefined}
-            onClick={() => onGrade(entry.grade)}
-            title={entry.hint}
-            aria-label={`${entry.label} — ${entry.hint} (press ${index + 1})`}
-          >
-            <span className={styles.gradeDot} aria-hidden="true" />
-            <span>{entry.label}</span>
-            <kbd className={styles.gradeKey}>{index + 1}</kbd>
-          </button>
-        ))}
+        {config.grades.map((entry, index) => {
+          const next = formatInterval(reviewCard(state, entry.grade).interval);
+          return (
+            <button
+              key={entry.grade}
+              type="button"
+              className={styles.gradeButton}
+              style={{ '--grade-color': entry.color }}
+              // Focus lands on Good, the honest default, not on Again.
+              ref={entry.grade === Grade.GOOD ? gradeFocusRef : undefined}
+              onClick={() => onGrade(entry.grade)}
+              title={entry.hint}
+              aria-label={`${entry.label}: ${entry.hint}, next review ${next.toLowerCase()} (press ${index + 1})`}
+            >
+              <span className={styles.gradeDot} aria-hidden="true" />
+              <span className={styles.gradeText}>
+                <span>{entry.label}</span>
+                <span className={styles.gradeNext}>{next}</span>
+              </span>
+              <kbd className={styles.gradeKey}>{index + 1}</kbd>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -948,10 +968,6 @@ function SessionAside({ reviewedCount, left, stats, onEnd }) {
           <span style={{ width: `${percent}%` }} />
         </div>
         <div className={styles.progressRows}>
-          <div className={styles.progressRow}>
-            <span>Reviewed</span>
-            <strong>{reviewedCount}</strong>
-          </div>
           <div className={styles.progressRow}>
             <span>Left in queue</span>
             <strong>{left}</strong>
@@ -1017,20 +1033,10 @@ function SessionSummary({
         <CheckIcon />
       </span>
 
-      <p className={styles.kicker}>
-        {nothingWasDue ? 'All caught up' : 'Session complete'}
-      </p>
+      <p className={styles.kicker}>{topicLabel}</p>
 
       <h1 id="revise-summary-title" className={styles.summaryTitle}>
-        {nothingWasDue ? (
-          <>
-            You&apos;re <em>caught up.</em>
-          </>
-        ) : (
-          <>
-            Nice <em>work.</em>
-          </>
-        )}
+        {nothingWasDue ? 'You’re caught up' : 'Session complete'}
       </h1>
 
       <p className={styles.summaryCopy}>
