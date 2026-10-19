@@ -285,7 +285,7 @@ export default function DrillPage() {
   if (status === Status.LOADING) {
     return (
       <Layout {...pageMeta}>
-        <div className={styles.shell}>
+        <main className={styles.shell}>
           <DrillMessage
             kicker="Interview drill"
             title="Loading the question bank"
@@ -296,7 +296,7 @@ export default function DrillPage() {
               <span />
             </span>
           </DrillMessage>
-        </div>
+        </main>
       </Layout>
     );
   }
@@ -304,14 +304,14 @@ export default function DrillPage() {
   if (status === Status.ERROR) {
     return (
       <Layout {...pageMeta}>
-        <div className={styles.shell}>
+        <main className={styles.shell}>
           <DrillMessage
             kicker="Interview drill"
             title="The question bank did not load"
           >
             <p className={styles.messageText}>
-              Refresh the page to retry. If you are developing locally, run{' '}
-              <code>npm run content:build</code> first.
+              Something went wrong loading the questions. Refresh the page
+              to try again.
             </p>
             <button
               type="button"
@@ -321,7 +321,7 @@ export default function DrillPage() {
               Try again
             </button>
           </DrillMessage>
-        </div>
+        </main>
       </Layout>
     );
   }
@@ -329,7 +329,7 @@ export default function DrillPage() {
   if (phase === Phase.SETUP) {
     return (
       <Layout {...pageMeta}>
-        <div className={styles.shell}>
+        <main className={styles.shell}>
           <DrillSetup
             availableCount={eligibleCards.length}
             topicCounts={topicCounts}
@@ -342,7 +342,7 @@ export default function DrillPage() {
             onShowExplainBoxChange={setShowExplainBox}
             onStart={startDrill}
           />
-        </div>
+        </main>
       </Layout>
     );
   }
@@ -350,7 +350,7 @@ export default function DrillPage() {
   if (phase === Phase.RESULTS) {
     return (
       <Layout {...pageMeta}>
-        <div className={styles.shell}>
+        <main className={styles.shell}>
           <DrillResults
             tally={tally}
             topicTally={topicTally}
@@ -358,7 +358,7 @@ export default function DrillPage() {
             elapsed={elapsed}
             onRestart={() => setPhase(Phase.SETUP)}
           />
-        </div>
+        </main>
       </Layout>
     );
   }
@@ -367,7 +367,7 @@ export default function DrillPage() {
 
   return (
     <Layout {...pageMeta}>
-      <div className={styles.shell}>
+      <main className={styles.shell}>
         <h1 className={styles.srOnly}>Interview drill</h1>
 
         <SessionBar
@@ -398,7 +398,7 @@ export default function DrillPage() {
             </>
           )}
         </p>
-      </div>
+      </main>
     </Layout>
   );
 }

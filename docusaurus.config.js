@@ -76,6 +76,10 @@ const config = {
 
   onBrokenLinks: 'throw',
 
+  // Pages are served from directories (/intro/, not /intro), so emit links
+  // and canonical URLs with the trailing slash to avoid a 301 on every hop.
+  trailingSlash: true,
+
   markdown: {
     // Diagrams live in markdown as Mermaid code blocks: diffable in review,
     // no binary assets to maintain.
@@ -87,10 +91,46 @@ const config = {
 
   themes: ['@docusaurus/theme-mermaid'],
 
+  plugins: [
+    // The study pages (Revise, Drill, practice lists) are client-rendered,
+    // so with JavaScript disabled they would sit on a loading state. Inject
+    // one honest fallback message into every page's body.
+    function noscriptFallback() {
+      return {
+        name: 'noscript-fallback',
+        injectHtmlTags() {
+          return {
+            preBodyTags: [
+              {
+                tagName: 'noscript',
+                innerHTML:
+                  '<div style="padding:1rem 1.25rem;background:#1a2234;color:#e6edf6;'
+                  + 'font-family:system-ui,sans-serif;font-size:15px;line-height:1.5;'
+                  + 'text-align:center">This site needs JavaScript for the study and '
+                  + 'practice pages. The theory pages read fine without it.</div>',
+              },
+            ],
+          };
+        },
+      };
+    },
+  ],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  // Open Graph fields Docusaurus does not emit on its own. og:url, og:image
+  // and the canonical are generated per-page from site.url, so they are not
+  // repeated here. Image dimensions let scrapers render the card immediately.
+  headTags: [
+    { tagName: 'meta', attributes: { property: 'og:type', content: 'website' } },
+    { tagName: 'meta', attributes: { property: 'og:site_name', content: site.shortTitle } },
+    { tagName: 'meta', attributes: { property: 'og:image:width', content: '1200' } },
+    { tagName: 'meta', attributes: { property: 'og:image:height', content: '630' } },
+    { tagName: 'meta', attributes: { property: 'og:image:alt', content: site.shortTitle } },
+  ],
 
   presets: [
     [

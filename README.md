@@ -2,7 +2,7 @@
 
 A free, open-source **spaced repetition system** for DevOps interview prep. Study the theory, then prove you remember it — spacing happens without you managing it.
 
-**Live site:** https://devops.dtk2globle.com
+**Live site:** https://devops.oxelan.com
 
 ---
 

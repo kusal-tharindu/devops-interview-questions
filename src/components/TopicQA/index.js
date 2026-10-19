@@ -119,8 +119,7 @@ export default function TopicQA({ topic: topicProp, page: pageProp }) {
   if (status === Status.ERROR) {
     return (
       <p className={styles.muted}>
-        Could not load questions for this page. Refresh to retry, or run{' '}
-        <code>npm run build</code> if you are developing locally.
+        Could not load the questions for this page. Refresh to try again.
       </p>
     );
   }

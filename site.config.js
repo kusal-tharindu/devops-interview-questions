@@ -24,7 +24,7 @@ const site = {
   shortTitle: 'DevOps Interview Q&A',
   tagline:
     'Study the theory, then prove you remember it. Spaced-repetition interview prep for Linux, Docker, and the rest of the DevOps stack.',
-  url: 'https://devops.dtk2globle.com',
+  url: 'https://devops.oxelan.com',
   baseUrl: '/',
   organizationName: GITHUB_OWNER,
   projectName: GITHUB_REPO,

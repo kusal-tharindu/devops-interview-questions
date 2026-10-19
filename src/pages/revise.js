@@ -467,7 +467,7 @@ function ReviseShell({ children }) {
       title="Revise — spaced review"
       description="Pick a DevOps topic, test yourself, and let a spaced review schedule decide what comes back."
     >
-      <div className={styles.shell}>{children}</div>
+      <main className={styles.shell}>{children}</main>
     </Layout>
   );
 }
@@ -491,8 +491,7 @@ function ErrorState() {
       <p className={styles.kicker}>Something went wrong</p>
       <h1 className={styles.centerTitle}>The question bank didn&apos;t load.</h1>
       <p className={styles.centerCopy}>
-        Refresh to try again. If you&apos;re developing locally, run{' '}
-        <code>npm run build</code> first.
+        Refresh the page to try again.
       </p>
       <button
         type="button"

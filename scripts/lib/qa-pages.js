@@ -62,6 +62,41 @@ function theoryFileFor(topic, page) {
 }
 
 /**
+ * Build a FAQPage JSON-LD block for a page's cards.
+ *
+ * Emitted into the generated markdown so it ships in the server-rendered HTML
+ * (the live card list is fetched client-side and would be invisible to
+ * crawlers). The JSON is HTML-escaped and the closing-tag sequence is broken so
+ * it cannot terminate the <script> early.
+ *
+ * @param {object[]} cards Cards for this page, in display order.
+ * @returns {string} A <script type="application/ld+json"> block, or '' if none.
+ */
+function faqJsonLd(cards) {
+  const entities = cards
+    .filter((card) => card && card.q && card.a && !card.deprecated)
+    .map((card) => ({
+      '@type': 'Question',
+      name: String(card.q),
+      acceptedAnswer: { '@type': 'Answer', text: String(card.a) },
+    }));
+
+  if (entities.length === 0) return '';
+
+  const data = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: entities };
+  // MDX parses a bare { as JS, so the JSON is passed as a template-literal
+  // expression child. Escape backticks, ${ and the </script> sequence so the
+  // literal stays intact and cannot close the tag early.
+  const json = JSON.stringify(data)
+    .replace(/\\/g, '\\\\')
+    .replace(/`/g, '\\`')
+    .replace(/\$\{/g, '\\${')
+    .replace(/<\/script/gi, '<\\/script');
+
+  return '<script type="application/ld+json">{`' + json + '`}</script>';
+}
+
+/**
  * The Q&A page body.
  *
  * @param {object} args
@@ -71,7 +106,8 @@ function theoryFileFor(topic, page) {
  * @param {string} args.sidebar displayed_sidebar value, copied from the theory page's topic.
  * @returns {string}
  */
-function renderQaPage({ title, topic, page, sidebar }) {
+function renderQaPage({ title, topic, page, sidebar, cards }) {
+  const jsonLd = faqJsonLd(cards);
   return `---
 title: ${title} — Practice
 displayed_sidebar: ${sidebar}
@@ -80,6 +116,8 @@ description: Active-recall questions for the ${title} theory page
 ---
 
 ${MARKER}
+
+${jsonLd}
 
 import TopicQA from '@site/src/components/TopicQA';
 
@@ -137,6 +175,7 @@ function generateQaPages(byTopic) {
       if (!page) continue;
       const theoryFile = theoryFileFor(topic, page);
       if (!theoryFile) continue;
+      const pageCards = cards.filter((c) => c.page === page);
 
       const title = readFrontmatterTitle(theoryFile) || page;
       const sidebar = sidebarFor(theoryFile, topic);
@@ -145,7 +184,7 @@ function generateQaPages(byTopic) {
 
       fs.writeFileSync(
         outFile,
-        renderQaPage({ title, topic, page, sidebar })
+        renderQaPage({ title, topic, page, sidebar, cards: pageCards })
       );
       written += 1;
     }

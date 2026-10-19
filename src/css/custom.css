@@ -639,7 +639,8 @@ article {
 }
 
 .footer__copyright {
-  color: rgba(255, 255, 255, 0.35);
+  /* 0.55 alpha on the #0a0e17 footer clears WCAG AA (>=4.5:1). */
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.82rem;
 }
 
