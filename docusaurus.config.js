@@ -130,6 +130,14 @@ const config = {
     { tagName: 'meta', attributes: { property: 'og:image:width', content: '1200' } },
     { tagName: 'meta', attributes: { property: 'og:image:height', content: '630' } },
     { tagName: 'meta', attributes: { property: 'og:image:alt', content: site.shortTitle } },
+    // The only third-party origin (Cloudflare's privacy-friendly analytics
+    // beacon). Warming the connection early trims its request chain.
+    { tagName: 'link', attributes: { rel: 'preconnect', href: 'https://static.cloudflareinsights.com' } },
+    { tagName: 'link', attributes: { rel: 'dns-prefetch', href: 'https://static.cloudflareinsights.com' } },
+    // PWA manifest + mobile browser chrome colour and iOS home-screen icon.
+    { tagName: 'link', attributes: { rel: 'manifest', href: '/manifest.webmanifest' } },
+    { tagName: 'meta', attributes: { name: 'theme-color', content: '#0a0e17' } },
+    { tagName: 'link', attributes: { rel: 'apple-touch-icon', href: '/img/logo.svg' } },
   ],
 
   presets: [
@@ -149,6 +157,15 @@ const config = {
         blog: false,
         theme: {
           customCss: ['./src/css/custom.css', './src/css/theory.css'],
+        },
+        sitemap: {
+          lastmod: 'date',
+          // /review is a client-side redirect to /revise with no content of
+          // its own, so it should not be advertised to crawlers.
+          createSitemapItems: async ({ defaultCreateSitemapItems, ...rest }) => {
+            const items = await defaultCreateSitemapItems(rest);
+            return items.filter((item) => !item.url.endsWith('/review/'));
+          },
         },
       }),
     ],

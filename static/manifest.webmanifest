@@ -1,0 +1,13 @@
+{
+  "name": "DevOps Interview Questions & Answers",
+  "short_name": "DevOps Interview Q&A",
+  "description": "Spaced-repetition interview prep for Linux, Docker, and the rest of the DevOps stack.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e17",
+  "theme_color": "#0a0e17",
+  "icons": [
+    { "src": "/img/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/img/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}
